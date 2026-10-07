@@ -1,0 +1,62 @@
+name: verify
+on: [push, pull_request]
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: node tests/telemetry.mjs
+      - run: python3 -m unittest discover -s tests -v
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium webkit
+      - run: pnpm test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ matrix.os }}
+          path: test-results/
+          retention-days: 7
+
+  containers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/test-containers.sh docker
+      - run: scripts/test-containers.sh podman
+
+  scripts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - if: runner.os == 'Linux'
+        run: sudo apt-get install -y shellcheck
+      - if: runner.os == 'macOS'
+        run: brew install shellcheck
+      - run: shellcheck scripts/install-macos.sh scripts/install-linux.sh scripts/deploy-remote.sh scripts/test-containers.sh
+      - if: runner.os == 'macOS'
+        run: scripts/install-macos.sh --dry-run --allow-origin http://localhost:5173
+      - if: runner.os == 'Linux'
+        run: |
+          scripts/install-linux.sh --dry-run --allow-origin http://localhost:5173
+          sudo scripts/install-linux.sh --dry-run --system --allow-origin https://dash.example.com
+      - run: scripts/deploy-remote.sh 203.0.113.10 ci --dry-run

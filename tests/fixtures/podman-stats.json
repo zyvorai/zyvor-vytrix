@@ -1,0 +1,14 @@
+[
+  {
+    "id": "d4e5f6a1b2c3",
+    "name": "ml-worker",
+    "cpu_time": "1m2.5s",
+    "cpu_percent": "38.52%",
+    "avg_cpu": "30.10%",
+    "mem_usage": "1.6GB / 4.295GB",
+    "mem_percent": "37.25%",
+    "net_io": "420MB / 136MB",
+    "block_io": "10MB / 0B",
+    "pids": "17"
+  }
+]
