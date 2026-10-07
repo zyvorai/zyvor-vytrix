@@ -9,6 +9,16 @@
 - Real containers: Podman on macOS (nginx with an `18080→80/tcp` mapping); Docker (16 containers) and rootless Podman on the Ubuntu host.
 - `scripts/deploy-remote.sh` against an Ubuntu 24.04 host: the dashboard and API on `https://HOST:30847`.
 
+## Release artifacts
+
+Each `v*` tag runs `.github/workflows/release.yml`, which tests, builds and attaches to the GitHub release:
+
+- `zyvor-vytrix-dashboard-VERSION.tar.gz`: the built Worker (`dist/server`) and assets (`dist/client`). Deploy with `npx wrangler@4 deploy --config dist/server/wrangler.json`.
+- `zyvor-vytrix-collector-VERSION.tar.gz`: `agent/vytrix.py`, the macOS and Linux installers and the API reference.
+- `SHA256SUMS`.
+
+Locally: `pnpm build && scripts/package-release.sh` writes the same files to `release/`.
+
 ## Deploying to a Linux host
 
 ```sh
