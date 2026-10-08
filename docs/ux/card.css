@@ -1,0 +1,30 @@
+/* Shared look for the README cards. Same palette as the social hero; chart colors are the dashboard's own tokens. */
+:root{--cpu:#0088ff;--mem:#8e5cf6;--disk:#ff9f0a;--net:#30c48d;--box:#0fb5d4;--bg:#0b0b0d;--panel:#161618;--line:rgba(255,255,255,.12);--text:#f5f5f7;--dim:#a1a1a6;--orange:#ff7a1a;--deep:#c2410c;--green:#30d158;--amber:#ffd60a;--red:#ff6961;--blue:#2997ff}
+*{box-sizing:border-box}html,body{margin:0}
+body{width:1600px;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;position:relative;overflow:hidden}
+body::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 380px at 12% -8%,rgba(255,122,26,.22),transparent 70%);pointer-events:none}
+.wrap{position:relative;padding:56px 72px 60px}
+.top{display:flex;align-items:center;gap:14px;font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:600}
+.mark{width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,var(--orange),var(--deep));display:grid;place-items:center;font-size:22px;font-weight:700;color:#fff;letter-spacing:0}
+h1{margin:20px 0 0;font-size:60px;line-height:1.06;letter-spacing:-.03em}
+h1 em{font-style:normal;color:var(--orange)}
+.lede{margin:14px 0 0;font-size:26px;line-height:1.38;color:var(--dim);max-width:1200px}
+.grid{display:grid;gap:18px;margin-top:34px}
+.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px 26px}
+.card .n{font-size:18px;font-weight:700;color:var(--orange);letter-spacing:.12em}
+.card h3{margin:8px 0 8px;font-size:30px;letter-spacing:-.015em}
+.card p{margin:0;font-size:22px;line-height:1.38;color:var(--dim)}
+.card.ok{border-color:rgba(48,209,88,.45)}.card.warn{border-color:rgba(255,214,10,.4)}.card.bad{border-color:rgba(255,105,97,.45)}.card.hit{border-color:rgba(255,122,26,.6);background:linear-gradient(180deg,rgba(255,122,26,.12),var(--panel))}
+.tag{display:inline-block;font-size:18px;font-weight:700;padding:4px 14px;border-radius:99px;margin-bottom:6px}
+.t-g{color:var(--green);background:rgba(48,209,88,.14)}.t-a{color:var(--amber);background:rgba(255,214,10,.12)}.t-r{color:var(--red);background:rgba(255,105,97,.14)}.t-d{color:var(--dim);background:rgba(255,255,255,.07)}.t-o{color:var(--orange);background:rgba(255,122,26,.14)}
+ul{margin:10px 0 0;padding:0;list-style:none}li{font-size:22px;line-height:1.4;color:var(--dim);padding:7px 0 7px 34px;position:relative}
+li::before{content:"";position:absolute;left:4px;top:15px;width:16px;height:16px;border-radius:50%}
+.yes li::before{background:var(--green)}.no li::before{background:transparent;border:3px solid var(--red)}
+.foot{margin-top:30px;font-size:20px;color:var(--dim);letter-spacing:.02em}
+
+.flow{display:flex;align-items:stretch;gap:0;margin-top:34px}
+.flow .card{flex:1}.flow .arrow{width:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--orange);font-size:30px;gap:4px;text-align:center}
+.flow .arrow small{font-size:15px;color:var(--dim);line-height:1.2;max-width:110px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.chips span{font-size:17px;padding:4px 12px;border-radius:99px;border:1px solid var(--line);color:var(--dim)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px}

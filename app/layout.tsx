@@ -1,12 +1,31 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const description =
+  "Read-only system activity monitor for macOS and Linux: grouped applications, processes, ports and Docker/Podman containers, in Liquid Glass or Adwaita.";
+// Absolute: crawlers fetch this from outside, and there is no hosted site to resolve a relative path against.
+const ogImage = "https://raw.githubusercontent.com/zyvorai/zyvor-vytrix/main/public/og.jpg";
+
 export const metadata: Metadata = {
   title: "Zyvor Vytrix — System intelligence",
-  description: "Open-source system monitoring: grouped applications, containers, CPU, memory, disk and network telemetry.",
+  description,
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Zyvor Vytrix",
+    title: "Zyvor Vytrix — See what your machine is really doing",
+    description,
+    images: [{ url: ogImage, width: 1200, height: 630, alt: "Zyvor Vytrix dashboard in Liquid Glass and Adwaita" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Zyvor Vytrix — See what your machine is really doing",
+    description,
+    images: [ogImage],
   },
 };
 

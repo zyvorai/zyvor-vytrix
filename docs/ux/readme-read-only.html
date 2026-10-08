@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Read-only by design</title><link rel="stylesheet" href="card.css"></head><body><div class="wrap">
+<div class="top"><div class="mark">V</div>VYTRIX · Read-only by design</div>
+<h1>It watches. It <em>never touches.</em></h1>
+<p class="lede">A monitor you can leave running on a production box has to be boring about what it can do.</p>
+<div class="grid g2">
+<div class="card ok"><span class="tag t-g">Vytrix does</span><ul class="yes">
+<li>Read processes, ports, resources and containers</li>
+<li>Group processes by application or <code>.app</code> bundle</li>
+<li>Require a bearer token and an exact CORS origin</li>
+<li>Serve HTTPS, and keep the token in tab memory only</li>
+<li>Keep 30 days of history in a 0600 SQLite file</li>
+</ul></div>
+<div class="card bad"><span class="tag t-r">Vytrix never</span><ul class="no">
+<li>Kills, signals or renices a process</li>
+<li>Controls fans, volume or Bluetooth</li>
+<li>Writes anywhere but its own history file</li>
+<li>Claims what it did not measure: GPU, sensors and per-app network are absent, and app memory is RSS</li>
+<li>Shows real data labeled as a demo, or the reverse</li>
+</ul></div>
+</div>
+<p class="foot">The dashboard has no login of its own: put it behind your own access control. See SECURITY.md.</p>
+</div><script>document.documentElement.dataset.h=document.querySelector('.wrap').offsetHeight</script></body></html>

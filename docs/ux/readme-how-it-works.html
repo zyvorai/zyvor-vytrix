@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>How Vytrix fits together</title><link rel="stylesheet" href="card.css"></head><body><div class="wrap">
+<div class="top"><div class="mark">V</div>VYTRIX · How it fits together</div>
+<h1>A browser, a collector, <em>your machine.</em></h1>
+<p class="lede">The page cannot read your processes, so a tiny collector does, read-only, and the dashboard polls it over HTTPS. Without one, the dashboard shows clearly labeled simulated telemetry.</p>
+<div class="flow">
+  <div class="card"><div class="n">DASHBOARD</div><h3>Browser</h3><p>React 19 + vinext, Cloudflare Worker output. Glass and Adwaita skins, light and dark. The token stays in tab memory.</p>
+    <div class="chips"><span>Overview</span><span>Applications</span><span>Containers</span><span>Alerts</span></div></div>
+  <div class="arrow">⇄<small>HTTPS<br>bearer token</small></div>
+  <div class="card hit"><div class="n">COLLECTOR</div><h3>agent/vytrix.py</h3><p>One file, Python 3.10+, standard library only. Snapshot and history API, CORS allow-list, TLS, 30-day SQLite.</p>
+    <div class="chips"><span>/v1/snapshot</span><span>/v1/history</span><span>/healthz</span></div></div>
+  <div class="arrow">←<small>read-only<br>reads</small></div>
+  <div class="card"><div class="n">HOST</div><h3>macOS or Linux</h3><p>Processes, ports, CPU, memory, disk, network, battery, and Docker and Podman containers via read-only CLI calls.</p>
+    <div class="chips"><span><i class="dot" style="background:var(--cpu)"></i>CPU</span><span><i class="dot" style="background:var(--mem)"></i>Memory</span><span><i class="dot" style="background:var(--disk)"></i>Disk</span><span><i class="dot" style="background:var(--net)"></i>Network</span><span><i class="dot" style="background:var(--box)"></i>Containers</span></div></div>
+</div>
+<p class="foot">No collector? Run <b>python3 agent/vytrix.py --once &gt; snapshot.json</b> and import the file: real readings without exposing anything to the browser.</p>
+</div><script>document.documentElement.dataset.h=document.querySelector('.wrap').offsetHeight</script></body></html>

@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Runs on</title><link rel="stylesheet" href="card.css"></head><body><div class="wrap">
+<div class="top"><div class="mark">V</div>VYTRIX · Runs on</div>
+<h1>Your Mac, your server, <em>your containers.</em></h1>
+<p class="lede">The same dashboard and collector, installed the way each platform expects.</p>
+<div class="grid g3">
+<div class="card"><div class="n">macOS 26</div><h3>launchd agent</h3><p>Liquid Glass window. <b>scripts/install-macos.sh</b> installs a user agent and keeps the token in the login Keychain.</p></div>
+<div class="card"><div class="n">LINUX</div><h3>systemd unit</h3><p>Adwaita window. <b>scripts/install-linux.sh</b> installs a user unit, or <b>--system</b> for a hardened system unit.</p></div>
+<div class="card hit"><div class="n">REMOTE LINUX</div><h3>One command</h3><p><b>scripts/deploy-remote.sh HOST USER</b>: rsync, build on the host, two systemd units, self-signed HTTPS on :30847.</p></div>
+</div>
+<div class="grid g2" style="margin-top:18px">
+<div class="card"><div class="n">DOCKER</div><h3>State, CPU, memory vs limit</h3><p>Network I/O and published ports from read-only <code>docker</code> calls.</p></div>
+<div class="card"><div class="n">PODMAN</div><h3>Rootless too</h3><p>Same view for Podman, including macOS machines. Verified on real hosts and in CI.</p></div>
+</div>
+</div><script>document.documentElement.dataset.h=document.querySelector('.wrap').offsetHeight</script></body></html>
