@@ -79,7 +79,11 @@ if [[ -n "${VYTRIX_TOKEN:-}" && ( ${#VYTRIX_TOKEN} -lt 24 || ! "$VYTRIX_TOKEN" =
 fi
 
 log() { printf '[vytrix-deploy] %s\n' "$*"; }
-cleanup() { [[ -n "${TARGET:-}" ]] && ssh "${SSH_OPTS[@]}" -O exit "$TARGET" >/dev/null 2>&1 || true; }
+cleanup() {
+  if [[ -n "${TARGET:-}" ]]; then
+    ssh "${SSH_OPTS[@]}" -O exit "$TARGET" >/dev/null 2>&1 || true
+  fi
+}
 trap cleanup EXIT
 # shellcheck disable=SC2029 # remote commands are built from validated values on purpose
 ssh_host() { ssh "${SSH_OPTS[@]}" "$TARGET" "$@"; }
