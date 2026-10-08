@@ -18,7 +18,7 @@ export const freePort = () =>
 
 export async function startDevServer() {
   const port = await freePort();
-  const proc = spawn(process.execPath, ["scripts/run-framework.mjs", "dev", "--port", String(port), "--hostname", "127.0.0.1"], {
+  const proc = spawn(process.execPath, ["scripts/run-framework.mjs", "dev", "--port", String(port), "--host", "127.0.0.1"], {
     cwd: root, stdio: "ignore", env: { ...process.env, CI: "1" },
   });
   const base = `http://127.0.0.1:${port}`;

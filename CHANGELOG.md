@@ -18,7 +18,7 @@ A macOS 27 window style, a native SwiftUI Mac app, an opt-in read-only Mac clust
 - Dependencies updated through Dependabot (React group, Next group, `@base-ui/react`, `@shadcn/react`).
 - The collector release archive now includes the cluster worker and coordinator (`agent/cluster_worker.py`, `cluster/coordinator.py`) and `docs/CLUSTER.md`.
 - `scripts/deploy-remote.sh` keeps its checkout in `~/.vytrix/app` instead of the shared `~/.deployments`, and reuses one SSH connection per run.
-- Playwright and the screenshot scripts bind with `--hostname` (vinext's flag); `--host` was ignored, so the dev server could listen on `::1` only and not answer `127.0.0.1`. `scripts/run-framework.mjs` adds its default dev port only when none is given.
+- Playwright and the screenshot scripts bind the dev server with `--host 127.0.0.1` (vinext 1.0.1 removed `--hostname`; an unbound server could listen on `::1` only and not answer `127.0.0.1`). `scripts/run-framework.mjs` adds its default dev port only when none is given.
 - Homebrew stub points at the `zyvorai` organization.
 
 ### Fixed
