@@ -8,6 +8,7 @@
 | `design/UX-CONTRACT.md` | Window styles, tokens, laws, checklist |
 | `social/` | Hero (`vytrix-hero-dark`), share card, and their HTML sources |
 | `ux/` | Screenshots (`<style>-<mode>-<view>.png`), README cards, demo GIF |
+| `../site/` | The GitHub Pages landing page (plain HTML/CSS/JS). `scripts/build-site.sh` adds the static live demo under `demo/` |
 
 ## Regenerating images
 
@@ -23,3 +24,12 @@ pnpm demo                          # docs/ux/vytrix-demo.gif (needs ffmpeg)
 `pnpm shots` and `pnpm demo` use Playwright's Chromium (`pnpm exec playwright install chromium`) and fall back to system Chrome.
 
 GitHub's **social preview** is uploaded by hand: Settings → General → Social preview → `docs/social/vytrix-hero-dark.jpg`.
+
+## The Pages site
+
+```bash
+./scripts/build-site.sh            # landing + the real dashboard as static files -> _site/
+node scripts/site-check.mjs        # serves _site under /zyvor-vytrix/ like Pages and drives it in a browser
+```
+
+The demo is the app's own production build with `VYTRIX_BASE_PATH=/zyvor-vytrix/demo`, plus the HTML its built worker serves. It leaves `dist/` built with that base path: run `pnpm build` again before `pnpm start`. `.github/workflows/pages.yml` deploys it on every push to `main` that touches the app or the site.

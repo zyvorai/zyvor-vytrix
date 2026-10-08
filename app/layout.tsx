@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+// Empty except for the GitHub Pages demo build (see next.config.ts). Metadata icon URLs are not prefixed
+// automatically, so they carry the base path themselves.
+const base = process.env.VYTRIX_BASE_PATH || "";
 const description =
   "Read-only system activity monitor for macOS and Linux: grouped applications, processes, ports and Docker/Podman containers, in Liquid Glass or Adwaita.";
 // Absolute: crawlers fetch this from outside, and there is no hosted site to resolve a relative path against.
@@ -10,9 +13,9 @@ export const metadata: Metadata = {
   title: "Zyvor Vytrix — System intelligence",
   description,
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: `${base}/favicon.svg`,
+    shortcut: `${base}/favicon.svg`,
+    apple: `${base}/apple-touch-icon.png`,
   },
   openGraph: {
     type: "website",

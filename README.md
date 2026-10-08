@@ -16,7 +16,7 @@
 
 **Read-only** · **Dependency-free collector** · **Liquid Glass + Adwaita** · **Docker and Podman aware** · **Local-first**
 
-🚀 **[Quickstart](#quickstart)** · 🧩 **[How it fits](#how-it-fits-together)** · 🔒 **[Security](SECURITY.md)** · 📖 **[API](docs/API.md)**
+🎮 **[Live demo](https://zyvorai.github.io/zyvor-vytrix/demo/)** · 🌐 **[Site](https://zyvorai.github.io/zyvor-vytrix/)** · 🚀 **[Quickstart](#quickstart)** · 🧩 **[How it fits](#how-it-fits-together)** · 🔒 **[Security](SECURITY.md)** · 📖 **[API](docs/API.md)**
 
 </div>
 
@@ -31,6 +31,8 @@
 | You will leave it running on a production host | It is **read-only**: it never kills, signals or changes anything |
 
 ## See it
+
+**[Try the live demo](https://zyvorai.github.io/zyvor-vytrix/demo/)**: the real dashboard, running in your browser on simulated telemetry (nothing to install, nothing leaves the page).
 
 ![Vytrix: overview, an application's processes, containers, the Adwaita window style, then dark mode](docs/ux/vytrix-demo.gif)
 
@@ -159,7 +161,7 @@ What was run where, and what was not, is listed honestly in [docs/RELEASE.md](do
 | Understand the design rules | [docs/design/UX-CONTRACT.md](docs/design/UX-CONTRACT.md) |
 | Report a vulnerability | [SECURITY.md](SECURITY.md) |
 | Contribute | [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md) |
-| Regenerate screenshots, the demo GIF and social images | [docs/README.md](docs/README.md) |
+| Regenerate screenshots, the demo GIF, social images and the Pages site | [docs/README.md](docs/README.md) |
 | See what changed | [CHANGELOG.md](CHANGELOG.md) |
 
 ## Scope

@@ -26,6 +26,7 @@ A **read-only** system activity monitor for macOS and Linux. A React 19 / Next 1
 | `worker/index.ts` | Worker entry (hands requests to vinext) |
 | `agent/vytrix.py` | The collector |
 | `scripts/` | Installers (macOS/Linux), `deploy-remote.sh`, release packaging, screenshots and demo GIF |
+| `site/`, `scripts/build-site.sh` | The Pages landing page, and the build that adds the static live demo (`VYTRIX_BASE_PATH`) |
 | `tests/` | Telemetry tests, Python collector tests, Playwright e2e, recorded container output |
 | `docs/` | API, testing, release status, UX contract, social images and screenshots (generated) |
 
@@ -44,6 +45,7 @@ shellcheck scripts/*.sh
 | --- | --- |
 | typecheck, `pnpm test`, build, `pnpm test:e2e` | `ci.yml` / verify (Ubuntu and macOS) |
 | `scripts/test-containers.sh docker|podman` | `ci.yml` / containers |
+| `./scripts/build-site.sh && node scripts/site-check.mjs` | `ci.yml` / site |
 | `shellcheck`, installer and deploy `--dry-run` | `ci.yml` / scripts |
 
 When you change the UI, regenerate images with `pnpm shots` and `pnpm demo`, then look at them. See `docs/README.md`.

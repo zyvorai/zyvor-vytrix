@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Zyvor Vytrix · See what your machine is really doing</title>
+  <meta name="description" content="A read-only system activity monitor for macOS and Linux: grouped applications, processes, ports and Docker and Podman containers, in Liquid Glass or Adwaita. Try the live demo." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="canonical" href="https://zyvorai.github.io/zyvor-vytrix/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Zyvor Vytrix" />
+  <meta property="og:title" content="Zyvor Vytrix · See what your machine is really doing" />
+  <meta property="og:description" content="Read-only system monitor for macOS and Linux. Apps, processes, ports, Docker and Podman containers." />
+  <meta property="og:url" content="https://zyvorai.github.io/zyvor-vytrix/" />
+  <meta property="og:image" content="https://zyvorai.github.io/zyvor-vytrix/social/vytrix-hero-dark.jpg" />
+  <meta property="og:image:width" content="2400" />
+  <meta property="og:image:height" content="1260" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://zyvorai.github.io/zyvor-vytrix/social/vytrix-hero-dark.jpg" />
+  <script src="theme.js"></script>
+  <link rel="stylesheet" href="site.css" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Zyvor Vytrix","applicationCategory":"DeveloperApplication","operatingSystem":"macOS, Linux","description":"Read-only system activity monitor with grouped applications, ports, and Docker and Podman containers.","codeRepository":"https://github.com/zyvorai/zyvor-vytrix","license":"https://www.apache.org/licenses/LICENSE-2.0","url":"https://zyvorai.github.io/zyvor-vytrix/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <a class="brand" href="./" aria-label="Vytrix home">
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1d1d1f"/><path d="M5 18h5l3-9 5 16 3-7h6" fill="none" stroke="#f56a21" stroke-width="2.5" stroke-linejoin="round"/></svg><b>VYTRIX</b></a>
+  <nav aria-label="Sections" id="sections">
+    <a href="#gallery">See it</a><a href="#features">Features</a><a href="#how">How it fits</a><a href="#quickstart">Quickstart</a><a href="#deploy">Deploy</a>
+  </nav>
+  <div class="bar-actions">
+    <button id="theme" class="icon" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <a class="btn small" href="https://github.com/zyvorai/zyvor-vytrix">GitHub</a>
+    <a class="btn small primary" href="demo/">Live demo</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <p class="kicker">Zyvor · system monitor</p>
+    <h1>See what your machine is <em>really doing.</em></h1>
+    <p class="lede">A <strong>read-only</strong> system activity monitor for macOS and Linux. Applications grouped the way you think about them, processes, listening ports, project folders, and Docker and Podman containers, in a Liquid Glass or Adwaita window.</p>
+    <p class="cta"><a class="btn primary" href="demo/">Try the live demo</a><a class="link" href="#quickstart">Run it yourself</a></p>
+    <ul class="chips" aria-label="Platforms"><li class="ro">Read-only</li><li>macOS 26</li><li>Linux</li><li>Docker</li><li>Podman</li></ul>
+  </section>
+
+  <section id="gallery" class="gallery">
+    <h2>Pick a look</h2>
+    <p class="sub">Every screenshot is the real app on simulated telemetry. <a href="demo/">Or open it and click around.</a></p>
+    <div class="controls" id="controls">
+      <div class="seg" role="radiogroup" aria-label="Window style" data-key="style">
+        <button type="button" role="radio" aria-checked="true" data-value="glass">Liquid Glass</button>
+        <button type="button" role="radio" aria-checked="false" data-value="adwaita">Adwaita</button>
+      </div>
+      <div class="seg" role="radiogroup" aria-label="Appearance" data-key="mode">
+        <button type="button" role="radio" aria-checked="false" data-value="light">Light</button>
+        <button type="button" role="radio" aria-checked="true" data-value="dark">Dark</button>
+      </div>
+      <div class="seg wide" role="radiogroup" aria-label="View" data-key="view">
+        <button type="button" role="radio" aria-checked="true" data-value="overview">Overview</button>
+        <button type="button" role="radio" aria-checked="false" data-value="applications">Applications</button>
+        <button type="button" role="radio" aria-checked="false" data-value="containers">Containers</button>
+        <button type="button" role="radio" aria-checked="false" data-value="projects">Projects</button>
+        <button type="button" role="radio" aria-checked="false" data-value="alerts">Alerts</button>
+      </div>
+    </div>
+    <figure class="shot"><img id="shot" src="ux/glass-dark-overview.png" width="1440" height="900" alt="Vytrix overview in the Liquid Glass window style, dark" />
+      <figcaption id="shot-cap">Liquid Glass · dark · Overview</figcaption></figure>
+  </section>
+
+  <section class="band" aria-label="Promises">
+    <div><b>Read-only</b><span>It watches. It never kills, signals or changes anything.</span></div>
+    <div><b>Dependency-free collector</b><span>One Python file, standard library only.</span></div>
+    <div><b>Local-first</b><span>Tokens stay in the tab. History stays on your disk.</span></div>
+    <div><b>Honest numbers</b><span>App memory is RSS. Not collected means absent, not zero.</span></div>
+  </section>
+
+  <section id="features">
+    <h2>Built for the questions you actually ask</h2>
+    <div class="grid">
+      <article class="card"><h3>Which app is it?</h3><p>Processes grouped by executable or <code>.app</code> bundle, with CPU and memory per application and a process sheet one click away.</p></article>
+      <article class="card"><h3>Which container?</h3><p>Docker and Podman side by side: state, CPU, memory against its limit, network I/O and published ports, from read-only CLI calls.</p></article>
+      <article class="card"><h3>What is on port 5173?</h3><p>Listening ports tied to the application and its project folder, so a stray dev server is easy to find.</p></article>
+      <article class="card"><h3>Tell me when</h3><p>Threshold alerts on CPU, memory, disk and containers, with a level you set. No notifications you did not ask for.</p></article>
+      <article class="card"><h3>What happened earlier?</h3><p>Activity history in the tab, and 30 days of samples in a 0600 SQLite file that the collector serves over an authenticated API.</p></article>
+      <article class="card"><h3>Safe to leave running</h3><p>Bearer token, exact CORS origin, HTTPS. No mutations in the API: it cannot do anything to the machine.</p></article>
+    </div>
+  </section>
+
+  <section id="demo-gif">
+    <h2>Twelve seconds</h2>
+    <figure class="frame"><img src="ux/vytrix-demo.gif" width="960" height="600" alt="Vytrix: overview, an application's processes, containers, switching to the Adwaita window style, then dark mode" loading="lazy" />
+      <figcaption>Overview, an application's processes, containers, then the Adwaita style and dark mode. <a href="demo/">Do it yourself.</a></figcaption></figure>
+  </section>
+
+  <section id="how">
+    <h2>A browser, a collector, your machine</h2>
+    <p class="sub">A web page cannot read your processes, so a small collector does, read-only, and the dashboard polls it over HTTPS. Without one, the dashboard shows clearly labeled simulated telemetry.</p>
+    <img class="card-img" src="ux/readme-how-it-works.jpg" width="3200" height="1814" alt="The dashboard talks to a read-only collector over HTTPS with a bearer token; the collector reads the host." loading="lazy" />
+    <img class="card-img" src="ux/readme-runs-on.jpg" width="3200" height="1814" alt="macOS launchd, Linux systemd, remote Linux in one command, Docker and Podman." loading="lazy" />
+  </section>
+
+  <section id="quickstart">
+    <h2>Quickstart</h2>
+    <p class="sub">Node 22.13 or newer. <code>npx pnpm@11.25.0 …</code> works without installing pnpm.</p>
+    <div class="code"><button class="copy" type="button" aria-label="Copy the dashboard commands">Copy</button>
+<pre><code>git clone https://github.com/zyvorai/zyvor-vytrix.git &amp;&amp; cd zyvor-vytrix
+npx pnpm@11.25.0 install --frozen-lockfile
+npx pnpm@11.25.0 dev            # http://localhost:5173, simulated telemetry</code></pre></div>
+    <p class="sub">Your own readings, offline (Python 3.10+, no root), then <strong>Connect → Import collector snapshot</strong>:</p>
+    <div class="code"><button class="copy" type="button" aria-label="Copy the snapshot command">Copy</button>
+<pre><code>python3 agent/vytrix.py --once &gt; snapshot.json</code></pre></div>
+    <p class="sub">Live telemetry from a collector on this machine:</p>
+    <div class="code"><button class="copy" type="button" aria-label="Copy the live telemetry commands">Copy</button>
+<pre><code>export VYTRIX_TOKEN="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
+python3 agent/vytrix.py --allow-origin http://localhost:5173</code></pre></div>
+  </section>
+
+  <section id="deploy">
+    <h2>One command to a Linux server</h2>
+    <div class="code"><button class="copy" type="button" aria-label="Copy the deploy command">Copy</button>
+<pre><code>./scripts/deploy-remote.sh 203.0.113.10 deploy      # HOST USER, or user@host</code></pre></div>
+    <p class="sub">It syncs the checkout over SSH, builds it on the host, and installs two systemd units: the dashboard on loopback and the collector on <code>https://HOST:30847</code> with a self-signed certificate, proxying the dashboard. Open the URL, accept the certificate, <strong>Connect</strong>, and paste the token. For a Mac or a laptop, <code>scripts/install-macos.sh</code> (launchd, token in the Keychain) and <code>scripts/install-linux.sh</code> (systemd) install the collector as a service.</p>
+    <img class="card-img" src="ux/readme-read-only.jpg" width="3200" height="1814" alt="Vytrix reads processes, ports, resources and containers. It never kills, signals or changes anything." loading="lazy" />
+    <p class="sub">The dashboard has no login of its own: put it behind your own access control. What the collector token protects, and what it does not, is in <a href="https://github.com/zyvorai/zyvor-vytrix/blob/main/SECURITY.md">SECURITY.md</a>.</p>
+  </section>
+</main>
+
+<footer>
+  <p><b>Zyvor Vytrix</b> by Zyvor AI Labs · Apache-2.0 · <a href="https://github.com/zyvorai/zyvor-vytrix">GitHub</a> · <a href="https://github.com/zyvorai/zyvor-vytrix/blob/main/SECURITY.md">Security</a> · <a href="https://github.com/zyvorai/zyvor-vytrix/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/API.md">API</a> · <a href="demo/">Live demo</a></p>
+  <p>Neighbors: <a href="https://zyvorai.github.io/kavira/">KAVIRA</a> · <a href="https://github.com/zyvorai/zyvor-netra">Netra</a></p>
+</footer>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script src="site.js"></script>
+</body>
+</html>
