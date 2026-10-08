@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
-import {BatteryMedium,Bell,Box,Cpu,FolderCode,Gauge,HardDrive,Layers,MemoryStick,Network,Settings} from 'lucide-react';
+import {BatteryMedium,Bell,Box,Cpu,FolderCode,Gauge,HardDrive,Layers,MemoryStick,Network,Server,Settings} from 'lucide-react';
 
 export const views=[
   {id:'overview',label:'Overview',icon:Gauge,section:'Monitor',subtitle:'Your system at a glance'},
+  {id:'cluster',label:'Mac cluster',icon:Server,section:'Monitor',subtitle:'Machines and their telemetry, read-only'},
   {id:'cpu',label:'CPU',icon:Cpu,section:'Monitor',subtitle:'Processor load and the apps driving it'},
   {id:'memory',label:'Memory',icon:MemoryStick,section:'Monitor',subtitle:'Physical memory and the largest consumers'},
   {id:'disk',label:'Disk',icon:HardDrive,section:'Monitor',subtitle:'Root volume capacity'},

@@ -25,6 +25,7 @@ A **read-only** system activity monitor for macOS and Linux. A React 19 / Next 1
 | `hooks/`, `lib/` | Telemetry polling, preferences, schema (zod), grouping, alerts |
 | `worker/index.ts` | Worker entry (hands requests to vinext) |
 | `agent/vytrix.py` | The collector |
+| `agent/cluster_worker.py`, `cluster/coordinator.py` | Optional read-only Mac cluster: workers push snapshots, a coordinator serves them (`docs/CLUSTER.md`). No command channel; keep it that way |
 | `native/` | The native SwiftUI Mac app (`scripts/build-native.sh`, `scripts/shots-native.sh`); bundles the collector and keeps the token in memory |
 | `scripts/` | Installers (macOS/Linux), `deploy-remote.sh`, release packaging, screenshots and demo GIF |
 | `site/`, `scripts/build-site.sh` | The Pages landing page, and the build that adds the static live demo (`VYTRIX_BASE_PATH`) |
