@@ -62,6 +62,26 @@
 
 The dashboard starts on **clearly labeled simulated telemetry**. To see your own machine, run the collector and connect (live), or import a one-off snapshot (offline).
 
+## Native Mac app
+
+A SwiftUI app (`native/`) that shows the same telemetry in a native macOS 27 window. It starts the bundled collector on loopback with a random token held in memory, or connects to one you run elsewhere (Connect…, HTTPS unless it is localhost). It is read-only, like everything else here.
+
+```bash
+./scripts/build-native.sh      # native/build/Vytrix.app, ad-hoc signed development build
+open native/build/Vytrix.app   # or add --args --demo for simulated telemetry
+./scripts/shots-native.sh      # docs/ux/native-*.png, from the simulated telemetry
+```
+
+Needs macOS 26 or newer, the Xcode command line tools, and Python 3.10+ for the collector (the system `/usr/bin/python3` is 3.9; the app looks for Homebrew's first). Overview, Applications, Containers and Projects are in; Alerts, per-resource pages and Settings are not yet. Built and run on macOS 27.2.
+
+| Overview, light | Applications, light |
+| --- | --- |
+| ![Native overview, light](docs/ux/native-light-overview.png) | ![Native applications, light](docs/ux/native-light-applications.png) |
+
+| Containers, dark | Overview, dark |
+| --- | --- |
+| ![Native containers, dark](docs/ux/native-dark-containers.png) | ![Native overview, dark](docs/ux/native-dark-overview.png) |
+
 ## Quickstart
 
 **1. The dashboard, on simulated data** (Node ≥ 22.13; `npx pnpm@11.25.0 …` works without installing pnpm):

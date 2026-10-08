@@ -25,6 +25,7 @@ A **read-only** system activity monitor for macOS and Linux. A React 19 / Next 1
 | `hooks/`, `lib/` | Telemetry polling, preferences, schema (zod), grouping, alerts |
 | `worker/index.ts` | Worker entry (hands requests to vinext) |
 | `agent/vytrix.py` | The collector |
+| `native/` | The native SwiftUI Mac app (`scripts/build-native.sh`, `scripts/shots-native.sh`); bundles the collector and keeps the token in memory |
 | `scripts/` | Installers (macOS/Linux), `deploy-remote.sh`, release packaging, screenshots and demo GIF |
 | `site/`, `scripts/build-site.sh` | The Pages landing page, and the build that adds the static live demo (`VYTRIX_BASE_PATH`) |
 | `tests/` | Telemetry tests, Python collector tests, Playwright e2e, recorded container output |
@@ -39,6 +40,7 @@ pnpm test                      # telemetry schema + Python collector
 pnpm build
 pnpm test:e2e                  # WebKit, Chromium, mobile WebKit
 shellcheck scripts/*.sh
+./scripts/build-native.sh      # macOS only: the native app must compile
 ```
 
 | Command | CI job |
