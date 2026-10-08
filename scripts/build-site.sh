@@ -16,7 +16,7 @@ PNPM=(pnpm)
 command -v pnpm >/dev/null 2>&1 || PNPM=(npx -y pnpm@11.25.0)
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/vytrix-site.XXXXXX")"
 WORKER_PID=""
-# shellcheck disable=SC2329 # invoked through the EXIT trap below
+# shellcheck disable=SC2317,SC2329 # invoked through the EXIT trap below (older shellchecks say SC2317)
 cleanup() {
   if [[ -n "$WORKER_PID" ]]; then kill "$WORKER_PID" 2>/dev/null || true; fi
   rm -rf "$TMP"

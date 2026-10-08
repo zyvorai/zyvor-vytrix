@@ -5,7 +5,7 @@
 #   scripts/package-release.sh [VERSION]      (default: version from package.json)
 #
 #   zyvor-vytrix-dashboard-VERSION.tar.gz   dist/ (Worker + static assets)
-#   zyvor-vytrix-collector-VERSION.tar.gz   agent/vytrix.py, installers, docs
+#   zyvor-vytrix-collector-VERSION.tar.gz   agent/vytrix.py, cluster worker and coordinator, installers, docs
 #   SHA256SUMS
 set -euo pipefail
 
@@ -37,10 +37,11 @@ https://github.com/zyvorai/zyvor-vytrix
 EOF
 
 col="zyvor-vytrix-collector-$VERSION"
-mkdir -p "$STAGE/$col/agent" "$STAGE/$col/scripts" "$STAGE/$col/docs"
-cp agent/vytrix.py "$STAGE/$col/agent/"
+mkdir -p "$STAGE/$col/agent" "$STAGE/$col/cluster" "$STAGE/$col/scripts" "$STAGE/$col/docs"
+cp agent/vytrix.py agent/cluster_worker.py "$STAGE/$col/agent/"
+cp cluster/coordinator.py "$STAGE/$col/cluster/"
 cp scripts/install-macos.sh scripts/install-linux.sh "$STAGE/$col/scripts/"
-cp docs/API.md "$STAGE/$col/docs/"
+cp docs/API.md docs/CLUSTER.md "$STAGE/$col/docs/"
 cp LICENSE NOTICE README.md CHANGELOG.md "$STAGE/$col/"
 
 for name in "$dash" "$col"; do

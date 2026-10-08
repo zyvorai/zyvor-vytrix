@@ -205,6 +205,8 @@ An initial read-only release. It does not kill processes, control fans or volume
 | Docker and Podman | Working; parsing tested from recorded output, plus real Docker and Podman checks in CI |
 | Dashboard | Working; Playwright on WebKit, Chromium and mobile WebKit |
 | Installers (launchd, systemd) and remote deploy | Working; dry-run checked in CI |
+| Mac cluster (worker + coordinator, read-only) | Experimental; tested with unit and mocked e2e tests and one real Mac enrolled over loopback. Not yet checked across two Macs or over HTTPS |
+| Native Mac app | Built and run on macOS 27.2 (Apple silicon) with live and demo data; no automated tests, not notarized |
 | Homebrew formula | Stub, not published |
 | GPU, sensors, per-app network | Not collected |
 

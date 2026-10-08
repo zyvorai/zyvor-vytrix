@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## v0.3.0 — 2026-10-09
+
+A macOS 27 window style, a native SwiftUI Mac app, an opt-in read-only Mac cluster view, and the Pages site with a live demo.
 
 ### Added
 - **Mac cluster telemetry** (opt-in, read-only): `cluster/coordinator.py` (stdlib HTTP/TLS + SQLite, sessions, viewer/admin roles, single-use pairing, revocation, audit) and `agent/cluster_worker.py` push each Mac's snapshot to it; **Monitor → Mac cluster** shows per-machine CPU, memory, disk and network, applications and containers. Adapted from an externally contributed branch with its service-control half removed: no commands, services, `launchctl` or operator role, and tests that fail if a command channel appears.
@@ -13,6 +15,8 @@
 - `docs/design/UX-CONTRACT.md`, `docs/README.md`, `CONTRIBUTING.md`, `AGENTS.md`, issue and pull request templates, CODEOWNERS, Dependabot.
 
 ### Changed
+- Dependencies updated through Dependabot (React group, Next group, `@base-ui/react`, `@shadcn/react`).
+- The collector release archive now includes the cluster worker and coordinator (`agent/cluster_worker.py`, `cluster/coordinator.py`) and `docs/CLUSTER.md`.
 - `scripts/deploy-remote.sh` keeps its checkout in `~/.vytrix/app` instead of the shared `~/.deployments`, and reuses one SSH connection per run.
 - Playwright and the screenshot scripts bind with `--hostname` (vinext's flag); `--host` was ignored, so the dev server could listen on `::1` only and not answer `127.0.0.1`. `scripts/run-framework.mjs` adds its default dev port only when none is given.
 - Homebrew stub points at the `zyvorai` organization.
