@@ -1,68 +1,119 @@
+<div align="center">
+
 # Zyvor Vytrix
 
 [![verify](https://github.com/zyvorai/zyvor-vytrix/actions/workflows/ci.yml/badge.svg)](https://github.com/zyvorai/zyvor-vytrix/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-0071e3)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%E2%89%A522.13-2997ff)](package.json)
+[![Python](https://img.shields.io/badge/collector-python%203.10%2B%20%C2%B7%200%20deps-63e6be)](agent/vytrix.py)
+[![Platforms](https://img.shields.io/badge/macOS%2026%20%C2%B7%20Linux-000000)](docs/TESTING.md)
 
-A system activity monitor with a macOS 26 Liquid Glass interface (and an Adwaita-style variant on Linux). Original Vytrix code is licensed under **Apache-2.0**.
+![Zyvor Vytrix: see what your machine is really doing](docs/social/vytrix-hero-dark.jpg)
 
-## Included
+### See what your machine is really doing.
 
-- CPU, memory, disk, network, battery and application summary tiles.
-- Grouped process inspection, search, CPU/memory sorting, project folders and listening ports.
-- Captured resource history, pause/resume, threshold alerts, light/dark appearance, accent colours and reduced transparency.
-- Docker and Podman containers: state, CPU, memory against its limit, network I/O and published ports (read-only CLI calls).
-- Real Linux/macOS collector in Python, without Python dependencies.
-- Authenticated read-only snapshot/history API, exact CORS origin allow-list and 30-day SQLite retention.
-- JSON import/export: use real host data without exposing a collector to the browser.
+**A read-only system activity monitor for macOS and Linux.** Applications grouped the way you think about them, processes, listening ports, project folders, and Docker and Podman containers, in a macOS 26 Liquid Glass window or an Adwaita one. A single-file Python collector with no dependencies feeds it.
 
-The deployed preview starts with **clearly labeled simulated telemetry**. A webpage cannot read local processes. Connect a collector or import its snapshot for real readings.
+**Read-only** · **Dependency-free collector** · **Liquid Glass + Adwaita** · **Docker and Podman aware** · **Local-first**
 
-## Web app
+🚀 **[Quickstart](#quickstart)** · 🧩 **[How it fits](#how-it-fits-together)** · 🔒 **[Security](SECURITY.md)** · 📖 **[API](docs/API.md)**
 
-Node >=22.13; pnpm is used in this checkout. The lockfile is included.
+</div>
 
-```sh
-npm install -g pnpm@11.25.0
-pnpm install --frozen-lockfile
-pnpm dev
+## Why Vytrix
+
+| When this happens | Vytrix gives you |
+| --- | --- |
+| Activity Monitor lists 24 "Google Chrome Helper" rows and you want one number | Processes **grouped by executable or `.app` bundle**, with CPU and memory per application and a process sheet one click away |
+| "Which container is eating the box, and is it Docker or Podman?" | State, CPU, memory against its limit, network I/O and published ports for both runtimes, from read-only CLI calls |
+| "What is listening on 5173?" | Listening ports tied to the application and its **project folder** |
+| You want a monitor on a remote server without an agent suite | One Python file, one systemd unit, HTTPS and a bearer token |
+| You will leave it running on a production host | It is **read-only**: it never kills, signals or changes anything |
+
+## See it
+
+![Vytrix: overview, an application's processes, containers, the Adwaita window style, then dark mode](docs/ux/vytrix-demo.gif)
+
+*About 12 seconds against the built-in simulated telemetry: overview, an application's processes, containers, switching to the Adwaita window style, then dark mode.*
+
+| Liquid Glass, light | Liquid Glass, dark |
+| --- | --- |
+| ![Overview, Liquid Glass, light](docs/ux/glass-light-overview.png) | ![Overview, Liquid Glass, dark](docs/ux/glass-dark-overview.png) |
+
+| Adwaita, light | Adwaita, dark |
+| --- | --- |
+| ![Applications, Adwaita, light](docs/ux/adwaita-light-applications.png) | ![Containers, Adwaita, dark](docs/ux/adwaita-dark-containers.png) |
+
+| Phone (390px) | Phone, containers |
+| --- | --- |
+| ![Overview on a phone](docs/ux/mobile-dark-overview.png) | ![Containers on a phone](docs/ux/mobile-dark-containers.png) |
+
+*Every image here is the app's built-in **simulated telemetry** (host `zyvor-dev-01`). A web page cannot read your processes, so the hosted preview says so on screen. See the [UX contract](docs/design/UX-CONTRACT.md).*
+
+## How it fits together
+
+![A browser dashboard talks to a read-only collector over HTTPS; the collector reads the host](docs/ux/readme-how-it-works.jpg)
+
+The dashboard starts on **clearly labeled simulated telemetry**. To see your own machine, run the collector and connect (live), or import a one-off snapshot (offline).
+
+## Quickstart
+
+**1. The dashboard, on simulated data** (Node ≥ 22.13; `npx pnpm@11.25.0 …` works without installing pnpm):
+
+```bash
+git clone https://github.com/zyvorai/zyvor-vytrix.git && cd zyvor-vytrix
+npx pnpm@11.25.0 install --frozen-lockfile
+npx pnpm@11.25.0 dev            # http://localhost:5173
 ```
 
-For a production bundle:
+**2. Your own readings, offline** (Python 3.10+, Linux or macOS, no root):
 
-```sh
-pnpm build
-pnpm start
-```
-
-This starter uses React 19, TypeScript and Vinext (Next-compatible) with Cloudflare Worker output. `pnpm start` serves the built Worker locally through Wrangler on loopback. Host `dist/server` and `dist/client` on a supported Worker host; the public hosted preview is optional. The collector is a separate host process and does not run inside a cloud Worker.
-
-## Collect a real snapshot
-
-Python 3.10+ on Linux or macOS:
-
-```sh
+```bash
 python3 agent/vytrix.py --once > snapshot.json
 ```
 
-In the dashboard choose **Connect collector → Import collector snapshot**, or **Settings → Import**.
+In the dashboard choose **Connect → Import collector snapshot** (or **Settings → Import**). Nothing leaves your machine.
 
-## Live telemetry
+**3. Live telemetry**
 
-Generate and retain a token outside source control:
-
-```sh
-export VYTRIX_TOKEN="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
-python3 agent/vytrix.py --allow-origin https://YOUR-DASHBOARD-ORIGIN
+```bash
+export VYTRIX_TOKEN="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"   # keep it out of source control
+python3 agent/vytrix.py --allow-origin http://localhost:5173
 ```
 
-The collector binds `127.0.0.1:9847` by default. For browser access from another machine, serve HTTPS with `--tls-cert`/`--tls-key` (or put it behind a TLS reverse proxy that passes the Authorization header). `--ui-upstream http://127.0.0.1:8787` also serves the dashboard on the same origin, so one HTTPS port is enough. Use your actual dashboard origin, with no trailing slash. TLS and origin access must be configured before a hosted dashboard can connect. Browsers may also prompt for local-network access.
+Enter `http://127.0.0.1:9847/v1/snapshot` and the token in **Connect**. The dashboard polls every two seconds. The token stays in tab memory: it is not stored in `localStorage` and not sent anywhere else. For another machine, serve HTTPS with `--tls-cert`/`--tls-key` (or a TLS reverse proxy that passes `Authorization`). The UI refuses plain-HTTP collector URLs except on loopback.
 
-Enter `https://YOUR-COLLECTOR/v1/snapshot` and the token in **Connect collector**. The dashboard polls every two seconds. Tokens remain in tab memory; they are not stored in localStorage or sent to the hosted app server. Disconnect using **Settings → Use demo data**.
+### Collector flags
 
-For local development, allow the actual local dashboard origin with `--allow-origin http://localhost:3000` (adjust to the dev server's reported port). The UI permits HTTP collector URLs only for localhost and 127.0.0.1.
+| Flag | Default | Purpose |
+| --- | --- | --- |
+| `--once` | | Print one snapshot, then exit |
+| `--bind`, `--port` | `127.0.0.1`, `9847` | Where to listen. Plain HTTP on a non-loopback address prints a warning |
+| `--allow-origin` | none | Exact browser origin allowed by CORS. Repeatable |
+| `--tls-cert`, `--tls-key` | | PEM files: serve HTTPS (needed for remote browser access) |
+| `--ui-upstream` | | Proxy non-API paths to a dashboard URL (same-origin deploys) |
+| `--interval` | `2` | Seconds between samples |
+| `--database` | `~/.local/share/vytrix/history.sqlite` | History (30-day retention, directory 0700, file 0600) |
+| `--no-containers` | | Skip Docker and Podman |
+| `--container-interval` | `5` | Seconds between container polls |
+
+Endpoints: `GET /v1/snapshot`, `GET /v1/history?since=…&limit=…` (both need the bearer token and an allowed origin), and unauthenticated `GET /healthz`. Everything is a read; mutations are not supported. See [docs/API.md](docs/API.md).
+
+## Views
+
+| Section | Views |
+| --- | --- |
+| Monitor | Overview, CPU, Memory, Disk, Network, Battery |
+| Workloads | Applications (grouped), Containers (Docker and Podman), Projects (developer servers by folder) |
+| System | Alerts (threshold checks), Settings (window style, appearance, accent, reduced transparency, thresholds, import/export) |
+
+Also: search, CPU or memory sort, pause and resume, 1m/5m/1h activity history (captured while the tab is open, at most 1,800 samples), and JSON import/export.
 
 ## Install as a service
 
-```sh
+![macOS launchd, Linux systemd, remote Linux, Docker and Podman](docs/ux/readme-runs-on.jpg)
+
+```bash
 scripts/install-macos.sh --allow-origin http://localhost:5173     # launchd agent, token in the login Keychain
 scripts/install-linux.sh --allow-origin http://localhost:5173     # systemd user unit (--system for a hardened system unit)
 ```
@@ -71,25 +122,67 @@ Both accept `--dry-run`, `--port` and `--no-containers`.
 
 ## Deploy to a Linux server
 
-```sh
+```bash
 ./scripts/deploy-remote.sh 203.0.113.10 deploy      # HOST USER, or user@host
+./scripts/deploy-remote.sh HOST USER --quick        # sync + restart, no build
+./scripts/deploy-remote.sh HOST USER --verify-only
+./scripts/deploy-remote.sh HOST USER --dry-run      # prints the plan; no SSH
 ```
 
-Syncs the checkout over SSH to `~/.deployments/zyvor-vytrix`, builds it there (with a private Node 22 if the system Node is older), and installs two systemd units: the dashboard on `127.0.0.1:8787` and the collector on `https://HOST:30847`, which serves the API and proxies the dashboard. The token is kept in `~/.vytrix/env` and printed at the end; the certificate is self-signed. `--quick` skips the build, `--verify-only` checks the running deployment, `--dry-run` prints the plan. Details in [RELEASE.md](docs/RELEASE.md#deploying-to-a-linux-host).
+It syncs the checkout over SSH (one multiplexed connection) to `~/.vytrix/app`, builds it there (with a private Node 22 if the system Node is older), and installs two systemd units: the dashboard on `127.0.0.1:8787` and the collector on **`https://HOST:30847`** with a self-signed certificate that covers the host, proxying the dashboard on the same origin. The token is created once in `~/.vytrix/env` (0600). Open the URL, accept the certificate, **Connect** (the endpoint is pre-filled) and paste the token. Needs SSH, passwordless `sudo`, Python 3.10+, `curl`, `openssl`, `rsync`. Details: [docs/RELEASE.md](docs/RELEASE.md).
+
+## Read-only by design
+
+![Vytrix reads processes, ports, resources and containers; it never kills, signals or changes anything](docs/ux/readme-read-only.jpg)
+
+The dashboard has no login of its own: put it behind your own access control. What the collector token protects, and what it does not, is in [SECURITY.md](SECURITY.md).
 
 ## Verification
 
-```sh
-pnpm typecheck
+```bash
+pnpm typecheck && pnpm lint
 pnpm test          # telemetry schema tests + Python collector tests
-pnpm test:e2e      # Playwright, WebKit and Chromium
 pnpm build
+pnpm test:e2e      # Playwright: WebKit, Chromium, mobile WebKit
+pnpm shots         # regenerate docs/ux screenshots (simulated telemetry)
 ```
 
-See the [changelog](CHANGELOG.md), [testing on macOS and Linux](docs/TESTING.md), [API and telemetry definitions](docs/API.md), [release status](docs/RELEASE.md), [security](SECURITY.md), and [third-party notices](THIRD_PARTY.md).
+What was run where, and what was not, is listed honestly in [docs/RELEASE.md](docs/RELEASE.md) and [docs/TESTING.md](docs/TESTING.md).
+
+## Documentation map
+
+| I want to… | Read |
+| --- | --- |
+| Call the collector, or learn what each metric means | [docs/API.md](docs/API.md) |
+| Test on macOS and Linux | [docs/TESTING.md](docs/TESTING.md) |
+| Release or deploy | [docs/RELEASE.md](docs/RELEASE.md) |
+| Understand the design rules | [docs/design/UX-CONTRACT.md](docs/design/UX-CONTRACT.md) |
+| Report a vulnerability | [SECURITY.md](SECURITY.md) |
+| Contribute | [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md) |
+| Regenerate screenshots, the demo GIF and social images | [docs/README.md](docs/README.md) |
+| See what changed | [CHANGELOG.md](CHANGELOG.md) |
 
 ## Scope
 
-This is an initial read-only release. It does not kill processes, control fans or volume, inspect Bluetooth devices, measure per-app network/disk I/O, or collect GPU metrics. Collection is exercised on macOS 26 and on Ubuntu 24.04.
+An initial read-only release. It does not kill processes, control fans or volume, inspect Bluetooth devices, measure per-app network or disk I/O, or collect GPU metrics. App memory is RSS, not unique physical memory. On macOS, Docker Desktop and Podman run containers inside a Linux VM, so container CPU and memory are relative to that VM. The collector retains up to 30 days in SQLite; the dashboard's own history is the samples captured while the tab is open.
 
-History in the dashboard contains samples captured during the open tab (at most 1,800 samples). The collector separately retains up to 30 days in SQLite and provides authenticated history retrieval; the dashboard does not yet browse that persisted 30-day history. Process RSS sums can double-count shared memory; app memory is summed RSS, not unique physical memory. App grouping is based on executable names and macOS `.app` bundle paths; developer project discovery is best-effort on Linux and unavailable on macOS in this release.
+## Maturity
+
+| Area | Status |
+| --- | --- |
+| Collector (Linux, macOS), API, history, TLS, proxy | Working; native runs on macOS 26 and Ubuntu 24.04, tested in CI |
+| Docker and Podman | Working; parsing tested from recorded output, plus real Docker and Podman checks in CI |
+| Dashboard | Working; Playwright on WebKit, Chromium and mobile WebKit |
+| Installers (launchd, systemd) and remote deploy | Working; dry-run checked in CI |
+| Homebrew formula | Stub, not published |
+| GPU, sensors, per-app network | Not collected |
+
+## License
+
+[Apache-2.0](LICENSE). Copyright 2026 Zyvor AI Labs Private Limited. See [NOTICE](NOTICE) and [THIRD_PARTY.md](THIRD_PARTY.md).
+
+<div align="center">
+
+**See what your machine is really doing.** · [Quickstart](#quickstart) · [Security](SECURITY.md) · [Changelog](CHANGELOG.md)
+
+</div>

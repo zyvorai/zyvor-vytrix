@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      # A split bump of these breaks the build, so they move together.
+      react: { patterns: ["react", "react-dom", "@types/react", "@types/react-dom", "react-server-dom-webpack"] }
+      vinext-cloudflare: { patterns: ["vinext", "vite", "@vitejs/*", "@cloudflare/*", "wrangler"] }
+      next: { patterns: ["next", "eslint-config-next"] }
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      actions: { patterns: ["*"] }

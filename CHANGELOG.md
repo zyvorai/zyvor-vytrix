@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- README with hero, demo GIF, screenshots (Liquid Glass and Adwaita, light and dark, 390px), architecture and read-only cards, collector flag table, and a documentation map. Every image is built-in simulated telemetry.
+- Social images (`docs/social/`: hero, share card, `build.sh`), `public/og.jpg`, `apple-touch-icon.png`, and `openGraph`/`twitter` metadata.
+- `pnpm shots` and `pnpm demo` regenerate the screenshots and the GIF (`scripts/shots.mjs`, `scripts/demo.mjs`).
+- `docs/design/UX-CONTRACT.md`, `docs/README.md`, `CONTRIBUTING.md`, `AGENTS.md`, issue and pull request templates, CODEOWNERS, Dependabot.
+
+### Changed
+- `scripts/deploy-remote.sh` keeps its checkout in `~/.vytrix/app` instead of the shared `~/.deployments`, and reuses one SSH connection per run.
+- Playwright and the screenshot scripts bind with `--hostname` (vinext's flag); `--host` was ignored, so the dev server could listen on `::1` only and not answer `127.0.0.1`. `scripts/run-framework.mjs` adds its default dev port only when none is given.
+- Homebrew stub points at the `zyvorai` organization.
+
+### Fixed
+- Connect dialog: the pre-filled collector endpoint is derived during render instead of by a state update in an effect (it failed `pnpm lint`).
+
+### Removed
+- Starter and sandbox leftovers that the monitor never used: the vendored "Sites" Vite plugin and its mock sign-in, connector preview, the D1/Drizzle scaffold, ChatGPT auth helper, `examples/d1`, the sandbox installer scripts, and the starter `public/*.svg`. `worker/index.ts` is the Worker entry. Removes `drizzle-orm`, `drizzle-kit`, `json-rpc-2.0` and `raw-body`.
+
 ## v0.2.0 — 2026-10-07
 
 ### Added
