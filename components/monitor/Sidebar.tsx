@@ -21,10 +21,10 @@ export function MonitorSidebar({view,onSelect,badges,snapshot,source,paused}:{vi
     <div className="host-card">
       <div className="host-card-icon"><Monitor size={16}/></div>
       <div className="host-card-text">
-        <strong title={snapshot.host.name}>{snapshot.host.name}</strong>
-        <span>{snapshot.host.os}</span>
+        <strong title={snapshot.host.name}>{view==='cluster'?'Mac cluster':snapshot.host.name}</strong>
+        <span>{view==='cluster'?'Read-only fleet view':snapshot.host.os}</span>
       </div>
-      <div className={`status-pill ${source}${paused?' paused':''}`}><i/>{paused?'Paused':sourceLabel[source]}</div>
+      <div className={`status-pill ${source}${paused?' paused':''}`}><i/>{view==='cluster'?'Coordinator':paused?'Paused':sourceLabel[source]}</div>
     </div>
   </nav>;
 }

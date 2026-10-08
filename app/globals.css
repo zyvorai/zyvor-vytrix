@@ -1250,3 +1250,41 @@ small { display: block; font-size: 11px; color: var(--text-tertiary); font-weigh
 [data-theme="macos27"] .data-table td { padding: 11px 8px; }
 [data-theme="macos27"] .metric-value { font-size: 24px; font-weight: 650; }
 [data-theme="macos27"] .section-bar { margin-bottom: 16px; }
+
+[hidden] { display: none !important; }
+
+/* ==========================================================================
+   Mac cluster (read-only fleet view); uses the window and colour tokens.
+   ========================================================================== */
+.cluster-view { display: grid; gap: 18px; }
+.cluster-view h2 { display: flex; gap: 10px; align-items: center; }
+.cluster-view label { display: grid; gap: 6px; font-size: 12px; }
+.cluster-view input:not([type=checkbox]), .cluster-view select { width: 100%; min-width: 0; border: 1px solid var(--border); border-radius: 8px; background: var(--background); color: inherit; padding: 9px 11px; }
+.cluster-connect, .cluster-enrollment, .cluster-detail { padding: 22px; }
+.cluster-connect form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+.cluster-connect form label:first-child { grid-column: 1 / -1; }
+.cluster-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.cluster-summary .card { padding: 20px; display: grid; gap: 8px; }
+.cluster-summary strong { font-size: 26px; letter-spacing: -1px; }
+.cluster-summary span { font-size: 12px; }
+.cluster-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.cluster-actions > label { flex: 1; min-width: 160px; }
+.cluster-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.machine-card { padding: 22px; display: grid; gap: 14px; }
+.machine-heading { display: flex; gap: 12px; align-items: center; }
+.machine-heading > div { flex: 1; min-width: 0; }
+.machine-heading h3 { overflow-wrap: anywhere; }
+.machine-heading span { font-size: 11px; }
+.machine-status { font-size: 11px; color: var(--muted-foreground); }
+.machine-status.online { color: var(--success); }
+.machine-metric { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; }
+.machine-metric b { text-align: right; }
+.cluster-view .card > p { padding: 12px; }
+.cluster-view code { overflow-wrap: anywhere; }
+.cluster-view .table-scroll { overflow-x: auto; }
+[data-theme="macos27"] .machine-status.online { color: var(--text-secondary); }
+@media (max-width: 700px) {
+  .cluster-summary { grid-template-columns: 1fr; }
+  .cluster-connect form { grid-template-columns: 1fr; }
+  .cluster-summary .card { display: flex; align-items: center; justify-content: space-between; }
+}

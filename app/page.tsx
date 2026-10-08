@@ -10,6 +10,7 @@ import {useIsMobile} from '@/hooks/use-mobile';
 import {AppShell} from '@/components/monitor/AppShell';
 import {MonitorSidebar} from '@/components/monitor/Sidebar';
 import {Toolbar} from '@/components/monitor/Toolbar';
+import {ClusterView} from '@/components/monitor/ClusterView';
 import {OverviewView,type Range} from '@/components/monitor/OverviewView';
 import {ResourceView,type ResourceKind} from '@/components/monitor/ResourceView';
 import {AppsTable,sortApps,type AppSort} from '@/components/monitor/AppsTable';
@@ -74,18 +75,20 @@ export default function Page(){
   const badges={alerts:alerts.length,containers:snapshot.containers?runningContainers(snapshot).length:0,applications:allApps.length};
 
   const sidebar=<MonitorSidebar view={view} onSelect={navigate} badges={badges} snapshot={snapshot} source={source} paused={paused}/>;
-  const toolbar=<Toolbar theme={theme} title={meta.label} subtitle={view==='overview'?`${snapshot.host.name} · ${snapshot.host.os}`:meta.subtitle} search={search} onSearch={setSearch} showSearch={searchableViews.includes(view)} paused={paused} onPause={()=>setPaused(!paused)} onExport={()=>save(snapshot)} onConnect={()=>{setError('');setConnectOpen(true);}} onToggleSidebar={()=>isMobile?setMobileNav(true):setSidebarOpen(o=>!o)} dark={dark} onToggleDark={()=>update('appearance',dark?'light':'dark')}/>;
+  const toolbar=<Toolbar monitorControls={view!=='cluster'} theme={theme} title={meta.label} subtitle={view==='overview'?`${snapshot.host.name} · ${snapshot.host.os}`:meta.subtitle} search={search} onSearch={setSearch} showSearch={searchableViews.includes(view)} paused={paused} onPause={()=>setPaused(!paused)} onExport={()=>save(snapshot)} onConnect={()=>{setError('');setConnectOpen(true);}} onToggleSidebar={()=>isMobile?setMobileNav(true):setSidebarOpen(o=>!o)} dark={dark} onToggleDark={()=>update('appearance',dark?'light':'dark')}/>;
   const footer=<footer className="statusbar">
     <span><ShieldCheck size={13}/>Read-only telemetry</span>
-    <span>{source==='demo'?'Simulated data':source==='live'?'Live collector':'Imported snapshot'}{paused?' · Paused':''}</span>
-    <span className="num" suppressHydrationWarning>{source==='demo'?'':new Date(snapshot.timestamp).toLocaleTimeString()}</span>
+    <span>{view==='cluster'?'Cluster coordinator':source==='demo'?'Simulated data':source==='live'?'Live collector':'Imported snapshot'}{paused&&view!=='cluster'?' · Paused':''}</span>
+    <span className="num" suppressHydrationWarning>{source==='demo'||view==='cluster'?'':new Date(snapshot.timestamp).toLocaleTimeString()}</span>
   </footer>;
 
   return <>
     <AppShell sidebar={sidebar} toolbar={toolbar} footer={footer} sidebarOpen={sidebarOpen} mobileNavOpen={mobileNav} onMobileNavChange={setMobileNav}>
       {source==='demo'&&view==='overview'&&<div className="banner"><span>You are viewing <b>simulated telemetry</b>. A web page cannot read local processes.</span><button type="button" className="button small primary" onClick={()=>setConnectOpen(true)}>Connect a collector</button></div>}
       {error&&!connectOpen&&<div className="banner error" role="alert">{error}</div>}
-      <div className="view" key={view}>
+      {/* Mounted once and only hidden, so a cluster sign-in survives switching views (the token is in memory). */}
+      <div className="view" hidden={view!=='cluster'}><ClusterView/></div>
+      <div className="view" key={view} hidden={view==='cluster'}>
         {view==='overview'&&<OverviewView snapshot={snapshot} history={history} apps={apps} range={range} onRange={setRange} onNavigate={navigate} onSelect={setSelected}/>}
         {resourceViews.includes(view)&&<ResourceView kind={view as ResourceKind} snapshot={snapshot} history={history} apps={apps} range={range} onRange={setRange} onSelect={setSelected}/>}
         {view==='applications'&&<Card>

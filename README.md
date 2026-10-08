@@ -62,6 +62,10 @@
 
 The dashboard starts on **clearly labeled simulated telemetry**. To see your own machine, run the collector and connect (live), or import a one-off snapshot (offline).
 
+## Mac cluster
+
+Optional and read-only: a small worker on each Mac pushes its snapshot to a coordinator, and **Monitor → Mac cluster** shows every machine's CPU, memory, disk, network, applications and containers. There is no command channel. See [docs/CLUSTER.md](docs/CLUSTER.md).
+
 ## Native Mac app
 
 A SwiftUI app (`native/`) that shows the same telemetry in a native macOS 27 window. It starts the bundled collector on loopback with a random token held in memory, or connects to one you run elsewhere (Connect…, HTTPS unless it is localhost). It is read-only, like everything else here.
@@ -180,6 +184,7 @@ What was run where, and what was not, is listed honestly in [docs/RELEASE.md](do
 | I want to… | Read |
 | --- | --- |
 | Call the collector, or learn what each metric means | [docs/API.md](docs/API.md) |
+| Monitor several Macs (read-only) | [docs/CLUSTER.md](docs/CLUSTER.md) |
 | Test on macOS and Linux | [docs/TESTING.md](docs/TESTING.md) |
 | Release or deploy | [docs/RELEASE.md](docs/RELEASE.md) |
 | Understand the design rules | [docs/design/UX-CONTRACT.md](docs/design/UX-CONTRACT.md) |

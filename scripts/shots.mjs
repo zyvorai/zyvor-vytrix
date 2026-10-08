@@ -9,7 +9,7 @@ import { goTo, launch, openApp, root, startDevServer } from "./shots-lib.mjs";
 const out = path.resolve(process.argv[2] || path.join(root, "docs/ux"));
 mkdirSync(out, { recursive: true });
 
-const views = ["Overview", "Applications", "Containers", "Projects", "Alerts"];
+const views = ["Overview", "Applications", "Containers", "Projects", "Alerts", "Mac cluster"];
 const styles = ["glass", "macos27", "adwaita"];
 const modes = ["light", "dark"];
 
@@ -25,7 +25,7 @@ for (const theme of styles) for (const appearance of modes) {
   for (const view of views) {
     if (view !== "Overview") await goTo(page, view);
     await page.mouse.move(2, 2);
-    await page.screenshot({ path: path.join(out, `${theme}-${appearance}-${view.toLowerCase()}.png`) });
+    await page.screenshot({ path: path.join(out, `${theme}-${appearance}-${view.toLowerCase().replaceAll(" ", "-")}.png`) });
     count++;
     if (!(await noSideScroll(page))) failures.push(`${theme}/${appearance}/${view}: horizontal scroll`);
   }
