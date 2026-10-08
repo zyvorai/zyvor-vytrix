@@ -247,6 +247,13 @@
   --shadow-window: 0 0 0 .5px rgba(0, 0, 0, .16), 0 12px 32px rgba(0, 0, 0, .22), 0 28px 70px -12px rgba(0, 0, 0, .28);
   --shadow-card: 0 0 0 .5px rgba(0, 0, 0, .08), 0 1px 2px rgba(0, 0, 0, .05);
   --wallpaper: linear-gradient(160deg, #e9ecf2 0%, #d5d9e3 100%);
+  --chart-memory: #8e8e93;
+  --chart-disk: #a1a1a6;
+  --chart-network: #636366;
+  --chart-upload: #c7c7cc;
+  --chart-battery: #8e8e93;
+  --chart-containers: #a1a1a6;
+  --chart-apps: #636366;
 }
 .dark[data-theme="macos27"] {
   --text: #f5f5f7;
@@ -262,6 +269,14 @@
   --shadow-window: 0 0 0 .5px rgba(255, 255, 255, .14), 0 12px 32px rgba(0, 0, 0, .55), 0 28px 70px -12px rgba(0, 0, 0, .65);
   --shadow-card: 0 0 0 .5px rgba(255, 255, 255, .08), 0 1px 2px rgba(0, 0, 0, .3);
   --wallpaper: linear-gradient(160deg, #1c1d22 0%, #101114 100%);
+  --chart-cpu: #3ba3ff;
+  --chart-memory: #98989d;
+  --chart-disk: #78787d;
+  --chart-network: #aeaeb2;
+  --chart-upload: #636366;
+  --chart-battery: #98989d;
+  --chart-containers: #78787d;
+  --chart-apps: #aeaeb2;
 }
 [data-theme="macos27"] .sidebar { box-shadow: inset -1px 0 0 #d5d5d5; }
 .dark[data-theme="macos27"] .sidebar { box-shadow: inset -1px 0 0 #40403e; }
@@ -274,7 +289,7 @@
 [data-theme="macos27"] .traffic-lights { top: 19px; left: calc(-1 * var(--sidebar-width) + 18px); }
 [data-theme="macos27"] .window[data-sidebar="closed"] .traffic-lights { left: 18px; }
 html[data-theme="macos27"] .nav-item[aria-current="page"] { background: #d5d5d5; box-shadow: none; }
-.dark[data-theme="macos27"] .nav-item[aria-current="page"] { background: #434341; }
+.dark[data-theme="macos27"] .nav-item[aria-current="page"] { background: #434341; box-shadow: none; }
 [data-theme="macos27"] .tool-button { width: 35px; height: 35px; border-radius: 50%; }
 
 @theme inline {
@@ -1182,3 +1197,56 @@ small { display: block; font-size: 11px; color: var(--text-tertiary); font-weigh
   .metric-value { font-size: 22px; }
   .banner { flex-direction: column; align-items: flex-start; }
 }
+
+/* ==========================================================================
+   macOS 27, calm: one accent, grouped neutral surfaces, roomier spacing.
+   Mirrors the native app (zyvor-velora captures): grey selection, no tinted
+   tiles or badges, 13pt text. Loaded last so it beats the base rules.
+   ========================================================================== */
+[data-theme="macos27"] {
+  --card-bg: #f7f7f7;
+  --card-hover: #f1f1f1;
+}
+.dark[data-theme="macos27"] {
+  --card-bg: #2a2a28;
+  --card-hover: #30302e;
+}
+[data-theme="macos27"] body, [data-theme="macos27"] .window { font-size: 13px; }
+
+/* colour: neutral icons, badges and banners */
+[data-theme="macos27"] .nav-item svg { color: var(--text-secondary); }
+[data-theme="macos27"] .nav-item[aria-current="page"] svg { color: var(--accent-color); }
+[data-theme="macos27"] .brand-mark { background: var(--accent-color); box-shadow: none; }
+[data-theme="macos27"] .metric-icon { background: var(--fill); box-shadow: none; color: var(--accent-color); }
+[data-theme="macos27"] .app-icon {
+  background: var(--fill-strong) !important;
+  color: var(--text-secondary);
+  text-shadow: none;
+  box-shadow: none;
+}
+[data-theme="macos27"] .runtime-badge { background: var(--fill-strong) !important; color: var(--text-secondary); font-weight: 600; }
+[data-theme="macos27"] .runtime-dot.docker, [data-theme="macos27"] .runtime-dot.podman { background: var(--text-tertiary); }
+[data-theme="macos27"] .banner { background: var(--fill); color: var(--text); box-shadow: inset 0 0 0 .5px var(--separator); }
+[data-theme="macos27"] .banner strong, [data-theme="macos27"] .banner b { color: var(--text); }
+[data-theme="macos27"] .sparkline path:first-of-type { display: none; }
+[data-theme="macos27"] .sparkline path:last-of-type { stroke-width: 1.5; }
+
+/* surfaces: grouped, flat, no rim */
+[data-theme="macos27"] .card { box-shadow: none; border-radius: 12px; }
+[data-theme="macos27"] .card::before, [data-theme="macos27"] .capsule::before { display: none; }
+[data-theme="macos27"] .metric-tile:hover { transform: none; box-shadow: none; background: var(--card-hover); }
+
+/* density */
+@media (min-width: 768px) {
+  [data-theme="macos27"] .content { padding: 24px 32px 32px; }
+}
+[data-theme="macos27"] .stack { gap: 24px; }
+[data-theme="macos27"] .card { padding: 20px; }
+[data-theme="macos27"] .metric-grid { gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@container (max-width: 640px) { [data-theme="macos27"] .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+[data-theme="macos27"] .metric-tile { padding: 16px 16px 0; gap: 10px; }
+[data-theme="macos27"] .sparkline { width: calc(100% + 32px); margin: 0 -16px; height: 40px; }
+[data-theme="macos27"] .nav-item { height: 32px; }
+[data-theme="macos27"] .data-table td { padding: 11px 8px; }
+[data-theme="macos27"] .metric-value { font-size: 24px; font-weight: 650; }
+[data-theme="macos27"] .section-bar { margin-bottom: 16px; }

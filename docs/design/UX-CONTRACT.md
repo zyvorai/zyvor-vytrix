@@ -6,7 +6,7 @@ Vytrix is a quiet instrument: it shows what a machine is doing and never changes
 
 | Style | `data-theme` | Looks like | Chosen |
 | --- | --- | --- | --- |
-| macOS 27 | `macos27` | Opaque surfaces, no blur, traffic lights, 220pt sidebar flush to the window edge with a hairline divider, 52pt toolbar with a hairline separator, round toolbar buttons. Values sampled from real macOS 27.2 captures (`zyvor-velora`); card and control radii and type sizes are not measured | Default when the monitored host reports macOS 27 or newer, or Settings → Window style |
+| macOS 27 | `macos27` | Opaque, flat grouped surfaces with one accent colour (charts and icons are neutral greys, status colours only for state), no blur, roomier spacing, traffic lights, 220pt sidebar flush to the window edge with a hairline divider, 52pt toolbar with a hairline separator, round toolbar buttons. Values sampled from real macOS 27.2 captures (`zyvor-velora`); card and control radii and type sizes are not measured | Default when the monitored host reports macOS 27 or newer, or Settings → Window style |
 | macOS 26 Liquid Glass | `glass` | Floating window, traffic lights, translucent sidebar capsule, 40px blur, light edge highlights | Default on macOS 26 and older, and in the browser demo, or Settings → Window style |
 | Adwaita | `adwaita` | GNOME/libadwaita headerbar and flat cards, window controls on the right | Default on Linux, or Settings |
 
