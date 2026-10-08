@@ -19,14 +19,14 @@ test.beforeEach(async ({ page }) => {
 test.describe("desktop", () => {
   test.skip(({ isMobile }) => isMobile, "desktop layout only");
 
-  test("overview shows simulated telemetry in the glass window", async ({ page }) => {
+  test("overview shows simulated telemetry in the macOS window", async ({ page }) => {
     await open(page);
     await expect(page.getByText("simulated telemetry")).toBeVisible();
     await expect(page.locator(".metric-tile")).toHaveCount(6);
     await expect(page.locator(".toolbar h1")).toHaveText("Overview");
     await expect(page.locator(".window .host-card")).toContainText("zyvor-dev-01");
     await expect(page.locator(".activity-chart svg").first()).toBeVisible();
-    await expect(page.locator("html")).toHaveAttribute("data-theme", /glass|adwaita/);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", /glass|macos27|adwaita/);
   });
 
   test("containers view groups Docker and Podman and filters by state", async ({ page }) => {
@@ -53,8 +53,11 @@ test.describe("desktop", () => {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "adwaita");
     await expect(page.locator(".gnome-controls")).toBeVisible();
     await expect(page.locator(".traffic-lights")).toHaveCount(0);
-    await page.getByRole("radiogroup", { name: "Window style" }).getByRole("radio", { name: "macOS" }).click();
+    await page.getByRole("radiogroup", { name: "Window style" }).getByRole("radio", { name: "macOS 26" }).click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "glass");
+    await expect(page.locator(".traffic-lights")).toBeVisible();
+    await page.getByRole("radiogroup", { name: "Window style" }).getByRole("radio", { name: "macOS 27" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "macos27");
     await expect(page.locator(".traffic-lights")).toBeVisible();
     await page.getByRole("radiogroup", { name: "Appearance" }).getByRole("radio", { name: "Dark" }).click();
     await expect(page.locator("html")).toHaveClass(/dark/);
@@ -64,6 +67,7 @@ test.describe("desktop", () => {
     await page.locator("html[data-transparency]").waitFor({ state: "attached" });
     await expect(page.locator("html")).toHaveClass(/dark/);
     await expect(page.locator("html")).toHaveAttribute("data-accent", "purple");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "macos27");
   });
 
   test("reduce transparency swaps glass for solid surfaces", async ({ page }) => {

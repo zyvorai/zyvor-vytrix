@@ -13,7 +13,7 @@ function GnomeControls(){
 
 export function Toolbar({theme,title,subtitle,search,onSearch,showSearch,paused,onPause,onExport,onConnect,onToggleSidebar,dark,onToggleDark}:{theme:Theme,title:string,subtitle:string,search:string,onSearch:(v:string)=>void,showSearch:boolean,paused:boolean,onPause:()=>void,onExport:()=>void,onConnect:()=>void,onToggleSidebar:()=>void,dark:boolean,onToggleDark:()=>void}){
   return <header className="toolbar">
-    {theme==='glass'&&<TrafficLights/>}
+    {theme!=='adwaita'&&<TrafficLights/>}
     <div className="toolbar-group capsule">
       <button type="button" className="tool-button" aria-label="Toggle sidebar" onClick={onToggleSidebar}><PanelLeft size={17}/></button>
     </div>

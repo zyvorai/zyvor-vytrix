@@ -10,7 +10,7 @@ const out = path.resolve(process.argv[2] || path.join(root, "docs/ux"));
 mkdirSync(out, { recursive: true });
 
 const views = ["Overview", "Applications", "Containers", "Projects", "Alerts"];
-const styles = ["glass", "adwaita"];
+const styles = ["glass", "macos27", "adwaita"];
 const modes = ["light", "dark"];
 
 const server = await startDevServer();

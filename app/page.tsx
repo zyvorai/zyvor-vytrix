@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ShieldCheck} from 'lucide-react';
-import {groupApps,platformOf,runningContainers,type AppGroup,type Snapshot} from '@/lib/telemetry';
+import {groupApps,macMajor,platformOf,runningContainers,type AppGroup,type Snapshot} from '@/lib/telemetry';
 import {computeAlerts} from '@/lib/alerts';
 import {useTelemetry} from '@/hooks/use-telemetry';
 import {usePreferences,viewerPlatform,type Theme} from '@/hooks/use-preferences';
@@ -50,7 +50,7 @@ export default function Page(){
   useEffect(()=>{const frame=requestAnimationFrame(()=>setViewer(viewerPlatform()));return()=>cancelAnimationFrame(frame);},[]);
   const host=platformOf(snapshot.host.os);
   const autoPlatform=source==='demo'?viewer:host;
-  const theme:Theme=prefs.theme!=='auto'?prefs.theme:autoPlatform==='linux'?'adwaita':'glass';
+  const theme:Theme=prefs.theme!=='auto'?prefs.theme:autoPlatform==='linux'?'adwaita':source!=='demo'&&macMajor(snapshot.host.os)>=27?'macos27':'glass';
   useEffect(()=>{document.documentElement.dataset.theme=theme;},[theme]);
 
   const allApps=useMemo(()=>groupApps(snapshot),[snapshot]);

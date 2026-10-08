@@ -12,9 +12,9 @@
 
 ### See what your machine is really doing.
 
-**A read-only system activity monitor for macOS and Linux.** Applications grouped the way you think about them, processes, listening ports, project folders, and Docker and Podman containers, in a macOS 26 Liquid Glass window or an Adwaita one. A single-file Python collector with no dependencies feeds it.
+**A read-only system activity monitor for macOS and Linux.** Applications grouped the way you think about them, processes, listening ports, project folders, and Docker and Podman containers, in a macOS 27 window, a macOS 26 Liquid Glass one, or an Adwaita one. A single-file Python collector with no dependencies feeds it.
 
-**Read-only** · **Dependency-free collector** · **Liquid Glass + Adwaita** · **Docker and Podman aware** · **Local-first**
+**Read-only** · **Dependency-free collector** · **macOS 27 + Liquid Glass + Adwaita** · **Docker and Podman aware** · **Local-first**
 
 🎮 **[Live demo](https://zyvorai.github.io/zyvor-vytrix/demo/)** · 🌐 **[Site](https://zyvorai.github.io/zyvor-vytrix/)** · 🚀 **[Quickstart](#quickstart)** · 🧩 **[How it fits](#how-it-fits-together)** · 🔒 **[Security](SECURITY.md)** · 📖 **[API](docs/API.md)**
 
@@ -38,6 +38,10 @@
 
 *About 12 seconds against the built-in simulated telemetry: overview, an application's processes, containers, switching to the Adwaita window style, then dark mode.*
 
+| macOS 27, light | macOS 27, dark |
+| --- | --- |
+| ![Overview, macOS 27, light](docs/ux/macos27-light-overview.png) | ![Overview, macOS 27, dark](docs/ux/macos27-dark-overview.png) |
+
 | Liquid Glass, light | Liquid Glass, dark |
 | --- | --- |
 | ![Overview, Liquid Glass, light](docs/ux/glass-light-overview.png) | ![Overview, Liquid Glass, dark](docs/ux/glass-dark-overview.png) |
@@ -57,6 +61,26 @@
 ![A browser dashboard talks to a read-only collector over HTTPS; the collector reads the host](docs/ux/readme-how-it-works.jpg)
 
 The dashboard starts on **clearly labeled simulated telemetry**. To see your own machine, run the collector and connect (live), or import a one-off snapshot (offline).
+
+## Native Mac app
+
+A SwiftUI app (`native/`) that shows the same telemetry in a native macOS 27 window. It starts the bundled collector on loopback with a random token held in memory, or connects to one you run elsewhere (Connect…, HTTPS unless it is localhost). It is read-only, like everything else here.
+
+```bash
+./scripts/build-native.sh      # native/build/Vytrix.app, ad-hoc signed development build
+open native/build/Vytrix.app   # or add --args --demo for simulated telemetry
+./scripts/shots-native.sh      # docs/ux/native-*.png, from the simulated telemetry
+```
+
+Needs macOS 26 or newer, the Xcode command line tools, and Python 3.10+ for the collector (the system `/usr/bin/python3` is 3.9; the app looks for Homebrew's first). Overview, Applications, Containers and Projects are in; Alerts, per-resource pages and Settings are not yet. Built and run on macOS 27.2.
+
+| Overview, light | Applications, light |
+| --- | --- |
+| ![Native overview, light](docs/ux/native-light-overview.png) | ![Native applications, light](docs/ux/native-light-applications.png) |
+
+| Containers, dark | Overview, dark |
+| --- | --- |
+| ![Native containers, dark](docs/ux/native-dark-containers.png) | ![Native overview, dark](docs/ux/native-dark-overview.png) |
 
 ## Quickstart
 

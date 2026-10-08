@@ -3,8 +3,8 @@
 import {useCallback,useEffect,useState} from 'react';
 
 export type Appearance='auto'|'light'|'dark';
-export type ThemeChoice='auto'|'glass'|'adwaita';
-export type Theme='glass'|'adwaita';
+export type ThemeChoice='auto'|'glass'|'macos27'|'adwaita';
+export type Theme='glass'|'macos27'|'adwaita';
 export const accents=['blue','purple','pink','red','orange','yellow','green','graphite'] as const;
 export type Accent=typeof accents[number];
 
@@ -26,7 +26,7 @@ function load():Preferences{
     const saved=JSON.parse(localStorage.getItem(KEY)||'null') as Partial<Preferences>|null;
     if(saved){
       if(['auto','light','dark'].includes(saved.appearance as string))prefs.appearance=saved.appearance!;
-      if(['auto','glass','adwaita'].includes(saved.theme as string))prefs.theme=saved.theme!;
+      if(['auto','glass','macos27','adwaita'].includes(saved.theme as string))prefs.theme=saved.theme!;
       if(accents.includes(saved.accent as Accent))prefs.accent=saved.accent!;
       if(typeof saved.reduceTransparency==='boolean')prefs.reduceTransparency=saved.reduceTransparency;
       if(typeof saved.alertsEnabled==='boolean')prefs.alertsEnabled=saved.alertsEnabled;

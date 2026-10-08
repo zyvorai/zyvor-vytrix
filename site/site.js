@@ -16,7 +16,7 @@
 
   // ---- gallery: window style x appearance x view, all real screenshots
   var state = { style: "glass", mode: root.getAttribute("data-theme") === "light" ? "light" : "dark", view: "overview" };
-  var LABEL = { glass: "Liquid Glass", adwaita: "Adwaita", light: "light", dark: "dark", overview: "Overview", applications: "Applications", containers: "Containers", projects: "Projects", alerts: "Alerts" };
+  var LABEL = { glass: "Liquid Glass", macos27: "macOS 27", adwaita: "Adwaita", light: "light", dark: "dark", overview: "Overview", applications: "Applications", containers: "Containers", projects: "Projects", alerts: "Alerts" };
   var img = document.getElementById("shot"), cap = document.getElementById("shot-cap");
   var groups = [].slice.call(document.querySelectorAll(".seg"));
 

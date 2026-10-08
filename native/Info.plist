@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key><string>Vytrix</string>
+	<key>CFBundleIdentifier</key><string>dev.zyvor.vytrix</string>
+	<key>CFBundleIconFile</key><string>Vytrix</string>
+	<key>CFBundleName</key><string>Vytrix</string>
+	<key>CFBundleDisplayName</key><string>Vytrix</string>
+	<key>CFBundleVersion</key><string>1</string>
+	<key>CFBundleShortVersionString</key><string>0.1.0</string>
+	<key>CFBundlePackageType</key><string>APPL</string>
+	<key>LSMinimumSystemVersion</key><string>26.0</string>
+	<key>LSApplicationCategoryType</key><string>public.app-category.developer-tools</string>
+	<key>NSHighResolutionCapable</key><true/>
+	<key>NSPrincipalClass</key><string>NSApplication</string>
+	<key>NSLocalNetworkUsageDescription</key><string>Vytrix connects to a collector you choose to read system telemetry.</string>
+</dict>
+</plist>

@@ -40,7 +40,7 @@ export const viewport: Viewport = {
 };
 
 // Applies saved appearance before first paint so the window never flashes the wrong theme.
-const preferenceScript = `try{var p=JSON.parse(localStorage.getItem('vytrix-preferences')||'{}'),r=document.documentElement,a=p.appearance||'auto',d=a==='dark'||(a==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);r.classList.toggle('dark',d);if(p.accent)r.dataset.accent=p.accent;if(p.reduceTransparency)r.dataset.transparency='reduced';if(p.theme==='adwaita'||p.theme==='glass')r.dataset.theme=p.theme;}catch(e){}`;
+const preferenceScript = `try{var p=JSON.parse(localStorage.getItem('vytrix-preferences')||'{}'),r=document.documentElement,a=p.appearance||'auto',d=a==='dark'||(a==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);r.classList.toggle('dark',d);if(p.accent)r.dataset.accent=p.accent;if(p.reduceTransparency)r.dataset.transparency='reduced';if(p.theme==='adwaita'||p.theme==='glass'||p.theme==='macos27')r.dataset.theme=p.theme;}catch(e){}`;
 
 export default function RootLayout({
   children,
