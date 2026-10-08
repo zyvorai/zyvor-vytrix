@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- **macOS 27 window style** (`data-theme="macos27"`): opaque surfaces, a flush 220pt sidebar, a 52pt toolbar and round toolbar buttons, with values sampled from real macOS 27.2 captures. Auto picks it when the host reports macOS 27 or newer; Settings → Window style has a `macOS 27` option next to `macOS 26` and `Linux`. `pnpm shots` writes `docs/ux/macos27-*.png`, and the landing-page gallery gains the style.
 - **Site and live demo on GitHub Pages** (`https://zyvorai.github.io/zyvor-vytrix/`): a landing page with an interactive gallery of the real screenshots (window style x appearance x view), feature grid, quickstart with copy buttons and deploy notes; and `/demo/`, the real dashboard on its simulated telemetry, built static. `VYTRIX_BASE_PATH` (empty by default) sets Next's `basePath` for that build only. `scripts/build-site.sh` assembles `_site/`; `scripts/site-check.mjs` drives both under the real sub-path in CI.
 - README with hero, demo GIF, screenshots (Liquid Glass and Adwaita, light and dark, 390px), architecture and read-only cards, collector flag table, and a documentation map. Every image is built-in simulated telemetry.
 - Social images (`docs/social/`: hero, share card, `build.sh`), `public/og.jpg`, `apple-touch-icon.png`, and `openGraph`/`twitter` metadata.

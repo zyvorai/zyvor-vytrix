@@ -11,7 +11,7 @@ async function load(name){
  return import(out.href);
 }
 try{
- const {demoSnapshot,groupApps,snapshotSchema,runningContainers,formatPort,platformOf}=await load('telemetry');
+ const {demoSnapshot,groupApps,snapshotSchema,runningContainers,formatPort,platformOf,macMajor}=await load('telemetry');
  const {computeAlerts}=await load('alerts');
  const s=demoSnapshot();assert(snapshotSchema.safeParse(s).success);
  const groups=groupApps(s);assert.equal(groups.length,8);
@@ -42,6 +42,9 @@ try{
 
  assert.equal(platformOf('macOS 26.0'),'macos');
  assert.equal(platformOf('Darwin 25.6.0'),'macos');
+ assert.equal(macMajor('macOS 27.2'),27);
+ assert.equal(macMajor('macOS 26.7.1'),26);
+ assert.equal(macMajor('Linux 6.8.0'),0);
  assert.equal(platformOf('Linux 6.8.0-45-generic'),'linux');
  assert.equal(platformOf('Linux · Ubuntu 24.04'),'linux');
  assert.equal(platformOf('Windows'),'other');

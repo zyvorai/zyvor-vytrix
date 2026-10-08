@@ -15,7 +15,7 @@
 Everything image-like in `social/` and `ux/` is generated. The HTML and scripts are the source of truth. All of it uses the **built-in simulated telemetry**: never publish a capture of a real collector.
 
 ```bash
-pnpm shots                         # docs/ux/*.png: glass and adwaita, light and dark, 390px (Playwright)
+pnpm shots                         # docs/ux/*.png: glass, macos27 and adwaita, light and dark, 390px (Playwright)
 pnpm demo                          # docs/ux/vytrix-demo.gif (needs ffmpeg)
 ./docs/social/build.sh             # hero, share card, og image (macOS: Chrome + sips)
 ./docs/ux/build-readme-cards.sh    # README cards

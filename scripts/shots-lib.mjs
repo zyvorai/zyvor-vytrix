@@ -38,7 +38,7 @@ export async function launch() {
   return chromium.launch().catch(() => chromium.launch({ channel: "chrome" }));
 }
 
-/** New page with stored preferences applied before first paint. prefs: { theme: glass|adwaita, appearance: light|dark, accent } */
+/** New page with stored preferences applied before first paint. prefs: { theme: glass|macos27|adwaita, appearance: light|dark, accent } */
 export async function openApp(browser, base, prefs, viewport, extra = {}) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: "reduce", ...extra });
   const page = await context.newPage();

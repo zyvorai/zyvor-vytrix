@@ -12,9 +12,9 @@
 
 ### See what your machine is really doing.
 
-**A read-only system activity monitor for macOS and Linux.** Applications grouped the way you think about them, processes, listening ports, project folders, and Docker and Podman containers, in a macOS 26 Liquid Glass window or an Adwaita one. A single-file Python collector with no dependencies feeds it.
+**A read-only system activity monitor for macOS and Linux.** Applications grouped the way you think about them, processes, listening ports, project folders, and Docker and Podman containers, in a macOS 27 window, a macOS 26 Liquid Glass one, or an Adwaita one. A single-file Python collector with no dependencies feeds it.
 
-**Read-only** · **Dependency-free collector** · **Liquid Glass + Adwaita** · **Docker and Podman aware** · **Local-first**
+**Read-only** · **Dependency-free collector** · **macOS 27 + Liquid Glass + Adwaita** · **Docker and Podman aware** · **Local-first**
 
 🎮 **[Live demo](https://zyvorai.github.io/zyvor-vytrix/demo/)** · 🌐 **[Site](https://zyvorai.github.io/zyvor-vytrix/)** · 🚀 **[Quickstart](#quickstart)** · 🧩 **[How it fits](#how-it-fits-together)** · 🔒 **[Security](SECURITY.md)** · 📖 **[API](docs/API.md)**
 
@@ -37,6 +37,10 @@
 ![Vytrix: overview, an application's processes, containers, the Adwaita window style, then dark mode](docs/ux/vytrix-demo.gif)
 
 *About 12 seconds against the built-in simulated telemetry: overview, an application's processes, containers, switching to the Adwaita window style, then dark mode.*
+
+| macOS 27, light | macOS 27, dark |
+| --- | --- |
+| ![Overview, macOS 27, light](docs/ux/macos27-light-overview.png) | ![Overview, macOS 27, dark](docs/ux/macos27-dark-overview.png) |
 
 | Liquid Glass, light | Liquid Glass, dark |
 | --- | --- |

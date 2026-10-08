@@ -15,6 +15,7 @@ export function groupApps(s:Snapshot):AppGroup[]{const groups=new Map<string,App
 export function runningContainers(s:Snapshot){return (s.containers??[]).filter(c=>c.state.toLowerCase()==='running');}
 export function formatPort(p:Container['ports'][number]){return p.hostPort?`${p.hostPort}→${p.containerPort}/${p.protocol}`:`${p.containerPort}/${p.protocol}`;}
 export type Platform = 'macos'|'linux'|'other';
+export function macMajor(os:string):number{const m=/(?:macos|mac os x?)\s*(\d+)/i.exec(os);return m?Number(m[1]):0;}
 export function platformOf(os:string):Platform{const o=os.toLowerCase();if(o.includes('darwin')||o.includes('macos'))return 'macos';if(o.includes('linux'))return 'linux';return 'other';}
 const GB=1024**3;
 const MB=1024**2;

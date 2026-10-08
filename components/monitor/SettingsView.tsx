@@ -17,8 +17,8 @@ export function SettingsView({prefs,update,resolvedTheme,source,onImport,onExpor
       <Row title="Appearance" text="Auto follows your system light/dark setting.">
         <Segmented label="Appearance" value={prefs.appearance} onChange={v=>update('appearance',v)} options={[{value:'auto',label:'Auto'},{value:'light',label:'Light'},{value:'dark',label:'Dark'}]}/>
       </Row>
-      <Row title="Window style" text={`Auto picks from the monitored host. Currently ${resolvedTheme==='glass'?'macOS Liquid Glass':'Linux Adwaita'}.`}>
-        <Segmented label="Window style" value={prefs.theme} onChange={v=>update('theme',v)} options={[{value:'auto',label:'Auto'},{value:'glass',label:'macOS'},{value:'adwaita',label:'Linux'}]}/>
+      <Row title="Window style" text={`Auto picks from the monitored host. Currently ${{glass:'macOS 26 Liquid Glass',macos27:'macOS 27',adwaita:'Linux Adwaita'}[resolvedTheme]}.`}>
+        <Segmented label="Window style" value={prefs.theme} onChange={v=>update('theme',v)} options={[{value:'auto',label:'Auto'},{value:'glass',label:'macOS 26'},{value:'macos27',label:'macOS 27'},{value:'adwaita',label:'Linux'}]}/>
       </Row>
       <Row title="Accent color">
         <div className="swatches" role="radiogroup" aria-label="Accent color">{accents.map(a=><button key={a} type="button" role="radio" aria-checked={prefs.accent===a} aria-label={a} className={`swatch ${a}`} onClick={()=>update('accent',a)}/>)}</div>

@@ -4,7 +4,7 @@ Guidance for AI coding agents and humans working in this repository.
 
 ## What Vytrix is
 
-A **read-only** system activity monitor for macOS and Linux. A React 19 / Next 16 / vinext dashboard (Cloudflare Worker output) with two window styles, macOS 26 Liquid Glass and Adwaita, plus a single-file, dependency-free Python collector (`agent/vytrix.py`) that serves an authenticated snapshot/history API.
+A **read-only** system activity monitor for macOS and Linux. A React 19 / Next 16 / vinext dashboard (Cloudflare Worker output) with three window styles, macOS 27, macOS 26 Liquid Glass and Adwaita, plus a single-file, dependency-free Python collector (`agent/vytrix.py`) that serves an authenticated snapshot/history API.
 
 ## Hard boundaries
 

@@ -82,9 +82,9 @@ check(await page.locator('[aria-label="Appearance"] [aria-checked="true"]').inne
 await page.reload();
 check(await page.getAttribute("html", "data-theme") === "dark", "landing: theme persists across reload");
 await shot(page, "site-landing-dark");
-// every one of the 40 screenshot combinations exists
+// every one of the 60 screenshot combinations exists
 const combos = [];
-for (const s of ["glass", "adwaita"]) for (const m of ["light", "dark"]) for (const v of ["overview", "applications", "containers", "projects", "alerts"]) combos.push(`ux/${s}-${m}-${v}.png`);
+for (const s of ["glass", "macos27", "adwaita"]) for (const m of ["light", "dark"]) for (const v of ["overview", "applications", "containers", "projects", "alerts"]) combos.push(`ux/${s}-${m}-${v}.png`);
 const missing = [];
 for (const c of combos) { const r = await page.request.get(base + c); if (!r.ok()) missing.push(c); }
 check(missing.length === 0, `gallery: all ${combos.length} screenshots are served${missing.length ? " (missing: " + missing.join(", ") + ")" : ""}`);

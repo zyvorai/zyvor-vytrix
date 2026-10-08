@@ -2,11 +2,12 @@
 
 Vytrix is a quiet instrument: it shows what a machine is doing and never changes it. The interface borrows the platform's own look, so it feels native on the machine it monitors. All tokens live in `app/globals.css`; components use tokens, not raw colors.
 
-## Two window styles, one token set
+## Three window styles, one token set
 
 | Style | `data-theme` | Looks like | Chosen |
 | --- | --- | --- | --- |
-| macOS 26 Liquid Glass | `glass` | Floating window, traffic lights, translucent sidebar capsule, 40px blur, light edge highlights | Default on macOS/other, or Settings → Window style |
+| macOS 27 | `macos27` | Opaque surfaces, no blur, traffic lights, 220pt sidebar flush to the window edge with a hairline divider, 52pt toolbar with a hairline separator, round toolbar buttons. Values sampled from real macOS 27.2 captures (`zyvor-velora`); card and control radii and type sizes are not measured | Default when the monitored host reports macOS 27 or newer, or Settings → Window style |
+| macOS 26 Liquid Glass | `glass` | Floating window, traffic lights, translucent sidebar capsule, 40px blur, light edge highlights | Default on macOS 26 and older, and in the browser demo, or Settings → Window style |
 | Adwaita | `adwaita` | GNOME/libadwaita headerbar and flat cards, window controls on the right | Default on Linux, or Settings |
 
 Light and dark are a `.dark` class (auto follows the OS). Eight accents via `data-accent`: blue, purple, pink, red, orange, yellow, green, graphite. Preferences persist in `localStorage["vytrix-preferences"]` and an inline script in `app/layout.tsx` applies them before first paint, so the wrong theme never flashes.
