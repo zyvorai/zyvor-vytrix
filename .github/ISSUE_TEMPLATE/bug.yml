@@ -17,4 +17,4 @@ body:
     attributes: { label: "OS and version", placeholder: "macOS 26.1 / Ubuntu 24.04" }
   - type: input
     id: version
-    attributes: { label: "Vytrix version", placeholder: "0.2.0" }
+    attributes: { label: "Vytrix version", placeholder: "0.3.0" }

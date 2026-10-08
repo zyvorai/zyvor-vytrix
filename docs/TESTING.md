@@ -1,8 +1,10 @@
-# Testing on macOS 26 and Linux
+# Testing on macOS 26, macOS 27 and Linux
 
 | Layer | Command | Needs |
 |---|---|---|
 | Types | `pnpm typecheck` | Node ≥ 22.13 |
+| Cluster schema and URL rules | `node tests/cluster.mjs` | Node |
+| Native Mac app | `./scripts/build-native.sh` (compiles; there are no Swift tests) | macOS, Xcode command line tools |
 | Schema, grouping, alerts | `node tests/telemetry.mjs` | Node |
 | Collector, API, TLS, dashboard proxy, container parsing | `python3 -m unittest discover -s tests -v` | Python ≥ 3.10, `openssl` |
 | Browser end-to-end | `pnpm test:e2e` | `pnpm exec playwright install chromium webkit` |
@@ -12,7 +14,7 @@
 
 The container unit tests replay recorded `docker`/`podman` CLI output from `tests/fixtures/`, so they run anywhere without a runtime. They assert that the collector only ever calls `--version`, `version`, `ps` and `stats --no-stream`, and that `docker ps` never uses `{{json .}}` (that template makes Docker compute every container's disk size, which took 77 s on a host with many stopped containers).
 
-## macOS 26 (Tahoe)
+## macOS 26 and 27
 
 ```sh
 brew install node python pnpm          # Python 3.10+; Apple's /usr/bin/python3 is too old
