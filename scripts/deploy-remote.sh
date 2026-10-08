@@ -12,7 +12,7 @@
 #   --dry-run       Print what would run; no SSH
 #
 # On the host:
-#   ~/.deployments/zyvor-vytrix   checkout (VYTRIX_REMOTE_SUBDIR overrides, relative to $HOME)
+#   ~/.vytrix/app                 checkout (VYTRIX_REMOTE_SUBDIR overrides, relative to $HOME)
 #   ~/.vytrix/node                private Node 22 when the system Node is older than 22.13
 #   ~/.vytrix/env                 VYTRIX_TOKEN (0600, kept across deploys; VYTRIX_TOKEN overrides)
 #   ~/.vytrix/tls.{crt,key}       self-signed certificate with the host as subjectAltName
@@ -29,7 +29,10 @@ PROFILE="full"
 DRY_RUN=false
 VERIFY_ONLY=false
 POSITIONAL=()
-SSH_OPTS=(-o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30)
+# One multiplexed connection per run: every step otherwise pays a fresh handshake, which hurts on busy or slow hosts.
+# ControlPath stays under /tmp because unix socket paths are limited to ~104 bytes.
+SSH_OPTS=(-o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30
+  -o ControlMaster=auto -o "ControlPath=/tmp/vytrix-ssh-%C" -o ControlPersist=120)
 
 usage() {
   sed -n '3,22p' "$0" | sed 's/^# \{0,1\}//'
@@ -63,7 +66,8 @@ fi
 
 PUBLIC_HOST="${TARGET#*@}"
 PORT="${VYTRIX_PORT:-30847}"
-SUBDIR="${VYTRIX_REMOTE_SUBDIR:-.deployments/zyvor-vytrix}"
+# Not ~/.deployments: other projects there rsync --delete into the shared parent and can wipe a sibling mid-run.
+SUBDIR="${VYTRIX_REMOTE_SUBDIR:-.vytrix/app}"
 if [[ ! "$PORT" =~ ^[0-9]+$ ]] || (( PORT < 1024 || PORT > 65535 )); then
   echo "VYTRIX_PORT must be 1024–65535" >&2; exit 2
 fi
@@ -75,6 +79,8 @@ if [[ -n "${VYTRIX_TOKEN:-}" && ( ${#VYTRIX_TOKEN} -lt 24 || ! "$VYTRIX_TOKEN" =
 fi
 
 log() { printf '[vytrix-deploy] %s\n' "$*"; }
+cleanup() { [[ -n "${TARGET:-}" ]] && ssh "${SSH_OPTS[@]}" -O exit "$TARGET" >/dev/null 2>&1 || true; }
+trap cleanup EXIT
 # shellcheck disable=SC2029 # remote commands are built from validated values on purpose
 ssh_host() { ssh "${SSH_OPTS[@]}" "$TARGET" "$@"; }
 
@@ -172,7 +178,7 @@ User=$USER_NAME
 WorkingDirectory=$DIR
 Environment=PATH=$(dirname "$NODE"):/usr/local/bin:/usr/bin:/bin
 Environment=CI=1
-ExecStart=$NODE --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --port 8787 --inspector-port 0
+ExecStart=$NODE --import ./scripts/runtime-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --port 8787 --inspector-port 0
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=true
@@ -247,7 +253,7 @@ fi
 ssh_host "mkdir -p '$SUBDIR'"
 rsync -az --delete -e "ssh ${SSH_OPTS[*]}" \
   --exclude '.git' --exclude 'node_modules' --exclude 'dist' --exclude '.wrangler' \
-  --exclude '.sites-runtime' --exclude '.vinext' --exclude '.next' --exclude 'test-results' \
+  --exclude '.vinext' --exclude '.next' --exclude 'test-results' \
   --exclude 'playwright-report' --exclude '.cursor' --exclude '.DS_Store' \
   --exclude '__pycache__' --exclude 'tsconfig.tsbuildinfo' --exclude 'lib/.*-test.mjs' \
   "${ROOT}/" "${TARGET}:${SUBDIR}/"

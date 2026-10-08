@@ -32,7 +32,7 @@ Requirements on the host: SSH access, passwordless `sudo` (for the systemd units
 
 | Path / unit | Purpose |
 |---|---|
-| `~/.deployments/zyvor-vytrix` | Checkout (`VYTRIX_REMOTE_SUBDIR` overrides) |
+| `~/.vytrix/app` | Checkout (`VYTRIX_REMOTE_SUBDIR` overrides). Not `~/.deployments`: other projects there `rsync --delete` into the shared parent |
 | `~/.vytrix/env` | `VYTRIX_TOKEN`, 0600, kept across deploys (`VYTRIX_TOKEN=… ./scripts/deploy-remote.sh` replaces it) |
 | `~/.vytrix/tls.{crt,key}` | Self-signed certificate; regenerated only when the host changes |
 | `vytrix-dashboard.service` | Dashboard on `127.0.0.1:8787` |

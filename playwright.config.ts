@@ -19,7 +19,7 @@ export default defineConfig({
     { name: "mobile-webkit", use: { ...devices["iPhone 15"] }, grep: /@mobile/ },
   ],
   webServer: {
-    command: `node scripts/run-framework.mjs dev --port ${port} --host 127.0.0.1`,
+    command: `node scripts/run-framework.mjs dev --port ${port} --hostname 127.0.0.1`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

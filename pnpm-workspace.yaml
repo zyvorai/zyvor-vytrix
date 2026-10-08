@@ -1,4 +1,4 @@
-# Copied Sites are standalone projects and cannot inherit the monorepo policy.
+# Supply-chain policy: refuse packages younger than 7 days, and refuse unexpected install scripts.
 minimumReleaseAge: 10080
 minimumReleaseAgeIgnoreMissingTime: false
 trustLockfile: false
@@ -9,12 +9,10 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   workerd: true
-storeDir: ${SITES_PNPM_SHARED_STORE:-.sites-runtime/pnpm-store}
-cacheDir: ${SITES_PNPM_SHARED_STORE:-.sites-runtime/pnpm-store}/policy-cache
 enableGlobalVirtualStore: false
 # Reuse store files with clones or hardlinks before falling back to copies.
 packageImportMethod: auto
-# The explicit installer owns dependency setup, including restored workspaces.
+# Do not re-check or re-install dependencies implicitly before scripts run.
 verifyDepsBeforeRun: false
 optimisticRepeatInstall: false
 overrides:

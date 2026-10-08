@@ -1,23 +1,18 @@
-import { spawnSync } from "node:child_process";
+// SPDX-License-Identifier: Apache-2.0
+// Runs the vinext CLI in this process so `pnpm dev` / `pnpm build` keep their PID and signals.
 import { fileURLToPath } from "node:url";
-import { readExecutionProfile } from "./execution-profile.mjs";
 
 const [command, ...args] = process.argv.slice(2);
 if (!["dev", "build"].includes(command)) throw new Error("Expected dev or build.");
-const managedLinux = readExecutionProfile() === "managed-linux";
 
-if (managedLinux && command === "build") {
-  const result = spawnSync("bash", [
-    fileURLToPath(new URL("./build-verified.sh", import.meta.url)), ...args,
-  ], { stdio: "inherit" });
-  if (result.error) throw result.error;
-  process.exit(result.status ?? 1);
-}
-
-// Import in this process so the preview owner retains its PID and signals.
-const cli = new URL(managedLinux
-  ? "../node_modules/vite/bin/vite.js"
-  : "../node_modules/vinext/dist/cli.js", import.meta.url);
-process.argv = [process.execPath, fileURLToPath(cli), command,
-  ...(!managedLinux && command === "dev" ? ["--port", "5173"] : []), ...args];
+const cli = new URL("../node_modules/vinext/dist/cli.js", import.meta.url);
+// Default dev port 5173 unless the caller (Playwright, shots, demo) chose one.
+const hasPort = args.some((a) => a === "--port" || a === "-p" || a.startsWith("--port="));
+process.argv = [
+  process.execPath,
+  fileURLToPath(cli),
+  command,
+  ...(command === "dev" && !hasPort ? ["--port", "5173"] : []),
+  ...args,
+];
 await import(cli.href);
