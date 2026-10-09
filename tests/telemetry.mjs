@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 const compiled=[];
 async function load(name){
  const out=new URL(`../lib/.${name}-test.mjs`,import.meta.url);
- const source=await readFile(new URL(`../lib/${name}.ts`,import.meta.url),'utf8');
+ if(name==='telemetry')await load('intelligence');
+ const source=(await readFile(new URL(`../lib/${name}.ts`,import.meta.url),'utf8')).replace("'./intelligence'","'./.intelligence-test.mjs'");
  await writeFile(out,ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);
  compiled.push(out);
  return import(out.href);

@@ -24,7 +24,7 @@ const hold = async (ms) => { for (let i = 0; i < Math.max(1, Math.round((ms / 10
 await hold(1800); // glass, light
 await goTo(page, "Applications");
 await hold(1400);
-await page.locator(".data-table tbody tr").first().click();
+await page.locator(".view:not([hidden]) .data-table tbody tr").first().click();
 await page.locator(".process-sheet").waitFor();
 await hold(2200);
 await page.keyboard.press("Escape");

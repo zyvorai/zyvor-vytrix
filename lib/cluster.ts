@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: BUSL-1.1
 import {z} from 'zod';
-import {demoSnapshot,snapshotSchema} from './telemetry';
+import {agentHealthSchema,demoSnapshot,inventorySchema,snapshotSchema} from './telemetry';
 const id=z.string().min(1).max(128);
 export const sessionSchema=z.object({token:z.string().min(1).max(256)});
 export const pairingSchema=z.object({code:z.string().min(1).max(128),expires:z.number().finite()});
 export const auditSchema=z.object({events:z.array(z.object({id:z.number(),at:z.number(),actor:z.string(),event:z.string()})).max(200)});
-export const role=z.enum(['viewer','auditor','operator','admin']);
+export const role=z.enum(['viewer','auditor','editor','admin']);
 export const entitlementSchema=z.object({valid:z.boolean().optional(),plan:z.string().max(64).optional(),maxNodes:z.number().int().positive().optional(),features:z.array(z.string().max(128)).optional(),error:z.string().max(128).optional()}).passthrough();
-export const clusterSchema=z.object({version:z.literal(1),actor:id,role,nodes:z.array(z.object({id,name:id,seen:z.number().finite().nonnegative(),online:z.boolean(),snapshot:snapshotSchema.nullable(),tags:z.array(z.string().max(64)).max(64).optional(),group:z.string().max(128).nullable().optional(),site:z.string().max(128).nullable().optional(),inventory:z.unknown().nullable().optional(),agentHealth:z.unknown().nullable().optional()})).max(10000),entitlement:entitlementSchema.optional()});
+export const clusterSchema=z.object({version:z.literal(1),actor:id,role,nodes:z.array(z.object({id,name:id,seen:z.number().finite().nonnegative(),online:z.boolean(),snapshot:snapshotSchema.nullable(),tags:z.array(z.string().max(64)).max(64).optional(),group:z.string().max(128).nullable().optional(),site:z.string().max(128).nullable().optional(),inventory:inventorySchema.nullable().optional(),agentHealth:agentHealthSchema.nullable().optional()})).max(10000),entitlement:entitlementSchema.optional()});
 export type ClusterSnapshot=z.infer<typeof clusterSchema>;
 export type ClusterNode=ClusterSnapshot['nodes'][number];
 export function clusterOrigin(raw:string){const url=new URL(raw);if(url.username||url.password||url.search||url.hash||!['','/'].includes(url.pathname))throw Error('Enter a coordinator origin without a path or credentials.');if(url.protocol!=='https:'&&!(url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname)))throw Error('Remote coordinators require HTTPS.');return url.origin;}

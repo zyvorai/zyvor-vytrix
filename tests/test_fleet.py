@@ -29,6 +29,6 @@ class FleetTests(unittest.TestCase):
   clock[0]+=10;sample['cpu']=10;store.record('n1',sample);self.assertEqual(store.alerts()[0]['status'],'closed')
   text=store.prometheus([{'id':'n1','online':True,'snapshot':sample}]);self.assertIn('vytrix_node_online{node="n1"} 1',text);self.assertIn('vytrix_cpu{node="n1"} 10.0',text)
  def test_roles(self):
-  self.assertTrue(core.role_at_least('operator','auditor'));self.assertFalse(core.role_at_least('viewer','operator'))
+  self.assertTrue(core.role_at_least('editor','auditor'));self.assertFalse(core.role_at_least('viewer','editor'))
 
 if __name__=='__main__':unittest.main()

@@ -11,7 +11,7 @@ Fleet Pro extends the existing read-only Vytrix collector/coordinator without a 
 - Safe software/version inventory and collector health.
 - 90-day centralized history by default (`--retention-days`, up to 3650).
 - Node tags, group and site metadata.
-- Viewer, auditor, operator and admin roles with node scoping.
+- Viewer, auditor, editor and admin roles (editor writes only coordinator-side rules and tags; no host commands) with node scoping.
 - Central alert rules/events and signed HTTPS webhooks (Slack-compatible incoming webhooks are supported).
 - Signed reverse-proxy SSO assertion endpoint, suitable behind an OIDC/SAML identity proxy.
 - Prometheus `/metrics` export protected by `VYTRIX_METRICS_TOKEN`.

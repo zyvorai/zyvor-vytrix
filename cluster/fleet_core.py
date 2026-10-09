@@ -13,8 +13,8 @@ import urllib.request
 from urllib.parse import urlsplit
 from typing import Any
 
-VALID_ROLES = {"viewer", "auditor", "operator", "admin"}
-ROLE_LEVEL = {"viewer": 10, "auditor": 20, "operator": 30, "admin": 40}
+VALID_ROLES = {"viewer", "auditor", "editor", "admin"}
+ROLE_LEVEL = {"viewer": 10, "auditor": 20, "editor": 30, "admin": 40}
 
 
 def role_at_least(role: str, required: str) -> bool:

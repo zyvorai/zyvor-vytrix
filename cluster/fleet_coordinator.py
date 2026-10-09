@@ -30,7 +30,7 @@ class FleetCluster(base.Cluster):
         self.sso_secret=sso_secret
         self.entitlement=core.entitlement_status(license_token,license_secret,clock())
         for user in self.enterprise_users.values():
-            if user.get("role") not in core.VALID_ROLES: raise ValueError("role must be viewer/auditor/operator/admin")
+            if user.get("role") not in core.VALID_ROLES: raise ValueError("role must be viewer/auditor/editor/admin")
 
     def principal(self,token):
         actor,_=super().principal(token)
@@ -71,11 +71,11 @@ class FleetCluster(base.Cluster):
             return {"version":1,"actor":actor,"role":user["role"],"nodes":self.nodes(user),"entitlement":self.entitlement}
         if method=="GET" and path=="/v1/fleet/alerts": self._require(user,"auditor"); return {"events":self.fleet.alerts()}
         if method=="GET" and path=="/v1/fleet/rules": self._require(user,"auditor"); return {"rules":self.fleet.list_rules()}
-        if method=="POST" and path=="/v1/fleet/rules": self._require(user,"operator"); return {"id":self.fleet.set_rule(body)}
+        if method=="POST" and path=="/v1/fleet/rules": self._require(user,"editor"); return {"id":self.fleet.set_rule(body)}
         if method=="GET" and path=="/v1/fleet/webhooks": self._require(user,"admin"); return {"webhooks":self.fleet.webhooks()}
         if method=="POST" and path=="/v1/fleet/webhooks": self._require(user,"admin"); return {"id":self.fleet.set_webhook(str(body.get("name") or "Webhook"),str(body.get("url") or ""),str(body.get("secret") or ""))}
         if method=="POST" and path=="/v1/fleet/meta":
-            self._require(user,"operator");node_id=base.text(body.get("node"));
+            self._require(user,"editor");node_id=base.text(body.get("node"));
             if not self.allowed(user,node_id): raise base.APIError(403,"Machine outside your permissions")
             self.fleet.set_meta(node_id,body.get("tags") or [],body.get("group"),body.get("site"));self.audit(actor,"node-meta-updated",{"node":node_id});return {"ok":True}
         if method=="GET" and path=="/v1/fleet/history":
