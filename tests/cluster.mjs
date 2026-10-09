@@ -4,13 +4,13 @@ import {readFile,writeFile,unlink} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const compiled=[];
 try {
-  for(const name of ['telemetry','cluster']){
+  for(const name of ['intelligence','telemetry','cluster']){
     const out=new URL(`../lib/.${name}-cluster-test.mjs`,import.meta.url);
-    const source=(await readFile(new URL(`../lib/${name}.ts`,import.meta.url),'utf8')).replace("'./telemetry'","'./.telemetry-cluster-test.mjs'");
+    const source=(await readFile(new URL(`../lib/${name}.ts`,import.meta.url),'utf8')).replace("'./telemetry'","'./.telemetry-cluster-test.mjs'").replace("'./intelligence'","'./.intelligence-cluster-test.mjs'");
     await writeFile(out,ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);
     compiled.push(out);
   }
-  const {clusterSchema,clusterOrigin,demoCluster}=await import(compiled[1].href);
+  const {clusterSchema,clusterOrigin,demoCluster}=await import(compiled[2].href);
   const demo=demoCluster();
   assert(clusterSchema.safeParse(demo).success);
   assert.equal(demo.nodes.length,3);
