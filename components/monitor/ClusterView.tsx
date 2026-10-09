@@ -5,6 +5,9 @@ import {Monitor,ShieldCheck,Server} from 'lucide-react';
 import {clusterOrigin,clusterRequest,clusterSchema,sessionSchema,pairingSchema,auditSchema,demoCluster,type ClusterSnapshot} from '@/lib/cluster';
 import {bytes,groupApps,type Snapshot} from '@/lib/telemetry';
 import {Card,Meter,Sparkline} from './primitives';
+import {FleetIntelligence} from './FleetIntelligence';
+import {FleetAdminPanel} from './FleetAdminPanel';
+import {FleetInventory} from './FleetInventory';
 
 type Connection={origin:string,token:string};
 /** Read-only fleet view: the coordinator only receives telemetry, so there is nothing here that changes a Mac. */
@@ -67,6 +70,9 @@ export function ClusterView(){
     </form></Card>:<div className="banner"><ShieldCheck size={18}/><span>{cluster.actor} · {cluster.role} · Tokens stay in tab memory</span></div>}
     {error&&<div className="banner error" role="alert">{error}</div>}
     <div className="cluster-summary"><Card><strong>{healthy.length} / {cluster.nodes.length}</strong><span>Machines online</span></Card><Card><strong>{healthy.reduce((s,n)=>s+(n.snapshot?.host.cores??0),0)}</strong><span>CPU cores online</span></Card><Card><strong>{bytes(totalMemory)}</strong><span>Memory across online hosts</span></Card></div>
+    <FleetIntelligence cluster={cluster}/>
+    <FleetInventory cluster={cluster}/>
+    <FleetAdminPanel cluster={cluster} connection={connection}/>
     <div className="cluster-actions"><label>Find a machine<input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Machine name"/></label></div>
     <div className="cluster-grid">{cluster.nodes.filter(n=>n.name.toLowerCase().includes(query.toLowerCase())).map(n=><Card key={n.id} className="machine-card">
       <div className="machine-heading"><Monitor size={28}/><div><h3>{n.name}</h3><span className="muted">{n.snapshot?.host.os??'Waiting for first sample'}</span></div></div>

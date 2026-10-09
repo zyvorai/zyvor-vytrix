@@ -1,0 +1,34 @@
+name: Fleet complete
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  fleet-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - run: python3 -m py_compile agent/advanced.py agent/fleet.py agent/vytrix_fleet.py agent/cluster_worker_fleet.py cluster/fleet_core.py cluster/fleet_coordinator.py cluster/backup.py scripts/vytrix-agent-update.py
+      - run: python3 -m unittest tests/test_fleet.py -v
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: {version: 11.25.0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22.13.0', cache: pnpm}
+      - run: pnpm install --frozen-lockfile
+      - run: node tests/forecast.mjs
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+  native-model:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: swiftc -parse native/App/Model/Snapshot.swift

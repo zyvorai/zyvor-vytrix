@@ -229,3 +229,8 @@ Copyright © 2026 Zyvor AI Labs Private Limited.
 **See what your machine is really doing.** · [Quickstart](#quickstart) · [Security](SECURITY.md) · [Changelog](CHANGELOG.md)
 
 </div>
+
+
+## Fleet Pro
+
+For production fleet telemetry, roles, tags/groups, centralized alerts, retention, SSO-proxy integration and metrics export, see `docs/FLEET-PRO.md`. The original collector/coordinator remain available as a read-only rollback path.

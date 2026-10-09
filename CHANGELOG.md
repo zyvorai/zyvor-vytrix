@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- **Fleet Pro layer** (opt-in, read-only): advanced silicon/AI telemetry, safe inventory, macOS per-process rates, agent health and verified updates, centralized history, tags/groups, roles, alerts, webhooks, SSO-proxy assertions, entitlements, Prometheus export, capacity forecasting, and backup tooling. New entry points: `agent/vytrix_fleet.py`, `agent/cluster_worker_fleet.py`, `cluster/fleet_coordinator.py`; the original collector, worker and coordinator are unchanged. See `docs/FLEET-PRO.md`. No command channel to agents was added.
+
 ### Changed
 - **License:** future versions are under the Business Source License 1.1 (non-production use free; production use needs a commercial license from Zyvor AI Labs Private Limited; each version converts to Apache-2.0 four years after its first public release). v0.3.0 and earlier remain Apache-2.0. Contribution terms in CONTRIBUTING.md updated accordingly.
 

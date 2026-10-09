@@ -6,6 +6,8 @@ import {bytes,groupApps,runningContainers,type AppGroup,type Snapshot} from '@/l
 import {ActivityChart,ChartLegend} from './ActivityChart';
 import {AppsTable,sortApps,type AppSort} from './AppsTable';
 import {MetricTile,type Metric} from './MetricTile';
+import {IntelligenceCard} from './IntelligenceCard';
+import {CapacityCard} from './CapacityCard';
 import {palette,type ViewId} from './nav';
 import {AppIcon,Card,Meter,Segmented} from './primitives';
 
@@ -46,6 +48,8 @@ export function OverviewView({snapshot,history,apps,range,onRange,onNavigate,onS
   const running=runningContainers(snapshot).sort((a,b)=>b.cpu-a.cpu).slice(0,4);
   return <div className="stack">
     <div className="metric-grid">{buildMetrics(snapshot,series).map(m=><MetricTile key={m.id} metric={m} onClick={()=>onNavigate(m.id as ViewId)}/>)}</div>
+    <IntelligenceCard snapshot={snapshot}/>
+    <CapacityCard history={series}/>
     <div className="split-grid">
       <Card className="chart-card">
         <div className="section-bar"><div><h2>Activity</h2><ChartLegend series={[{key:'cpu',label:'CPU',color:palette.cpu},{key:'memory',label:'Memory',color:palette.memory}]}/></div><Segmented label="Time range" value={range} onChange={onRange} options={rangeOptions}/></div>
