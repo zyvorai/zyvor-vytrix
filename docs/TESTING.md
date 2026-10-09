@@ -6,6 +6,8 @@
 | Cluster schema and URL rules | `node tests/cluster.mjs` | Node |
 | Native Mac app | `./scripts/build-native.sh` (compiles; there are no Swift tests) | macOS, Xcode command line tools |
 | Schema, grouping, alerts | `node tests/telemetry.mjs` | Node |
+| Capacity forecasting | `node tests/forecast.mjs` | Node |
+| Fleet Pro (Python) and forecasting | `pnpm test:fleet` | Python ≥ 3.10, Node |
 | Collector, API, TLS, dashboard proxy, container parsing | `python3 -m unittest discover -s tests -v` | Python ≥ 3.10, `openssl` |
 | Browser end-to-end | `pnpm test:e2e` | `pnpm exec playwright install chromium webkit` |
 | Real container runtimes | `scripts/test-containers.sh podman` / `docker` | Podman or Docker with a running engine |

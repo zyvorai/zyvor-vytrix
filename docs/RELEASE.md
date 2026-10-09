@@ -1,3 +1,12 @@
+# Release status
+
+## Unreleased (after v0.3.0)
+
+- **License:** future versions are under the Business Source License 1.1; v0.3.0 and earlier stay Apache-2.0. Each version converts to Apache-2.0 four years after its first public release; set a concrete Change Date when you cut a release.
+- **Fleet Pro** ([FLEET-PRO.md](FLEET-PRO.md)): richer telemetry, central history, roles (`auditor`, `editor`), alerts, webhooks, SSO-proxy endpoint, entitlements, Prometheus export, forecasting.
+- Verified in CI on Ubuntu and macOS: typecheck, lint, production build, telemetry, cluster and forecast tests, 36 Python tests, Playwright end-to-end, shellcheck, container tests and the Pages site checks. The native app compiles with `scripts/build-native.sh`.
+- Not verified: Fleet Pro across several Macs over HTTPS, webhook delivery, SSO behind a real identity proxy, Prometheus scraping, Apple notarization.
+
 # v0.3.0 release status
 
 ## What is new
