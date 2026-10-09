@@ -11,8 +11,9 @@ A **read-only** system activity monitor for macOS and Linux. A React 19 / Next 1
 - **Read-only.** Vytrix never kills processes, changes settings, controls fans or volume, or writes to the host beyond its own SQLite history. Do not add a control that mutates the machine.
 - **The collector stays dependency-free.** Python 3.10+ standard library only. No `pip install`, no vendored packages.
 - **Tokens never leave the tab.** The bearer token lives in memory only: not in `localStorage`, not in URLs, not in logs, not in screenshots.
-- **Never claim more than was measured.** App memory is RSS, GPU/sensors/per-app network are not collected. Copy and README say so.
+- **Never claim more than was measured.** App memory is RSS, the base collector does not collect GPU, sensors or per-app network, and Fleet Pro only adds what the host actually exposes (unavailable counters are omitted, never estimated; no Linux per-process network). Copy and README say so.
 - **Demo data in public images.** Screenshots, the hero, and the demo GIF come from the built-in simulated telemetry (`demoSnapshot`, host `zyvor-dev-01`). Never publish a capture of a real collector: it contains real process names, paths and ports.
+- **License.** Business Source License 1.1 (`LICENSE`): new source files carry `SPDX-License-Identifier: BUSL-1.1`. v0.3.0 and earlier are Apache-2.0.
 - **Auth is the host's job.** The dashboard has no login. `SECURITY.md` explains what the collector token does and does not protect.
 
 ## Layout
@@ -26,6 +27,7 @@ A **read-only** system activity monitor for macOS and Linux. A React 19 / Next 1
 | `worker/index.ts` | Worker entry (hands requests to vinext) |
 | `agent/vytrix.py` | The collector |
 | `agent/cluster_worker.py`, `cluster/coordinator.py` | Optional read-only Mac cluster: workers push snapshots, a coordinator serves them (`docs/CLUSTER.md`). No command channel; keep it that way |
+| `agent/vytrix_fleet.py`, `agent/cluster_worker_fleet.py`, `cluster/fleet_coordinator.py`, `agent/advanced.py`, `agent/fleet.py`, `cluster/fleet_core.py` | Fleet Pro (`docs/FLEET-PRO.md`): same read-only boundary, roles `viewer`/`auditor`/`editor`/`admin`, no `operator` role |
 | `native/` | The native SwiftUI Mac app (`scripts/build-native.sh`, `scripts/shots-native.sh`); bundles the collector and keeps the token in memory |
 | `scripts/` | Installers (macOS/Linux), `deploy-remote.sh`, release packaging, screenshots and demo GIF |
 | `site/`, `scripts/build-site.sh` | The Pages landing page, and the build that adds the static live demo (`VYTRIX_BASE_PATH`) |

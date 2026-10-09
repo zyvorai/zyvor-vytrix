@@ -4,6 +4,8 @@ Vytrix can show one machine or a fleet. Each Mac runs a small worker that **push
 
 **It is read-only end to end.** The coordinator has no command channel: it cannot start, stop or change anything on a Mac, and the worker has no code that runs `launchctl`, a shell or any other subprocess. A test (`test_there_is_no_command_channel`) fails if that changes. The only thing a pairing code or an administrator can do is let a Mac send telemetry, or stop it from doing so.
 
+For central history, tags and groups, an `editor` role, alerts, webhooks and Prometheus export, see [FLEET-PRO.md](FLEET-PRO.md). This page describes the base coordinator, whose only roles are `viewer` and `admin`.
+
 ## Components
 
 - Dashboard: **Monitor → Mac cluster**. Machine cards with CPU, memory, disk and network, a recent CPU sparkline, machine details (applications, containers), and, for administrators, pairing codes, revocation and the audit log.

@@ -185,6 +185,7 @@ What was run where, and what was not, is listed honestly in [docs/RELEASE.md](do
 | --- | --- |
 | Call the collector, or learn what each metric means | [docs/API.md](docs/API.md) |
 | Monitor several Macs (read-only) | [docs/CLUSTER.md](docs/CLUSTER.md) |
+| Fleet history, roles, alerts, Prometheus export | [docs/FLEET-PRO.md](docs/FLEET-PRO.md) |
 | Test on macOS and Linux | [docs/TESTING.md](docs/TESTING.md) |
 | Release or deploy | [docs/RELEASE.md](docs/RELEASE.md) |
 | Understand the design rules | [docs/design/UX-CONTRACT.md](docs/design/UX-CONTRACT.md) |
@@ -208,7 +209,8 @@ An initial read-only release. It does not kill processes, control fans or volume
 | Mac cluster (worker + coordinator, read-only) | Experimental; tested with unit and mocked e2e tests and one real Mac enrolled over loopback. Not yet checked across two Macs or over HTTPS |
 | Native Mac app | Built and run on macOS 27.2 (Apple silicon) with live and demo data; no automated tests, not notarized |
 | Homebrew formula | Stub, not published |
-| GPU, sensors, per-app network | Not collected |
+| Fleet Pro (`agent/vytrix_fleet.py`, `cluster/fleet_coordinator.py`) | New and opt-in; unit-tested and covered by CI. Not yet checked across several Macs, over HTTPS, or with real webhook, SSO and Prometheus receivers |
+| GPU, sensors, per-app network | Not collected by the base collector. Fleet Pro adds best-effort GPU and thermal data (Apple capability; Linux DRM where exported) and macOS per-process network via `nettop`; unavailable counters are omitted, and Linux per-process network is not provided |
 
 ## License
 
@@ -233,4 +235,4 @@ Copyright © 2026 Zyvor AI Labs Private Limited.
 
 ## Fleet Pro
 
-For production fleet telemetry, roles, tags/groups, centralized alerts, retention, SSO-proxy integration and metrics export, see `docs/FLEET-PRO.md`. The original collector/coordinator remain available as a read-only rollback path.
+Opt-in and still read-only (no command channel): richer silicon and AI workload telemetry, central history, tags and groups, `auditor` and `editor` roles, alerts and webhooks, an SSO-proxy endpoint, Prometheus export and local capacity forecasting. See [docs/FLEET-PRO.md](docs/FLEET-PRO.md). The original collector and coordinator stay available as a rollback path.

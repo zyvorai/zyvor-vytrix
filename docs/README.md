@@ -4,7 +4,10 @@
 | --- | --- |
 | `API.md` | Collector endpoints, flags, metric definitions, containers, storage |
 | `TESTING.md` | Test matrix for macOS and Linux, installers, remote verification |
+| `CLUSTER.md` | The optional read-only Mac cluster: coordinator, workers, API |
+| `FLEET-PRO.md` | Fleet Pro: richer telemetry, central history, roles, alerts, exports |
 | `RELEASE.md` | Verified and not-verified status, release artifacts, deploy layout |
+| `FLEET-RELEASE.md` | What a notarized macOS release still needs |
 | `design/UX-CONTRACT.md` | Window styles, tokens, laws, checklist |
 | `social/` | Hero (`vytrix-hero-dark`), share card, and their HTML sources |
 | `ux/` | Screenshots (`<style>-<mode>-<view>.png`), README cards, demo GIF |

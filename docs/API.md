@@ -37,6 +37,10 @@ All `/v1` reads require `Authorization: Bearer <VYTRIX_TOKEN>`. Browser requests
 - Listening ports: TCP only; restricted process visibility can hide ports.
 - macOS memory: estimate from `vm_stat`; macOS process CPU is the OS-reported `ps` estimate, not a sampled Mach task counter.
 
+## Fleet Pro fields
+
+`agent/vytrix_fleet.py` serves the same API and adds optional fields, so consumers of version 1 snapshots keep working: `hardware`, `aiWorkloads`, `inventory`, `agent`, and per-process `diskReadRate`, `diskWriteRate`, `networkInRate`, `networkOutRate`, `networkSockets` and `ai`. Rates are bytes per second. A field is omitted when the host cannot measure it. See [FLEET-PRO.md](FLEET-PRO.md).
+
 ## Containers
 
 Present unless the collector runs with `--no-containers`; both fields are optional, so older snapshots stay valid.
