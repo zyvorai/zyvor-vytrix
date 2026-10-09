@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 """Read-only Linux/macOS telemetry collector. Python 3.10+, no dependencies."""
 import argparse
 import datetime as dt

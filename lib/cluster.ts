@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {z} from 'zod';
 import {demoSnapshot,snapshotSchema} from './telemetry';
 const id=z.string().min(1).max(128);

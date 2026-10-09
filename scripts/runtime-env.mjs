@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 // Preloaded (`node --import`) before wrangler: keeps its state project-local and its telemetry off.
 import { mkdirSync } from "node:fs";
 import path from "node:path";

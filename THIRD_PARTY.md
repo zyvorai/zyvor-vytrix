@@ -1,6 +1,6 @@
 # Third-party components
 
-The original Vytrix source is Apache-2.0. Dependency licenses remain separate.
+The original Vytrix source is under the Business Source License 1.1 (versions up to v0.3.0: Apache-2.0). Dependency licenses remain separate.
 
 - React and React DOM: MIT
 - Next.js, Vinext, Vite and TypeScript: MIT

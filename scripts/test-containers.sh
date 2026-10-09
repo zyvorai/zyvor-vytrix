@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 # Integration test against a real container runtime.
 #
 #   scripts/test-containers.sh [docker|podman]

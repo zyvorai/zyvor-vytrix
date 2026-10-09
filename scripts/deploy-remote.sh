@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 # Vytrix — remote deploy to a Linux host (SSH + rsync + systemd, no containers)
 #
 # Usage:

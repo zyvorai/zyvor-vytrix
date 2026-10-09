@@ -3,7 +3,7 @@
 # Zyvor Vytrix
 
 [![verify](https://github.com/zyvorai/zyvor-vytrix/actions/workflows/ci.yml/badge.svg)](https://github.com/zyvorai/zyvor-vytrix/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-0071e3)](LICENSE)
+[![License](https://img.shields.io/badge/license-BUSL--1.1-0071e3)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%E2%89%A522.13-2997ff)](package.json)
 [![Python](https://img.shields.io/badge/collector-python%203.10%2B%20%C2%B7%200%20deps-63e6be)](agent/vytrix.py)
 [![Platforms](https://img.shields.io/badge/macOS%2026%20%C2%B7%20Linux-000000)](docs/TESTING.md)
@@ -212,7 +212,17 @@ An initial read-only release. It does not kill processes, control fans or volume
 
 ## License
 
-[Apache-2.0](LICENSE). Copyright 2026 Zyvor AI Labs Private Limited. See [NOTICE](NOTICE) and [THIRD_PARTY.md](THIRD_PARTY.md).
+Vytrix is licensed under the **Business Source License 1.1**.
+
+You may use Vytrix for development, evaluation, testing, demonstration, and other non-production purposes under the terms of the BSL.
+
+**Production and commercial deployments require a commercial license from Zyvor AI Labs Private Limited.**
+
+Each version converts to the **Apache License 2.0** four years after its initial release under the Business Source License.
+
+See [LICENSE](LICENSE) for the complete terms, [NOTICE](NOTICE) and [THIRD_PARTY.md](THIRD_PARTY.md). Releases up to and including v0.3.0 were published under Apache-2.0 and remain so.
+
+Copyright © 2026 Zyvor AI Labs Private Limited.
 
 <div align="center">
 

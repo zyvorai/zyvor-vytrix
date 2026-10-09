@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {Download,Moon,PanelLeft,Pause,Play,Plug,Search,Sun,X} from 'lucide-react';
 import {type Theme} from '@/hooks/use-preferences';
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 // Shared by shots.mjs and demo.mjs: start the dev server on a free port and open the app with chosen preferences.
 // Everything captured here is the built-in simulated telemetry (host zyvor-dev-01). Never point it at a real collector.
 import { spawn } from "node:child_process";

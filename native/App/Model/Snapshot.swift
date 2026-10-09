@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import Foundation
 
 /// Mirrors the collector's version 1 snapshot (docs/API.md). Every field is read-only telemetry.

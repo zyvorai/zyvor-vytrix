@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {Sheet,SheetContent,SheetDescription,SheetTitle} from '@/components/ui/sheet';
 import {bytes,type AppGroup} from '@/lib/telemetry';
 import {AppIcon} from './primitives';

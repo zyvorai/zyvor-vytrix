@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import Foundation
 
 /// Simulated telemetry for screenshots and trying the app without a collector. Host `zyvor-dev-01`.

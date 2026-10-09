@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 # Homebrew formula stub for the Vytrix collector.
 # `url` points at the v0.3.0 tag, which is not pushed yet, and `sha256` is a placeholder:
 # fill both from the real release tarball before publishing to a tap.
@@ -8,7 +8,7 @@ class Vytrix < Formula
   homepage "https://github.com/zyvorai/zyvor-vytrix"
   url "https://github.com/zyvorai/zyvor-vytrix/archive/refs/tags/v0.3.0.tar.gz"
   sha256 "0000000000000000000000000000000000000000000000000000000000000000"
-  license "Apache-2.0"
+  license "BUSL-1.1"
 
   depends_on "python@3.13"
 

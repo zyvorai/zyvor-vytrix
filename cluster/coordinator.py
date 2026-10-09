@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 """Opt-in, read-only cluster telemetry coordinator. Python standard library only.
 
 Workers push snapshots; viewers read them. There is no command channel: the coordinator cannot start,

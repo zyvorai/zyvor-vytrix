@@ -12,4 +12,6 @@
 5. **UI changes** follow [docs/design/UX-CONTRACT.md](docs/design/UX-CONTRACT.md): tokens only, both window styles, light and dark, 390px with no horizontal scroll. Run `pnpm shots` and look at the result.
 6. Add a line under `## Unreleased` in [CHANGELOG.md](CHANGELOG.md).
 
-By contributing you agree your work is licensed under Apache-2.0.
+By contributing to Vytrix, you agree that your contribution may be incorporated into and distributed as part of Vytrix under the project's current license, including the Business Source License 1.1 and any commercial licenses offered by Zyvor AI Labs Private Limited.
+
+You represent that you have the legal right to submit the contribution and grant Zyvor AI Labs Private Limited the rights necessary to distribute, sublicense, and commercially license that contribution as part of Vytrix.

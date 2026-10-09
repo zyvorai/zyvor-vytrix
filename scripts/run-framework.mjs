@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 // Runs the vinext CLI in this process so `pnpm dev` / `pnpm build` keep their PID and signals.
 import { fileURLToPath } from "node:url";
 

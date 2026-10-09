@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 # Install the Vytrix collector as a per-user launchd agent on macOS.
 # The access token is generated once and kept in the login Keychain.
 #

@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {Download,Upload} from 'lucide-react';
 import {Switch} from '@/components/ui/switch';
 import {accents,type Preferences,type Theme} from '@/hooks/use-preferences';

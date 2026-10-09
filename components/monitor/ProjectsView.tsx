@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {FolderCode} from 'lucide-react';
 import {bytes,type AppGroup} from '@/lib/telemetry';
 import {Card,EmptyState} from './primitives';

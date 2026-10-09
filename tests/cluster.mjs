@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import ts from 'typescript';
 import {readFile,writeFile,unlink} from 'node:fs/promises';
 import assert from 'node:assert/strict';

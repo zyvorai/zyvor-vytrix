@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {useState} from 'react';
 import {ArrowDown,ArrowUp,BatteryCharging,BatteryWarning} from 'lucide-react';
 import {bytes,type AppGroup,type Snapshot} from '@/lib/telemetry';

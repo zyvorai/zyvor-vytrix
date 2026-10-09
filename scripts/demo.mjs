@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 // Records the README demo GIF from the simulated telemetry: overview, a process sheet, containers,
 // switch to the Adwaita window style, then dark mode.
 // Same command locally: pnpm demo [out.gif]    (needs ffmpeg; Playwright's Chromium or system Chrome)
