@@ -21,8 +21,8 @@ export function ProcessSheet({app,onClose}:{app:AppGroup|null,onClose:()=>void})
         <p className="fine-print">One full logical core = 100% CPU. Memory is summed RSS and may double-count shared pages.</p>
         <div className="sheet-list">
           <table className="data-table compact">
-            <thead><tr><th scope="col">PID</th><th scope="col">Process</th><th scope="col" className="num">CPU</th><th scope="col" className="num">Memory</th></tr></thead>
-            <tbody>{processes.map(p=><tr key={p.pid}><td className="mono muted">{p.pid}</td><td><span className="truncate" title={p.name}>{p.name}</span>{p.ports.length>0&&<small className="mono">:{p.ports.join(', :')}</small>}</td><td className="num">{p.cpu.toFixed(1)}%</td><td className="num">{bytes(p.memory)}</td></tr>)}</tbody>
+            <thead><tr><th scope="col">PID</th><th scope="col">Process</th><th scope="col" className="num">CPU</th><th scope="col" className="num">Memory</th><th scope="col" className="num">Read/s</th><th scope="col" className="num">Write/s</th><th scope="col" className="num">Net ↓/↑</th></tr></thead>
+            <tbody>{processes.map(p=><tr key={p.pid}><td className="mono muted">{p.pid}</td><td><span className="truncate" title={p.name}>{p.name}</span>{p.ai&&<small>{p.ai.engine} · {p.ai.confidence}% confidence</small>}{p.ports.length>0&&<small className="mono">:{p.ports.join(', :')}</small>}</td><td className="num">{p.cpu.toFixed(1)}%</td><td className="num">{bytes(p.memory)}</td><td className="num">{p.diskReadRate===undefined?'—':bytes(p.diskReadRate)+'/s'}</td><td className="num">{p.diskWriteRate===undefined?'—':bytes(p.diskWriteRate)+'/s'}</td><td className="num">{p.networkInRate===undefined&&p.networkOutRate===undefined?'—':`${bytes(p.networkInRate??0)}/${bytes(p.networkOutRate??0)}`}</td></tr>)}</tbody>
           </table>
         </div>
       </>}

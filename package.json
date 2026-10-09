@@ -10,12 +10,13 @@
     "build": "node scripts/run-framework.mjs build",
     "start": "node --import ./scripts/runtime-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "test": "node tests/telemetry.mjs && node tests/cluster.mjs && python3 -m unittest discover -s tests -v",
+    "test": "node tests/telemetry.mjs && node tests/forecast.mjs && node tests/cluster.mjs && python3 -m unittest discover -s tests -v",
     "test:e2e": "playwright test",
     "test:containers": "bash scripts/test-containers.sh",
     "typecheck": "tsc --noEmit",
     "shots": "node scripts/shots.mjs",
-    "demo": "node scripts/demo.mjs"
+    "demo": "node scripts/demo.mjs",
+    "test:fleet": "python3 -m unittest tests/test_fleet.py -v && node tests/forecast.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

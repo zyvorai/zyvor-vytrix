@@ -1,0 +1,6 @@
+// SPDX-License-Identifier: BUSL-1.1
+import type {Snapshot} from './telemetry';
+export type Forecast={trendPerHour:number,etaHours:number|null,anomaly:boolean,zScore:number};
+function stats(values:number[]){const mean=values.reduce((a,b)=>a+b,0)/Math.max(1,values.length);const variance=values.reduce((n,v)=>n+(v-mean)**2,0)/Math.max(1,values.length);return{mean,std:Math.sqrt(variance)}}
+export function forecast(values:Array<{at:number,value:number}>,limit=100):Forecast{if(values.length<3)return{trendPerHour:0,etaHours:null,anomaly:false,zScore:0};const first=values[0],last=values.at(-1)!;const hours=Math.max(1/3600,(last.at-first.at)/3600);const trend=(last.value-first.value)/hours;const base=values.slice(0,-1).map(x=>x.value);const s=stats(base);const z=s.std?Math.abs(last.value-s.mean)/s.std:0;const eta=trend>0&&last.value<limit?(limit-last.value)/trend:null;return{trendPerHour:trend,etaHours:eta!==null&&Number.isFinite(eta)&&eta>=0?eta:null,anomaly:z>=3,zScore:z};}
+export function fleetCapacity(history:Snapshot[]){const rows=history.map(s=>({at:Date.parse(s.timestamp)/1000,cpu:s.cpu,memory:s.memoryUsed/s.host.memoryTotal*100,disk:s.diskUsed/s.diskTotal*100}));return{cpu:forecast(rows.map(x=>({at:x.at,value:x.cpu}))),memory:forecast(rows.map(x=>({at:x.at,value:x.memory}))),disk:forecast(rows.map(x=>({at:x.at,value:x.disk})))}};
