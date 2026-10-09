@@ -128,9 +128,9 @@ check(await page.getByText("simulated telemetry").isVisible(), "demo: says it is
 await shot(page, "site-demo-overview");
 const nav = (label) => page.locator(".window .nav-item").filter({ hasText: label }).click();
 await nav("Applications");
-await page.waitForSelector(".data-table tbody tr");
-check(await page.locator(".data-table tbody tr").count() >= 5, "demo: applications table renders");
-await page.locator(".data-table tbody tr").first().click();
+await page.waitForSelector(".view:not([hidden]) .data-table tbody tr");
+check(await page.locator(".view:not([hidden]) .data-table tbody tr").count() >= 5, "demo: applications table renders");
+await page.locator(".view:not([hidden]) .data-table tbody tr").first().click();
 await page.locator(".process-sheet").waitFor();
 check(await page.locator(".process-sheet tbody tr").first().isVisible(), "demo: process sheet opens");
 await page.keyboard.press("Escape");

@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: BUSL-1.1
 import {useEffect,useState} from 'react';
 import type {ClusterSnapshot} from '@/lib/cluster';
-import {addWebhook,getAlerts,getRules,saveRule,setNodeMeta,alertRuleSchema} from '@/lib/fleet';
+import {addWebhook,getAlerts,getRules,saveRule,setNodeMeta,alertRuleSchema,alertEventSchema} from '@/lib/fleet';
 import {Card} from './primitives';
 import {z} from 'zod';
 type Rule=z.infer<typeof alertRuleSchema>;
 type Connection={origin:string,token:string};
+type FleetAlert=z.infer<typeof alertEventSchema>;
 export function FleetAdminPanel({cluster,connection}:{cluster:ClusterSnapshot,connection:Connection|null}){
- const [rules,setRules]=useState<Rule[]>([]),[alerts,setAlerts]=useState<any[]>([]),[error,setError]=useState('');
+ const [rules,setRules]=useState<Rule[]>([]),[alerts,setAlerts]=useState<FleetAlert[]>([]),[error,setError]=useState('');
  const [node,setNode]=useState(cluster.nodes[0]?.id??''),[tags,setTags]=useState(''),[group,setGroup]=useState(''),[site,setSite]=useState('');
  const canAudit=cluster.role!=='viewer',canEdit=cluster.role==='editor'||cluster.role==='admin';
  useEffect(()=>{if(!connection||!canAudit)return;void Promise.all([getRules(connection.origin,connection.token),getAlerts(connection.origin,connection.token)]).then(([r,a])=>{setRules(r);setAlerts(a)}).catch(e=>setError(String(e)));},[connection,canAudit]);
