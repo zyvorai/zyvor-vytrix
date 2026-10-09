@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 # Install the Vytrix collector as a systemd service on Linux.
 #
 #   scripts/install-linux.sh [--system] [--allow-origin URL]... [--port N] [--no-containers] [--dry-run]

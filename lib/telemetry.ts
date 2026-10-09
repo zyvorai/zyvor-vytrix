@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import { z } from 'zod';
 const metric = z.number().finite().nonnegative();
 export const processSchema = z.object({pid:z.number().int().positive(),name:z.string().max(256),app:z.string().max(256),cpu:metric,memory:metric,project:z.string().max(256).nullable(),ports:z.array(z.number().int().min(1).max(65535)).max(256)});

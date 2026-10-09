@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {useState} from 'react';
 import {ArrowDown,ArrowUp,Box,Terminal} from 'lucide-react';
 import {bytes,formatPort,runtimeNames,type Container,type Snapshot} from '@/lib/telemetry';

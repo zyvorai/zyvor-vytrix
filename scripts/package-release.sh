@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 # Package release archives from a finished `pnpm build` into release/.
 #
 #   scripts/package-release.sh [VERSION]      (default: version from package.json)

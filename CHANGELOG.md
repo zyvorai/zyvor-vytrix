@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- **License:** future versions are under the Business Source License 1.1 (non-production use free; production use needs a commercial license from Zyvor AI Labs Private Limited; each version converts to Apache-2.0 four years after its first public release). v0.3.0 and earlier remain Apache-2.0. Contribution terms in CONTRIBUTING.md updated accordingly.
+
 ## v0.3.0 — 2026-10-09
 
 A macOS 27 window style, a native SwiftUI Mac app, an opt-in read-only Mac cluster view, and the Pages site with a live demo.

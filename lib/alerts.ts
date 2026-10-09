@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {type Snapshot} from '@/lib/telemetry';
 
 export type Alert={id:string,severity:'warning'|'critical',title:string,text:string};

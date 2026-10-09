@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {useEffect,useId,useRef,useState,type ReactNode} from 'react';
 
 export function AnimatedNumber({value,decimals=0}:{value:number,decimals?:number}){

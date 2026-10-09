@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 # Assemble the Pages site into _site/:
 #   /        site/ (landing) + shared images from docs/social and docs/ux
 #   /demo/   the REAL dashboard on its simulated telemetry, as static files

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 // Worker entry: hand every request to vinext's fetch handler.
 import handler from "vinext/server/fetch-handler";
 

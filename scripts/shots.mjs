@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 // Screenshots of every main view in both window styles, light and dark, plus 390px mobile. Demo data only.
 // Same command locally: pnpm shots [outdir]     (default docs/ux; needs Playwright's Chromium or system Chrome)
 import { mkdirSync } from "node:fs";

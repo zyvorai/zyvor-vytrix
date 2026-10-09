@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {Monitor,ShieldCheck,Server} from 'lucide-react';
 import {clusterOrigin,clusterRequest,clusterSchema,sessionSchema,pairingSchema,auditSchema,demoCluster,type ClusterSnapshot} from '@/lib/cluster';

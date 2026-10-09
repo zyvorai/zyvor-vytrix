@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {useCallback,useEffect,useState} from 'react';
 
 export type Appearance='auto'|'light'|'dark';

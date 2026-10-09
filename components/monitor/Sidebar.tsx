@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {Monitor} from 'lucide-react';
 import {sections,views,type ViewId} from './nav';
 import {type Snapshot} from '@/lib/telemetry';

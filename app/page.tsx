@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ShieldCheck} from 'lucide-react';
 import {groupApps,macMajor,platformOf,runningContainers,type AppGroup,type Snapshot} from '@/lib/telemetry';

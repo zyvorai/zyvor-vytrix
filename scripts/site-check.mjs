@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 // Browser check of the built Pages site, served under the real /zyvor-vytrix/ sub-path (as GitHub Pages does).
 // Same command locally: ./scripts/build-site.sh && node scripts/site-check.mjs [--shots dir]
 // --base https://zyvorai.github.io/zyvor-vytrix/ checks the live site instead of serving _site locally.

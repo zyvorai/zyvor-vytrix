@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {BatteryMedium,Bell,Box,Cpu,FolderCode,Gauge,HardDrive,Layers,MemoryStick,Network,Server,Settings} from 'lucide-react';
 
 export const views=[

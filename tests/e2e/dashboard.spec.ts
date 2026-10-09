@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import { expect, test, type Page } from "@playwright/test";
 
 const nav = (page: Page, name: string) =>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BUSL-1.1
 """Outbound, read-only cluster worker: pushes this Mac's snapshot to a coordinator. No command channel."""
 import argparse
 import getpass

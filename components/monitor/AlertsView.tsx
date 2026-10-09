@@ -1,5 +1,5 @@
 'use client';
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import {AlertTriangle,ShieldCheck} from 'lucide-react';
 import {type Alert} from '@/lib/alerts';
 import {Card,EmptyState} from './primitives';

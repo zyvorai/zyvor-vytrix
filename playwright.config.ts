@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BUSL-1.1
 import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env.VYTRIX_E2E_PORT || 5198);
