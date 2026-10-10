@@ -53,7 +53,7 @@ jobs:
         run: sudo apt-get install -y shellcheck
       - if: runner.os == 'macOS'
         run: brew install shellcheck
-      - run: shellcheck scripts/install-macos.sh scripts/install-linux.sh scripts/deploy-remote.sh scripts/test-containers.sh scripts/build-site.sh
+      - run: shellcheck scripts/install-macos.sh scripts/install-linux.sh scripts/deploy-remote.sh scripts/test-containers.sh scripts/build-site.sh scripts/package-mac.sh scripts/test-native-ui.sh
       - if: runner.os == 'macOS'
         run: scripts/install-macos.sh --dry-run --allow-origin http://localhost:5173
       - if: runner.os == 'Linux'
