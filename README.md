@@ -34,6 +34,8 @@
 
 **[Try the live demo](https://zyvorai.github.io/zyvor-vytrix/demo/)**: the real dashboard, running in your browser on simulated telemetry (nothing to install, nothing leaves the page).
 
+**[Download for Mac](https://github.com/zyvorai/zyvor-vytrix/releases/download/v0.3.0/Vytrix-0.3.0.dmg)**: the [native app](#native-mac-app), v0.3.0, Developer ID signed, not yet notarized (Apple silicon, macOS 26+).
+
 ![Vytrix: overview, an application's processes, containers, the Adwaita window style, then dark mode](docs/ux/vytrix-demo.gif)
 
 *About 12 seconds against the built-in simulated telemetry: overview, an application's processes, containers, switching to the Adwaita window style, then dark mode.*
@@ -69,6 +71,10 @@ Optional and read-only: a small worker on each Mac pushes its snapshot to a coor
 ## Native Mac app
 
 A SwiftUI app (`native/`) that shows the same telemetry in a native macOS 27 window. It starts the bundled collector on loopback with a random token held in memory, or connects to one you run elsewhere (Connect…, HTTPS unless it is localhost). It is read-only, like everything else here.
+
+**[Download Vytrix 0.3.0 for Mac](https://github.com/zyvorai/zyvor-vytrix/releases/download/v0.3.0/Vytrix-0.3.0.dmg)** (DMG, Apple silicon, macOS 26 or newer). Open it and drag Vytrix to Applications. The app is signed with a Developer ID but not yet notarized, so the first launch is blocked: open **System Settings → Privacy & Security** and choose **Open Anyway** next to the Vytrix message. The SHA-256 is in [`Vytrix-0.3.0.dmg.sha256`](https://github.com/zyvorai/zyvor-vytrix/releases/download/v0.3.0/Vytrix-0.3.0.dmg.sha256) on the [v0.3.0 release](https://github.com/zyvorai/zyvor-vytrix/releases/tag/v0.3.0); check it with `shasum -a 256 -c Vytrix-0.3.0.dmg.sha256`. The app bundles the collector, which needs Python 3.10+ (see below).
+
+Or build it from source:
 
 ```bash
 ./scripts/build-native.sh      # native/build/Vytrix.app, ad-hoc signed development build
@@ -207,7 +213,7 @@ An initial read-only release. It does not kill processes, control fans or volume
 | Dashboard | Working; Playwright on WebKit, Chromium and mobile WebKit |
 | Installers (launchd, systemd) and remote deploy | Working; dry-run checked in CI |
 | Mac cluster (worker + coordinator, read-only) | Experimental; tested with unit and mocked e2e tests and one real Mac enrolled over loopback. Not yet checked across two Macs or over HTTPS |
-| Native Mac app | Built and run on macOS 27.2 (Apple silicon) with live and demo data; no automated tests, not notarized |
+| Native Mac app | Built and run on macOS 27.2 (Apple silicon) with live and demo data; no automated tests. v0.3.0 DMG is Developer ID signed, not notarized (Apple silicon only) |
 | Homebrew formula | Stub, not published |
 | Fleet Pro (`agent/vytrix_fleet.py`, `cluster/fleet_coordinator.py`) | New and opt-in; unit-tested and covered by CI. Not yet checked across several Macs, over HTTPS, or with real webhook, SSO and Prometheus receivers |
 | GPU, sensors, per-app network | Not collected by the base collector. Fleet Pro adds best-effort GPU and thermal data (Apple capability; Linux DRM where exported) and macOS per-process network via `nettop`; unavailable counters are omitted, and Linux per-process network is not provided |
