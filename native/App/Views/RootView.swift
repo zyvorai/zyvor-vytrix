@@ -9,7 +9,7 @@ struct RootView: View {
     var body: some View {
         NavigationSplitView {
             List(Pane.allCases, selection: $section) { s in
-                Label(s.rawValue, systemImage: s.symbol).tag(s as Pane?)
+                Label(s.rawValue, systemImage: s.symbol)
             }
             .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 260)
             .safeAreaInset(edge: .bottom) { HostFooter().padding(12) }
