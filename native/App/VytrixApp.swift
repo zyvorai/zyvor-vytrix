@@ -2,8 +2,15 @@
 import SwiftUI
 import AppKit
 
+/// One window: closing it quits, which also stops the bundled collector. Without this the app stays
+/// running windowless, and with New Window removed a Dock click cannot bring the window back.
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+}
+
 @main
 struct VytrixApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var store = TelemetryStore()
 
     /// `--appearance light|dark` pins the colour scheme (screenshots); otherwise the system decides.
