@@ -4,7 +4,7 @@ import SwiftUI
 
 enum Pane: String, CaseIterable, Identifiable {
     case overview = "Overview", applications = "Applications", containers = "Containers", projects = "Projects"
-    var id: String { rawValue }
+    var id: Self { self }   // the sidebar List tags rows by id; it must match the Pane selection
     var symbol: String {
         switch self {
         case .overview: return "gauge.with.dots.needle.bottom.50percent"
