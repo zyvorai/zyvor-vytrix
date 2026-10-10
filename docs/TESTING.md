@@ -4,7 +4,8 @@
 |---|---|---|
 | Types | `pnpm typecheck` | Node ≥ 22.13 |
 | Cluster schema and URL rules | `node tests/cluster.mjs` | Node |
-| Native Mac app | `./scripts/build-native.sh` (compiles; there are no Swift tests) | macOS, Xcode command line tools |
+| Native Mac app | `./scripts/build-native.sh` (compiles; there are no Swift unit tests) | macOS, Xcode command line tools |
+| Native Mac app, UI smoke | `./scripts/test-native-ui.sh`: real clicks on every sidebar row, then closing the window must quit the app and its bundled collector. Run before every Mac release; not in CI (needs Accessibility) | macOS, Python ≥ 3.10, Accessibility for the terminal |
 | Schema, grouping, alerts | `node tests/telemetry.mjs` | Node |
 | Capacity forecasting | `node tests/forecast.mjs` | Node |
 | Fleet Pro (Python) and forecasting | `pnpm test:fleet` | Python ≥ 3.10, Node |

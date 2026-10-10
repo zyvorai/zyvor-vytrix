@@ -36,15 +36,21 @@ Each `v*` tag runs `.github/workflows/release.yml`, which tests, builds and atta
 - `zyvor-vytrix-collector-VERSION.tar.gz`: `agent/vytrix.py`, the cluster worker and coordinator, the macOS and Linux installers, and the API and cluster references.
 - `SHA256SUMS`.
 
-The native Mac app is not built by the workflow. Its DMG is signed on a Mac with the Developer ID credentials, notarized and stapled when credentials allow (`xcrun notarytool submit … --wait`, `xcrun stapler staple`), then uploaded with its checksum:
+A second job, `mac`, runs `scripts/package-mac.sh VERSION` on a macOS runner and attaches the native app:
+
+- `Vytrix-VERSION.dmg` and `Vytrix-VERSION.pkg` (Apple silicon, macOS 26+), each with a `.sha256`.
+
+They are Developer ID signed and notarized only when the repository has the Apple secrets (`MACOS_CERTS_P12`, `MACOS_CERTS_PASSWORD`, `DEVELOPER_ID_APP`, `DEVELOPER_ID_INSTALLER`, `NOTARY_KEY_P8`, `NOTARY_KEY_ID`, `NOTARY_ISSUER`; see the comment in `release.yml`). Without them the app is ad-hoc signed, the DMG and pkg are unsigned, and the release notes must say so. On a Mac with the identities in the keychain, the same script signs and notarizes locally:
 
 ```sh
-xcrun stapler validate Vytrix-VERSION.dmg
-shasum -a 256 Vytrix-VERSION.dmg > Vytrix-VERSION.dmg.sha256
-gh release upload vVERSION Vytrix-VERSION.dmg Vytrix-VERSION.dmg.sha256
+DEVELOPER_ID_APP="Developer ID Application: NAME (TEAMID)" \
+DEVELOPER_ID_INSTALLER="Developer ID Installer: NAME (TEAMID)" \
+NOTARY_PROFILE=vytrix-notary ./scripts/package-mac.sh VERSION
 ```
 
-v0.3.0: [Vytrix-0.3.0.dmg](https://github.com/zyvorai/zyvor-vytrix/releases/download/v0.3.0/Vytrix-0.3.0.dmg) (Apple silicon, macOS 26+).
+Before a Mac release, run `./scripts/test-native-ui.sh` (see [TESTING.md](TESTING.md)).
+
+v0.3.0: [Vytrix-0.3.0.dmg](https://github.com/zyvorai/zyvor-vytrix/releases/download/v0.3.0/Vytrix-0.3.0.dmg) (Apple silicon, macOS 26+), signed by hand, not notarized.
 
 Locally: `pnpm build && scripts/package-release.sh` writes the same files to `release/`.
 
