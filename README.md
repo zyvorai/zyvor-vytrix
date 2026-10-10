@@ -230,7 +230,7 @@ Each version converts to the **Apache License 2.0** four years after its initial
 
 See [LICENSE](LICENSE) for the complete terms, [NOTICE](NOTICE) and [THIRD_PARTY.md](THIRD_PARTY.md). Releases up to and including v0.3.0 were published under Apache-2.0 and remain so.
 
-Copyright © 2026 Zyvor AI Labs Private Limited.
+Copyright © 2026 Zyvor AI Labs Private Limited · [zyvor.dev](https://zyvor.dev)
 
 <div align="center">
 
