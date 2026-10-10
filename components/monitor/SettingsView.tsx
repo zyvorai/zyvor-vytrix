@@ -46,5 +46,6 @@ export function SettingsView({prefs,update,resolvedTheme,source,onImport,onExpor
       </Row>
       <p className="fine-print">History shows samples captured while this page is open. The collector keeps up to 30 days in SQLite. GPU, fans, audio and Bluetooth are not collected in this release.</p>
     </Card>
+    <p className="fine-print settings-copyright">Zyvor Vytrix · © 2026 Zyvor AI Labs Private Limited · <a href="https://zyvor.dev" target="_blank" rel="noreferrer">zyvor.dev</a> · BUSL-1.1</p>
   </div>;
 }
