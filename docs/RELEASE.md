@@ -5,7 +5,7 @@
 - **License:** future versions are under the Business Source License 1.1; v0.3.0 and earlier stay Apache-2.0. Each version converts to Apache-2.0 four years after its first public release; set a concrete Change Date when you cut a release.
 - **Fleet Pro** ([FLEET-PRO.md](FLEET-PRO.md)): richer telemetry, central history, roles (`auditor`, `editor`), alerts, webhooks, SSO-proxy endpoint, entitlements, Prometheus export, forecasting.
 - Verified in CI on Ubuntu and macOS: typecheck, lint, production build, telemetry, cluster and forecast tests, 36 Python tests, Playwright end-to-end, shellcheck, container tests and the Pages site checks. The native app compiles with `scripts/build-native.sh`.
-- Not verified: Fleet Pro across several Macs over HTTPS, webhook delivery, SSO behind a real identity proxy, Prometheus scraping, Apple notarization.
+- Not verified: Fleet Pro across several Macs over HTTPS, webhook delivery, SSO behind a real identity proxy, Prometheus scraping, Apple notarization (the v0.3.0 DMG is signed but not notarized).
 
 # v0.3.0 release status
 
@@ -23,7 +23,7 @@ A macOS 27 window style, a native SwiftUI Mac app (`native/`), an opt-in read-on
 ## Not verified for v0.3.0
 
 - The cluster across two or more Macs, and over HTTPS with a real certificate or private CA. The browser sign-in against a live coordinator is only covered by mocked tests.
-- The native Mac app on macOS 26, and on Intel. It has no automated tests, is ad-hoc signed and not notarized, and is not part of the release archives; build it from source.
+- The native Mac app on macOS 26. It has no automated tests and is Apple silicon only (no Intel build). The `Vytrix-0.3.0.dmg` on the release is Developer ID signed (team `WL6Z5GU7BJ`, hardened runtime) but not notarized, so Gatekeeper blocks the first launch until **Open Anyway** in System Settings → Privacy & Security; `scripts/build-native.sh` still produces an ad-hoc signed development build.
 - Anything from the v0.2.0 verification that was not re-run: the native collector on macOS 26.7.1, real Docker and Podman containers, and `scripts/deploy-remote.sh` against an Ubuntu 24.04 host.
 - Optional WebMCP registration in a supported browser.
 - Homebrew formula (`packaging/homebrew/vytrix.rb` is a stub).
@@ -35,6 +35,16 @@ Each `v*` tag runs `.github/workflows/release.yml`, which tests, builds and atta
 - `zyvor-vytrix-dashboard-VERSION.tar.gz`: the built Worker (`dist/server`) and assets (`dist/client`). Deploy with `npx wrangler@4 deploy --config dist/server/wrangler.json`.
 - `zyvor-vytrix-collector-VERSION.tar.gz`: `agent/vytrix.py`, the cluster worker and coordinator, the macOS and Linux installers, and the API and cluster references.
 - `SHA256SUMS`.
+
+The native Mac app is not built by the workflow. Its DMG is signed on a Mac with the Developer ID credentials, notarized and stapled when credentials allow (`xcrun notarytool submit … --wait`, `xcrun stapler staple`), then uploaded with its checksum:
+
+```sh
+xcrun stapler validate Vytrix-VERSION.dmg
+shasum -a 256 Vytrix-VERSION.dmg > Vytrix-VERSION.dmg.sha256
+gh release upload vVERSION Vytrix-VERSION.dmg Vytrix-VERSION.dmg.sha256
+```
+
+v0.3.0: [Vytrix-0.3.0.dmg](https://github.com/zyvorai/zyvor-vytrix/releases/download/v0.3.0/Vytrix-0.3.0.dmg) (Apple silicon, macOS 26+).
 
 Locally: `pnpm build && scripts/package-release.sh` writes the same files to `release/`.
 

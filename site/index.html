@@ -33,7 +33,7 @@
   <a class="brand" href="./" aria-label="Vytrix home">
     <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1d1d1f"/><path d="M5 18h5l3-9 5 16 3-7h6" fill="none" stroke="#f56a21" stroke-width="2.5" stroke-linejoin="round"/></svg><b>VYTRIX</b></a>
   <nav aria-label="Sections" id="sections">
-    <a href="#gallery">See it</a><a href="#features">Features</a><a href="#how">How it fits</a><a href="#quickstart">Quickstart</a><a href="#deploy">Deploy</a>
+    <a href="#gallery">See it</a><a href="#features">Features</a><a href="#how">How it fits</a><a href="#download">Download</a><a href="#quickstart">Quickstart</a><a href="#deploy">Deploy</a>
   </nav>
   <div class="bar-actions">
     <button id="theme" class="icon" type="button" aria-label="Switch to dark mode" aria-pressed="false">
@@ -50,7 +50,7 @@
     <p class="kicker">Zyvor · system monitor</p>
     <h1>See what your machine is <em>really doing.</em></h1>
     <p class="lede">A <strong>read-only</strong> system activity monitor for macOS and Linux. Applications grouped the way you think about them, processes, listening ports, project folders, and Docker and Podman containers, in a Liquid Glass or Adwaita window.</p>
-    <p class="cta"><a class="btn primary" href="demo/">Try the live demo</a><a class="link" href="#quickstart">Run it yourself</a></p>
+    <p class="cta"><a class="btn primary" href="demo/">Try the live demo</a><a class="btn" href="#download">Download for Mac</a><a class="link" href="#quickstart">Run it yourself</a></p>
     <ul class="chips" aria-label="Platforms"><li class="ro">Read-only</li><li>macOS 26</li><li>Linux</li><li>Docker</li><li>Podman</li></ul>
   </section>
 
@@ -109,6 +109,12 @@
     <p class="sub">A web page cannot read your processes, so a small collector does, read-only, and the dashboard polls it over HTTPS. Without one, the dashboard shows clearly labeled simulated telemetry.</p>
     <img class="card-img" src="ux/readme-how-it-works.jpg" width="3200" height="1814" alt="The dashboard talks to a read-only collector over HTTPS with a bearer token; the collector reads the host." loading="lazy" />
     <img class="card-img" src="ux/readme-runs-on.jpg" width="3200" height="1814" alt="macOS launchd, Linux systemd, remote Linux in one command, Docker and Podman." loading="lazy" />
+  </section>
+
+  <section id="download">
+    <h2>Download for Mac</h2>
+    <p class="sub">The native SwiftUI app with the collector bundled: it starts it on loopback with a token held in memory, read-only like everything else. Signed with a Developer ID but not yet notarized: on first launch, open <strong>System Settings → Privacy &amp; Security</strong> and choose <strong>Open Anyway</strong>. Apple silicon, macOS 26 or newer; the collector needs Python 3.10+ (Homebrew's, since the system <code>/usr/bin/python3</code> is 3.9).</p>
+    <p class="cta"><a class="btn primary" href="https://github.com/zyvorai/zyvor-vytrix/releases/download/v0.3.0/Vytrix-0.3.0.dmg">Download Vytrix 0.3.0 (DMG)</a><a class="link" href="https://github.com/zyvorai/zyvor-vytrix/releases/tag/v0.3.0">Release notes, SHA-256 and the collector archive</a></p>
   </section>
 
   <section id="quickstart">
