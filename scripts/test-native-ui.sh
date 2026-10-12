@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: BUSL-1.1
 # Copyright 2026 Zyvor AI Labs Private Limited
 # Smoke test for the native app, driven like a person would: click each sidebar row and check the
-# section changes, then close the window and check the app and its bundled collector both exit.
+# section changes, close the window and check the app keeps running (menu bar), reopen it, then quit
+# and check the app and its bundled collector both exit.
 # macOS only. The terminal needs Accessibility access (System Settings > Privacy & Security >
 # Accessibility) to post clicks. It takes no screenshots. Quits any running Vytrix first.
 set -euo pipefail
@@ -49,7 +50,18 @@ done
 [[ "$(ax "count $rows")" == 4 ]] || fail "expected 4 sidebar rows"
 
 ax 'click (first button of window 1 whose subrole is "AXCloseButton")' >/dev/null
-if gone "$app/Contents/MacOS/Vytrix"; then ok "closing the window quits the app"; else fail "app still running after its window closed"; fi
+sleep 1
+if pgrep -f "$app/Contents/MacOS/Vytrix" >/dev/null && pgrep -f "$app/Contents/Resources/vytrix.py" >/dev/null; then
+  ok "closing the window keeps the app and collector running"
+else
+  fail "app or collector exited when its window closed"
+fi
+open "$app"
+for _ in $(seq 1 40); do [[ "$(ax 'count windows' 2>/dev/null || echo 0)" -ge 1 ]] && break; sleep 0.25; done
+if [[ "$(ax 'count windows' 2>/dev/null || echo 0)" -ge 1 ]]; then ok "reopening brings the window back"; else fail "no window after reopen"; fi
+
+osascript -e 'tell application "Vytrix" to quit'
+if gone "$app/Contents/MacOS/Vytrix"; then ok "quit stops the app"; else fail "app still running after quit"; fi
 if gone "$app/Contents/Resources/vytrix.py"; then ok "bundled collector exits with the app"; else fail "bundled collector still running"; fi
 
 if ((failures)); then echo "$failures failure(s)"; exit 1; fi
