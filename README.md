@@ -82,7 +82,7 @@ open native/build/Vytrix.app   # or add --args --demo for simulated telemetry
 ./scripts/shots-native.sh      # docs/ux/native-*.png, from the simulated telemetry
 ```
 
-Needs macOS 26 or newer, the Xcode command line tools, and Python 3.10+ for the collector (the system `/usr/bin/python3` is 3.9; the app looks for Homebrew's first). Overview, Applications, Containers and Projects are in; Alerts, per-resource pages and Settings are not yet. Built and run on macOS 27.2.
+Needs macOS 26 or newer, the Xcode command line tools, and Python 3.10+ for the collector (the system `/usr/bin/python3` is 3.9; the app looks for Homebrew's first). Overview, Applications, Containers, Projects and Alerts are in, along with a menu bar item; per-resource pages and Settings are not yet. Alerts use the dashboard's thresholds and post local notifications (never for demo data). Built and run on macOS 27.2.
 
 | Overview, light | Applications, light |
 | --- | --- |

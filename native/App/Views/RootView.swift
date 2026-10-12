@@ -10,6 +10,7 @@ struct RootView: View {
         NavigationSplitView {
             List(Pane.allCases, selection: $section) { s in
                 Label(s.rawValue, systemImage: s.symbol)
+                    .badge(s == .alerts ? store.alerts.count : 0)
             }
             .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 260)
             .safeAreaInset(edge: .bottom) { HostFooter().padding(12) }
@@ -25,6 +26,7 @@ struct RootView: View {
                     case .applications: ApplicationsView()
                     case .containers: ContainersView()
                     case .projects: ProjectsView()
+                    case .alerts: AlertsView()
                     }
                 }
             }

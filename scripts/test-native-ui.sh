@@ -38,8 +38,8 @@ if [[ "$(title)" == *·* ]]; then ok "live telemetry loaded"; else fail "no snap
 if pgrep -f "$app/Contents/Resources/vytrix.py" >/dev/null; then ok "bundled collector running"; else fail "bundled collector not running"; fi
 
 rows='rows of outline 1 of scroll area 1 of group 1 of splitter group 1 of group 1 of window 1'
-names=(Overview Applications Containers Projects)
-for i in 2 3 4 1; do
+names=(Overview Applications Containers Projects Alerts)
+for i in 2 3 4 5 1; do
   name="${names[$((i - 1))]}"
   geometry="$(ax "get {position, size} of row $i of outline 1 of scroll area 1 of group 1 of splitter group 1 of group 1 of window 1" | tr -d ' ')"
   IFS=, read -r x y w h <<<"$geometry"
@@ -47,7 +47,7 @@ for i in 2 3 4 1; do
   for _ in $(seq 1 20); do [[ "$(title)" == "$name"* ]] && break; sleep 0.25; done
   if [[ "$(title)" == "$name"* ]]; then ok "sidebar click opens $name"; else fail "sidebar click on $name left the window on: $(title)"; fi
 done
-[[ "$(ax "count $rows")" == 4 ]] || fail "expected 4 sidebar rows"
+[[ "$(ax "count $rows")" == 5 ]] || fail "expected 5 sidebar rows"
 
 ax 'click (first button of window 1 whose subrole is "AXCloseButton")' >/dev/null
 sleep 1

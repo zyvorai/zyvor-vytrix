@@ -7,7 +7,8 @@ struct MenuBarLabel: View {
     @EnvironmentObject private var store: TelemetryStore
     var body: some View {
         if let s = store.snapshot {
-            Label(String(format: "%.0f%%", s.cpu), systemImage: "gauge.with.dots.needle.bottom.50percent")
+            Label(String(format: "%.0f%%", s.cpu),
+                  systemImage: store.alerts.isEmpty ? "gauge.with.dots.needle.bottom.50percent" : "exclamationmark.triangle.fill")
         } else {
             Label("–", systemImage: "gauge.with.dots.needle.bottom.50percent")
         }
@@ -55,6 +56,7 @@ struct MenuBarView: View {
             row("CPU", Format.percent(s.cpu))
             row("Memory", Format.percent(memory))
             row("Network", "↓ \(Format.rate(s.download))  ↑ \(Format.rate(s.upload))")
+            row("Alerts", store.alerts.isEmpty ? "None" : "\(store.alerts.count) active")
             if store.source == .demo {
                 Text("Simulated telemetry").font(.caption).foregroundStyle(.secondary)
             }
