@@ -1,5 +1,13 @@
 # Release status
 
+## v0.7.0 (2026-10-13)
+
+- **Native widget and App Intents** (see [WIDGETS.md](WIDGETS.md)): a System widget (small, medium) and "What is using my CPU?" / "How is my Mac doing?" intents. Read-only; the app hands readings to the widget's own sandbox container, no App Group, no token.
+- **Fix:** the bundled collector no longer outlives the app (SIGTERM, SIGINT, SIGHUP, and `--exit-with-parent` for `kill -9`).
+- **Verified locally on macOS 27.2 (Apple silicon):** Xcode build of the app with the widget extension, signed sandboxed appex, `codesign --verify --deep --strict`, pluginkit registration, widget views rendered at both sizes, `scripts/test-native-logic.sh`, `scripts/test-native-ui.sh`; the collector was stopped with `kill -TERM` and `kill -KILL` of the app.
+- **Not verified:** the widget in the macOS widget gallery or on the desktop; Spotlight, Siri and Shortcuts UI; Developer ID signing of the appex; macOS 26. The DMG and pkg are unsigned and not notarized because the repository has no Apple secrets.
+- **Known:** Time Machine and timeline windows are capped at 1000 samples (about 33 minutes at the default interval).
+
 ## v0.6.0 (2026-10-13)
 
 - **MCP server** (`agent/vytrix_mcp.py`, [MCP.md](MCP.md)): read-only tools over a collector for MCP clients; every tool is a `GET`, asserted by tests.
@@ -13,7 +21,7 @@
 - **Native Mac app:** per-resource panes, Settings with snapshot import and export, the macOS 27 look pass, Evidence sheet and Timeline.
 - **Verified locally on macOS 27.2 (Apple silicon):** `scripts/build-native.sh`; `scripts/test-native-logic.sh` (41 checks, including decoding real collector output); `scripts/test-native-ui.sh` (15 sidebar rows, close-keeps-running, reopen, quit stops the collector); the Python suite (51 tests); `pnpm test:e2e`.
 - **Not verified:** the native app on macOS 26; dragging a range on the native chart by hand; a shaded anomaly range on a real busy host (only seen in tests); notifications on a fresh install. The DMG and pkg are unsigned and not notarized because the repository has no Apple secrets.
-- **Known:** terminating the app with SIGTERM leaves the bundled collector running; use Quit. (Fixed after this release: see CHANGELOG.)
+- **Known:** terminating the app with SIGTERM leaves the bundled collector running; use Quit. (Fixed in v0.7.0.)
 
 ## v0.4.1 (2026-10-13)
 
