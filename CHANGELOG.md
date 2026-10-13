@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.5.0 — 2026-10-13
+
+Anomaly bands, evidence, an incident timeline and a change recorder, on the collector, the web dashboard and the native app.
+
 ### Added
 - **Native app: Timeline pane** (System). The same `/v1/timeline` and `/v1/changes` as the web view: events, the fingerprint, why the window differs from the one before, and apps, ports and containers that appeared or went away, over 5, 15 or 30 minutes. Needs a collector; demo data and imported snapshots say so. The collector contract test now decodes real timeline and changes output.
 - **Web dashboard: Timeline view** (System). Shows `/v1/timeline` (alert transitions at your threshold, anomaly windows, container changes, the 12-hex fingerprint, and why the window differs from the one before) and `/v1/changes` (apps started or stopped, ports opened or closed, containers). Needs a live collector; demo data and imports say so.

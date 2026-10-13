@@ -1,5 +1,13 @@
 # Release status
 
+## v0.5.0 (2026-10-13)
+
+- **Anomaly bands, evidence, timeline and change recorder:** new collector endpoints `/v1/anomalies`, `/v1/evidence`, `/v1/timeline` and `/v1/changes`, computed from the stored history (no new storage), with a native Timeline pane and anomaly ribbon, and the same on the web dashboard. See [CHANGELOG.md](../CHANGELOG.md) and [API.md](API.md).
+- **Native Mac app:** per-resource panes, Settings with snapshot import and export, the macOS 27 look pass, Evidence sheet and Timeline.
+- **Verified locally on macOS 27.2 (Apple silicon):** `scripts/build-native.sh`; `scripts/test-native-logic.sh` (41 checks, including decoding real collector output); `scripts/test-native-ui.sh` (15 sidebar rows, close-keeps-running, reopen, quit stops the collector); the Python suite (51 tests); `pnpm test:e2e`.
+- **Not verified:** the native app on macOS 26; dragging a range on the native chart by hand; a shaded anomaly range on a real busy host (only seen in tests); notifications on a fresh install. The DMG and pkg are unsigned and not notarized because the repository has no Apple secrets.
+- **Known:** terminating the app with SIGTERM leaves the bundled collector running; use Quit.
+
 ## v0.4.1 (2026-10-13)
 
 Packaging fix only. The v0.4.0 tag's `mac` job failed (`sign_pkg[@]: unbound variable` in `scripts/package-mac.sh`), so v0.4.0 has the dashboard and collector archives but no DMG or pkg. v0.4.1 has the same app and the fix. The repository has no Apple secrets, so its DMG and pkg are unsigned and not notarized: Gatekeeper blocks the first launch until **Open Anyway**.
