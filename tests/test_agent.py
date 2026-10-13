@@ -230,6 +230,52 @@ class Tests(unittest.TestCase):
                     self.assertEqual(e.exception.code,400,bad)
             finally:
                 server.shutdown();server.server_close();thread.join()
+    def test_timeline_alert_hysteresis_and_container_changes(self):
+        samples=Tests.synthetic(12)
+        for i,sample in enumerate(samples):
+            sample['cpu']=[10,10,90,92,96,88,82,70,10,10,10,10][i]   # threshold 85: fires, critical at 95, clears below 80
+            sample['containers']=[] if i<4 else [{'runtime':'docker','id':'x','name':'web','image':'nginx','state':'running' if i<9 else 'exited','cpu':1,'memory':1,'memoryLimit':None}]
+            if i==0:sample['containers']=[{'runtime':'docker','id':'old','name':'job','image':'x','state':'running','cpu':1,'memory':1,'memoryLimit':None}]
+        events=v.timeline_events(samples,85)
+        alerts=[(e['subject'],e['detail']) for e in events if e['kind']=='alert']
+        self.assertEqual(alerts,[('cpu','fired'),('cpu','escalated'),('cpu','cleared')])
+        details=[e['detail'] for e in events if e['kind']=='container']
+        self.assertIn('appeared',details)
+        self.assertIn('disappeared',details)
+        self.assertIn('running to exited',details)
+    def test_fingerprint_depends_on_what_happened_not_when(self):
+        a=[{'time':'2026-01-01T00:00:00Z','kind':'alert','subject':'cpu','detail':'fired','severity':'warning'}]
+        b=[{'time':'2030-06-01T12:00:00Z','kind':'alert','subject':'cpu','detail':'fired','severity':'warning'}]
+        c=[{'time':'2026-01-01T00:00:00Z','kind':'alert','subject':'memory','detail':'fired','severity':'warning'}]
+        self.assertEqual(v.timeline_fingerprint(a),v.timeline_fingerprint(b))
+        self.assertNotEqual(v.timeline_fingerprint(a),v.timeline_fingerprint(c))
+        self.assertRegex(v.timeline_fingerprint(a),r'^[0-9a-f]{12}$')
+        self.assertEqual(v.timeline_fingerprint([]),v.timeline_fingerprint([]))
+    def test_timeline_endpoint_and_why_changed(self):
+        with tempfile.TemporaryDirectory() as d:
+            store=v.Store(str(Path(d)/'history.sqlite'))
+            samples=Tests.synthetic(60)
+            for i,sample in enumerate(samples):
+                sample['cpu']=95.0 if i>=30 else 5.0
+                store.add(sample)
+            server=v.TelemetryServer(('127.0.0.1',0),'a'*32,[],store,v.Collector().snapshot())
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            base='http://127.0.0.1:'+str(server.server_port)
+            def get(path):
+                return urllib.request.urlopen(urllib.request.Request(base+path,headers={'Authorization':'Bearer '+'a'*32}),timeout=3)
+            stamp=lambda i:dt.datetime.fromisoformat(samples[i]['timestamp'].replace('Z','+00:00')).timestamp()
+            try:
+                with get(f'/v1/timeline?from={stamp(30)}&to={stamp(59)}&threshold=85') as r:body=json.load(r)
+                self.assertEqual(body['window']['samples'],30)
+                self.assertTrue(any(e['kind']=='alert' and e['subject']=='cpu' and e['detail']=='fired' for e in body['events']))
+                self.assertRegex(body['fingerprint'],r'^[0-9a-f]{12}$')
+                # The previous window was quiet, so the alert is new relative to it.
+                self.assertIn('alert|cpu|fired|critical',body['whyChanged']['newSincePrevious'])
+                for bad in ('','?from=10','?from=10&to=5','?from=1&to=200000','?from=1&to=2&threshold=0','?from=nan&to=5'):
+                    with self.assertRaises(urllib.error.HTTPError) as e:get('/v1/timeline'+bad)
+                    self.assertEqual(e.exception.code,400,bad)
+            finally:
+                server.shutdown();server.server_close();thread.join()
     def test_retention(self):
         with tempfile.TemporaryDirectory() as d:
             store=v.Store(str(Path(d)/'history.sqlite'))

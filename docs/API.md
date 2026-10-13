@@ -8,6 +8,7 @@ All `/v1` reads require `Authorization: Bearer <VYTRIX_TOKEN>`. Browser requests
 | `GET /v1/history?since=EPOCH_SECONDS&limit=300` | `{version: 1, samples: [...]}` in chronological order; limit 1–1000 |
 | `GET /v1/anomalies?since=EPOCH_SECONDS&limit=600` | Anomaly bands over stored history; see below. limit 1–1000 |
 | `GET /v1/evidence?from=EPOCH&to=EPOCH&metric=cpu` | What was busy in a window, against the window before it; see below. `metric` is `cpu`, `memory` or `network` |
+| `GET /v1/timeline?from=EPOCH&to=EPOCH&threshold=85` | Alerts, anomaly windows and container changes in a window, with a fingerprint and what changed since the previous window; see below |
 | `GET /healthz` | `{"status": "ok"}`; no token, no telemetry |
 | `OPTIONS` | CORS preflight for an allowed origin |
 | any other path | With `--ui-upstream`: proxied to the dashboard (GET, HEAD, POST). Otherwise 404. |
@@ -35,6 +36,18 @@ The band is an exponentially weighted mean and variance with a floor on the devi
 - `notes`: what the numbers are and are not.
 
 `metric=network` lists only apps that actually have per-process network rates (Fleet Pro on macOS); with the base collector it returns an empty `apps` list and says why, rather than estimating. Evidence correlates; it does not establish cause.
+
+### Timeline
+
+`GET /v1/timeline?from=&to=&threshold=` (window at most 24 hours, `threshold` 1–100, default 85) turns stored history into a list of events and a fingerprint. It is deterministic and uses no model:
+
+- `events`: oldest first, at most 200 (`eventCount` is the total). Each has `time`, `kind`, `subject`, `detail`, `severity` and `text`.
+  - `alert`: CPU, memory and disk pressure and containers near their memory limit, replayed against `threshold`: `fired` at the threshold, `escalated` to critical at threshold + 10, `cleared` once 5 points below it.
+  - `container`: appeared, disappeared, or changed state.
+  - `anomaly`: a `/v1/anomalies` window (with `end` and `peak`).
+- `fingerprint`: 12 hex characters over the sorted set of `kind|subject|detail|severity`, without times, so the same pattern of events gives the same fingerprint in any window.
+- `whyChanged`: against the same-length window before it, the event keys that are `newSincePrevious` and `goneSincePrevious`, and that window's `previousFingerprint` (`null` when it holds no samples).
+- `window.samples` is capped at 1000, with a note when it was cut. `notes` says what the data is not: alerts are replayed from history, not a record of what a dashboard showed.
 
 401 means invalid/missing token, 403 means denied Origin, 400 means invalid history query, 404 means unknown path, 502 means the dashboard upstream is down. Mutations are not supported. The dashboard proxy never forwards the `Authorization` header. Snapshots contain host name, OS, process names, PIDs, RSS, CPU, best-effort project folder basename, listening ports and container metadata. No argv, environment, file contents or packet payloads are collected. Project names, executable paths and container names may still be sensitive; protect your collector and exported snapshots.
 
