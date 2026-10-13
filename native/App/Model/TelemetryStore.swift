@@ -48,6 +48,11 @@ final class TelemetryStore: ObservableObject {
     @Published private(set) var status: Status = .starting
     @Published private(set) var source: Source = .local
     @Published var paused = false
+    /// Time machine: stored samples (full snapshots) and the one on screen. While `replayIndex` is set
+    /// the dashboard shows that past sample and live polling keeps recording without replacing it.
+    @Published private(set) var replay: [Snapshot] = []
+    @Published private(set) var replayIndex: Int?
+    var isReplaying: Bool { replayIndex != nil }
     @Published var search = ""
     @Published var threshold: Double = {
         let v = UserDefaults.standard.double(forKey: "vytrix.threshold")
@@ -136,6 +141,8 @@ final class TelemetryStore: ObservableObject {
         snapshot = nil
         history = []
         dismissed = []
+        replay = []
+        replayIndex = nil
         notifier.reset()
         failures = 0
         status = .starting
@@ -232,6 +239,30 @@ final class TelemetryStore: ObservableObject {
 
     var canExplain: Bool { hasCollector }
 
+    // MARK: time machine
+
+    /// Loads up to the last 1000 stored samples (about 33 minutes at the default interval) and shows the
+    /// newest. False when there is no collector or it holds fewer than two samples.
+    func beginReplay() async -> Bool {
+        let since = Int(Date().timeIntervalSince1970) - 3600
+        guard let h = await fetch("/v1/history?since=\(since)&limit=1000", as: HistoryResponse.self), h.samples.count > 1 else { return false }
+        replay = h.samples
+        scrub(to: h.samples.count - 1)
+        return true
+    }
+
+    func scrub(to index: Int) {
+        guard replay.indices.contains(index) else { return }
+        replayIndex = index
+        snapshot = replay[index]
+    }
+
+    func endReplay() {
+        replayIndex = nil
+        replay = []
+        Task { await poll() }
+    }
+
     private func seedHistory() async {
         let since = Int(Date().timeIntervalSince1970) - 1800
         guard let r = request("/v1/history?since=\(since)&limit=300") else { return }
@@ -266,11 +297,11 @@ final class TelemetryStore: ObservableObject {
     }
 
     private func append(_ s: Snapshot, date: Date) {
-        snapshot = s
+        if replayIndex == nil { snapshot = s }
         let firing = AlertRules.compute(s, threshold: threshold)
         dismissed.formIntersection(firing.map(\.id))
         let fresh = notifier.fresh(firing)
-        if source != .demo, notificationsEnabled, !fresh.isEmpty { AlertNotifications.post(fresh, host: s.host.name) }
+        if source != .demo, notificationsEnabled, !fresh.isEmpty, replayIndex == nil { AlertNotifications.post(fresh, host: s.host.name) }
         history.append(Sample(s, at: date))
         if history.count > maxSamples { history.removeFirst(history.count - maxSamples) }
     }

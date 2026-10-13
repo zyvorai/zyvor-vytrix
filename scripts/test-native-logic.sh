@@ -25,6 +25,8 @@ for i in range(400):
                                     'cpu': 3.0, 'memory': 400, 'memoryLimit': 1000}]})
 ts = lambda i: base + i * 2
 tmp = sys.argv[1]
+real = v.Collector().snapshot()
+json.dump({'version': 1, 'samples': [real, dict(real, timestamp=real['timestamp'])]}, open(tmp + '/history.json', 'w'))
 json.dump(v.anomaly_report(samples), open(tmp + '/anomalies.json', 'w'))
 late = [dict(s) for s in samples[290:320]]
 for s in late[15:]:
