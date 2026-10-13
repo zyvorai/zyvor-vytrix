@@ -161,6 +161,75 @@ class Tests(unittest.TestCase):
                 self.assertEqual(e.exception.code,400)
             finally:
                 server.shutdown();server.server_close();thread.join()
+    @staticmethod
+    def with_processes(n,busy_from=None,network=False):
+        samples=Tests.synthetic(n)
+        for i,sample in enumerate(samples):
+            busy=busy_from is not None and i>=busy_from
+            procs=[{'pid':1,'name':'idle','app':'Idle','cpu':1.0,'memory':1000,'ports':[]},
+                   {'pid':2,'name':'node','app':'Build','cpu':60.0 if busy else 2.0,'memory':5000,'ports':[]},
+                   {'pid':3,'name':'node helper','app':'Build','cpu':10.0 if busy else 1.0,'memory':3000,'ports':[]}]
+            if network:procs[1]['networkInRate']=2000.0;procs[1]['networkOutRate']=500.0
+            sample['processes']=procs
+            sample['containers']=[{'runtime':'docker','id':'abc','name':'db','image':'pg','state':'running','cpu':30.0 if busy else 3.0,'memory':400,'memoryLimit':1000}]
+        return samples
+    def test_evidence_finds_the_busy_app_and_compares_with_baseline(self):
+        samples=self.with_processes(200,busy_from=100)
+        stamp=lambda i:dt.datetime.fromisoformat(samples[i]['timestamp'].replace('Z','+00:00')).timestamp()
+        start,end=stamp(100),stamp(199)
+        window=[s for s in samples if start<=dt.datetime.fromisoformat(s['timestamp'].replace('Z','+00:00')).timestamp()<=end]
+        baseline=samples[:100]
+        report=v.evidence_report(window,baseline,[],start,end)
+        top=report['apps'][0]
+        self.assertEqual(top['name'],'Build')
+        self.assertEqual(top['mean'],70.0)            # two processes summed per sample
+        self.assertEqual(top['baselineMean'],3.0)
+        self.assertEqual(top['delta'],67.0)
+        self.assertEqual(top['present'],len(window))
+        self.assertEqual(report['containers'][0]['name'],'db')
+        self.assertEqual(report['containers'][0]['meanCpu'],30.0)
+        self.assertEqual(report['host']['memory']['mean'],40.0)
+        self.assertTrue(any('RSS' in n for n in report['notes']))
+    def test_evidence_network_is_absent_not_zero_without_rates(self):
+        samples=self.with_processes(20)
+        report=v.evidence_report(samples,[],[],0,1,'network')
+        self.assertEqual(report['apps'],[])
+        self.assertTrue(any('per-app network' in n for n in report['notes']))
+        self.assertIsNone(report['baselineHost'])
+        withrates=v.evidence_report(self.with_processes(20,network=True),[],[],0,1,'network')
+        self.assertEqual(withrates['apps'][0]['name'],'Build')
+        self.assertEqual(withrates['apps'][0]['mean'],2500.0)
+    def test_evidence_includes_overlapping_anomaly_windows(self):
+        samples=self.with_processes(400)
+        for i in range(300,305):samples[i]['cpu']=95.0
+        t=lambda i:dt.datetime.fromisoformat(samples[i]['timestamp'].replace('Z','+00:00')).timestamp()
+        report=v.evidence_report(samples[290:320],samples[260:290],samples[:290][-v.ANOMALY_WARMUP:],t(290),t(319))
+        self.assertEqual([w['metric'] for w in report['anomalies']['windows']],['cpu'])
+        self.assertGreater(report['anomalies']['peaks']['cpu'],v.ANOMALY_K)
+    def test_evidence_endpoint(self):
+        with tempfile.TemporaryDirectory() as d:
+            store=v.Store(str(Path(d)/'history.sqlite'))
+            samples=self.with_processes(60,busy_from=30)
+            for sample in samples:store.add(sample)
+            snapshot=v.Collector().snapshot()
+            server=v.TelemetryServer(('127.0.0.1',0),'a'*32,[],store,snapshot)
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            base='http://127.0.0.1:'+str(server.server_port)
+            def get(path):
+                return urllib.request.urlopen(urllib.request.Request(base+path,headers={'Authorization':'Bearer '+'a'*32}),timeout=3)
+            stamp=lambda i:dt.datetime.fromisoformat(samples[i]['timestamp'].replace('Z','+00:00')).timestamp()
+            try:
+                with get(f'/v1/evidence?from={stamp(30)}&to={stamp(59)}&metric=cpu') as r:body=json.load(r)
+                self.assertEqual(body['window']['samples'],30)
+                # The baseline spans the same duration before `from`, so it holds one sample fewer than the inclusive window.
+                self.assertEqual(body['window']['baselineSamples'],29)
+                self.assertEqual(body['apps'][0]['name'],'Build')
+                self.assertEqual(body['apps'][0]['delta'],67.0)
+                for bad in ('','?from=10','?from=10&to=5','?from=1&to=200000','?from=1&to=2&metric=disk','?from=nan&to=5'):
+                    with self.assertRaises(urllib.error.HTTPError) as e:get('/v1/evidence'+bad)
+                    self.assertEqual(e.exception.code,400,bad)
+            finally:
+                server.shutdown();server.server_close();thread.join()
     def test_retention(self):
         with tempfile.TemporaryDirectory() as d:
             store=v.Store(str(Path(d)/'history.sqlite'))
