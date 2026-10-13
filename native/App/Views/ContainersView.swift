@@ -52,7 +52,7 @@ struct ContainersView: View {
                     Text(rt.available ? "available" : (rt.error ?? "unavailable")).foregroundStyle(.secondary)
                 }
                 .padding(12).frame(maxWidth: .infinity, alignment: .leading)
-                .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: 12))
+                .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: Theme.panelRadius))
             }
         }
     }

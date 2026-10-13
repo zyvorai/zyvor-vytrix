@@ -14,7 +14,7 @@ struct OverviewView: View {
                     if case .demo = store.source {
                         Label("You are viewing simulated telemetry.", systemImage: "info.circle")
                             .font(.callout).frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(12).background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: 10))
+                            .padding(12).background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: Theme.controlRadius))
                     }
                     tiles(s)
                     HStack(alignment: .top, spacing: 16) {
@@ -35,13 +35,13 @@ struct OverviewView: View {
         let apps = AppGroup.group(s)
         return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 3), spacing: 16) {
             MetricTile(label: "CPU", symbol: "cpu", value: String(format: "%.1f", s.cpu), unit: "%",
-                       hint: "\(s.host.cores) logical cores", series: recent.map(\.cpu), tint: .accentColor)
+                       hint: "\(s.host.cores) logical cores", series: recent.map(\.cpu), tint: MetricColor.cpu.color)
             MetricTile(label: "Memory", symbol: "memorychip", value: String(format: "%.1f", s.memoryUsed / 1_073_741_824), unit: "GB",
-                       hint: "of \(Format.bytes(s.host.memoryTotal))", series: recent.map(\.memory))
+                       hint: "of \(Format.bytes(s.host.memoryTotal))", series: recent.map(\.memory), tint: MetricColor.memory.color)
             MetricTile(label: "Disk", symbol: "internaldrive", value: String(format: "%.0f", s.diskUsed / max(1, s.diskTotal) * 100), unit: "%",
-                       hint: "\(Format.bytes(s.diskTotal - s.diskUsed)) free", series: recent.map(\.disk))
+                       hint: "\(Format.bytes(s.diskTotal - s.diskUsed)) free", series: recent.map(\.disk), tint: MetricColor.disk.color)
             MetricTile(label: "Network", symbol: "arrow.up.arrow.down", value: Format.bytes(s.download), unit: "/s in",
-                       hint: "↑ \(Format.rate(s.upload)) out", series: recent.map(\.network))
+                       hint: "↑ \(Format.rate(s.upload)) out", series: recent.map(\.network), tint: MetricColor.network.color)
             MetricTile(label: "Applications", symbol: "square.stack.3d.up", value: "\(apps.count)", unit: "apps",
                        hint: "\(s.processes.count) processes", action: { open(.applications) })
             MetricTile(label: "Containers", symbol: "shippingbox", value: "\(running(s)?.count ?? 0)", unit: "running",
@@ -68,7 +68,7 @@ struct OverviewView: View {
                         .foregroundStyle(by: .value("Series", "Memory"))
                 }
             }
-            .chartForegroundStyleScale(["CPU": Color.accentColor, "Memory": Color.secondary])
+            .chartForegroundStyleScale(["CPU": MetricColor.cpu.color, "Memory": MetricColor.memory.color])
             .chartYScale(domain: 0...100)
             .chartYAxis { AxisMarks(values: [0, 25, 50, 75, 100]) { v in AxisGridLine(); AxisValueLabel("\(v.as(Int.self) ?? 0)%") } }
             .frame(height: 230)
@@ -101,7 +101,7 @@ struct OverviewView: View {
                         HStack { Text(c.name).fontWeight(.medium); Spacer(); Text(Format.percent(c.cpu)).monospacedDigit() }
                         Text(c.image).font(.caption.monospaced()).foregroundStyle(.secondary).lineLimit(1)
                     }
-                    .padding(12).background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
+                    .padding(12).background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: Theme.controlRadius))
                 }
             }
         }

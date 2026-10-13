@@ -143,7 +143,7 @@ struct ResourceView: View {
                         .foregroundStyle(by: .value("Series", "Upload"))
                 }
             }
-            .chartForegroundStyleScale(["Download": Color.accentColor, "Upload": Color.secondary])
+            .chartForegroundStyleScale(["Download": MetricColor.network.color, "Upload": MetricColor.upload.color])
             .chartYAxis { AxisMarks { v in AxisGridLine(); AxisValueLabel(String(format: "%.1f MB/s", v.as(Double.self) ?? 0)) } }
         default:
             let value: (Sample) -> Double? = {
@@ -157,11 +157,20 @@ struct ResourceView: View {
             Chart(w) { p in
                 if let v = value(p) {
                     LineMark(x: .value("Time", p.date), y: .value(pane.rawValue, v))
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(lineColor)
                 }
             }
             .chartYScale(domain: 0...100)
             .chartYAxis { AxisMarks(values: [0, 25, 50, 75, 100]) { v in AxisGridLine(); AxisValueLabel("\(v.as(Int.self) ?? 0)%") } }
+        }
+    }
+
+    private var lineColor: Color {
+        switch pane {
+        case .cpu: return MetricColor.cpu.color
+        case .memory: return MetricColor.memory.color
+        case .disk: return MetricColor.disk.color
+        default: return MetricColor.battery.color
         }
     }
 

@@ -79,7 +79,7 @@ struct HostFooter: View {
             Spacer(minLength: 0)
         }
         .padding(10)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
+        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: Theme.controlRadius))
     }
     private var color: Color {
         if store.paused { return .secondary }

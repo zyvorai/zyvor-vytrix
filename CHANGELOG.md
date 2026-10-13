@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Changed
+- **Native app: macOS 27 look.** Chart colours are fixed per metric from the `macos27` tokens (CPU blue, everything else neutral grey) instead of following the accent, so changing the accent in Settings no longer recolours the charts; the top-consumer meters are neutral. Panels use the 14/10/7 radii of the web `macos27` style. `native/App/Views/Theme.swift` holds the tokens.
+
 ### Added
 - **Native app: Settings.** Appearance (Auto, Light, Dark), the eight dashboard accents, alert threshold and notifications, snapshot Import and Export (JSON in the telemetry schema, the same files as the web dashboard), and the data source (This Mac or demo data). An imported snapshot is shown as a single static sample and stops polling. Preferences are stored in UserDefaults; the token is never stored. The native window follows the system look, so there is no window-style switch.
 - **Native app: resource panes.** CPU, Memory, Disk, Network and Battery, each with the current reading, a few derived stats (average, peak, capacity), a 1m/5m/1h history chart, and for CPU and Memory the busiest applications (select one to open its process inspector). Battery shows "No battery reading" on hosts without one. The sidebar is grouped Monitor, Workloads and System like the web dashboard.
