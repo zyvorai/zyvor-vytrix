@@ -67,7 +67,7 @@ cat > "$WORK/distribution.xml" <<XML
 XML
 sign_pkg=()
 [[ -n "$PKG_ID" ]] && sign_pkg=(--sign "$PKG_ID" --timestamp)
-productbuild --distribution "$WORK/distribution.xml" --package-path "$WORK/pkgs" "${sign_pkg[@]}" "$PKG" >/dev/null
+productbuild --distribution "$WORK/distribution.xml" --package-path "$WORK/pkgs" ${sign_pkg[@]+"${sign_pkg[@]}"} "$PKG" >/dev/null
 
 notarize() {
   xcrun notarytool submit "$1" --keychain-profile "$NOTARY" --wait
