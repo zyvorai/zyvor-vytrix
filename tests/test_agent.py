@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: BUSL-1.1
+import datetime as dt
 import importlib.util
 import json
 import tempfile
@@ -100,6 +101,64 @@ class Tests(unittest.TestCase):
                 client.verify_flags&=~getattr(ssl,'VERIFY_X509_STRICT',0)
                 request=urllib.request.Request(f'https://127.0.0.1:{server.server_port}/v1/snapshot',headers={'Authorization':'Bearer '+'a'*32})
                 with urllib.request.urlopen(request,timeout=3,context=client) as r:self.assertEqual(json.load(r)['version'],1)
+            finally:
+                server.shutdown();server.server_close();thread.join()
+    @staticmethod
+    def synthetic(n,cpu=lambda i:20.0,network=lambda i:1000.0):
+        out=[]
+        base=1_760_000_000
+        for i in range(n):
+            stamp=dt.datetime.fromtimestamp(base+i*2,dt.timezone.utc).isoformat().replace('+00:00','Z')
+            out.append({'timestamp':stamp,'host':{'memoryTotal':1000},'cpu':cpu(i),'memoryUsed':400,
+                        'diskUsed':500,'diskTotal':1000,'download':network(i),'upload':0})
+        return out
+    def test_anomaly_warmup_is_null_not_zero(self):
+        report=v.anomaly_report(self.synthetic(v.ANOMALY_WARMUP))
+        self.assertEqual(len(report['samples']),v.ANOMALY_WARMUP)
+        self.assertTrue(all(row['cpu'] is None for row in report['samples']))
+        self.assertEqual(report['rate']['cpu'],None)
+        self.assertEqual(report['windows'],[])
+    def test_anomaly_flat_signal_is_quiet(self):
+        report=v.anomaly_report(self.synthetic(400,cpu=lambda i:20+(i%3)))
+        self.assertEqual(report['windows'],[])
+        self.assertEqual(report['rate']['cpu'],0.0)
+    def test_anomaly_spike_becomes_one_window(self):
+        spike=lambda i:95.0 if 300<=i<305 else 20.0
+        report=v.anomaly_report(self.synthetic(400,cpu=spike))
+        cpu=[w for w in report['windows'] if w['metric']=='cpu']
+        self.assertEqual(len(cpu),1)
+        self.assertEqual(cpu[0]['samples'],5)
+        self.assertGreater(cpu[0]['peak'],v.ANOMALY_K)
+        self.assertEqual([w for w in report['windows'] if w['metric']!='cpu'],[])
+    def test_anomaly_small_wobble_below_floor_is_ignored(self):
+        report=v.anomaly_report(self.synthetic(400,cpu=lambda i:22.0 if i>=300 else 20.0))
+        self.assertEqual(report['windows'],[])
+    def test_anomaly_since_only_trims_output(self):
+        samples=self.synthetic(400,cpu=lambda i:95.0 if 300<=i<305 else 20.0)
+        since=dt.datetime.fromisoformat(samples[290]['timestamp'].replace('Z','+00:00')).timestamp()
+        report=v.anomaly_report(samples,since)
+        self.assertEqual(len(report['samples']),110)
+        self.assertEqual(len([w for w in report['windows'] if w['metric']=='cpu']),1)
+    def test_anomalies_endpoint(self):
+        with tempfile.TemporaryDirectory() as d:
+            store=v.Store(str(Path(d)/'history.sqlite'))
+            for sample in self.synthetic(200):store.add(sample)
+            snapshot=v.Collector().snapshot()
+            server=v.TelemetryServer(('127.0.0.1',0),'a'*32,[],store,snapshot)
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            base='http://127.0.0.1:'+str(server.server_port)
+            def get(path):
+                return urllib.request.urlopen(urllib.request.Request(base+path,headers={'Authorization':'Bearer '+'a'*32}),timeout=3)
+            try:
+                with get('/v1/anomalies?limit=200') as r:body=json.load(r)
+                self.assertEqual(body['version'],1)
+                self.assertEqual(body['metrics'],['cpu','memory','disk','network'])
+                self.assertEqual(len(body['samples']),200)
+                self.assertIsNotNone(body['samples'][-1]['cpu'])
+                with self.assertRaises(urllib.error.HTTPError) as e:get('/v1/anomalies?limit=0')
+                self.assertEqual(e.exception.code,400)
+                with self.assertRaises(urllib.error.HTTPError) as e:get('/v1/anomalies?since=nan')
+                self.assertEqual(e.exception.code,400)
             finally:
                 server.shutdown();server.server_close();thread.join()
     def test_retention(self):
