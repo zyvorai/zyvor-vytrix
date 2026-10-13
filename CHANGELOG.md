@@ -3,18 +3,15 @@
 ## Unreleased
 
 ### Added
+- **Web dashboard: anomaly bands and evidence.** Connected to a live collector, the CPU, Memory, Disk and Network views shade the ranges `/v1/anomalies` flags, say when the baseline is still warming up, and offer "What was busy in this range?" (or drag across the chart) for CPU, Memory and Network. The evidence sheet lists host mean and peak against the range before, top apps with their change, containers and the anomalies inside it. Demo data and imported snapshots have no history endpoints, so they show none of it. The token stays in tab memory.
 - **Native app: anomaly ribbon and evidence.** On the CPU, Memory, Disk and Network panes, anomalous ranges from `/v1/anomalies` are shaded on the history chart, with a caption that says when the band is still warming up. Drag across the chart and choose Show Evidence to see what was busy in that range against the range before it: host stats, top apps with their change, containers and the anomalies inside it. Needs a collector (this Mac or remote); demo data and imported snapshots have no history endpoints, so they show neither. `scripts/test-native-logic.sh` now decodes real collector output, so a schema drift fails the test.
 - **Collector: evidence** (`GET /v1/evidence?from&to&metric`). For a time window, returns the top apps by CPU, memory or network with their change from the preceding same-length window, the busiest containers, host stats and the anomaly windows inside it. Absent per-app network is reported as absent, not zero. See `docs/API.md`.
 - **Collector: anomaly bands** (`GET /v1/anomalies`). Replays stored history through an exponentially weighted band per metric (CPU, memory, disk, network) and returns per-sample scores, anomaly windows and rates. Warm-up samples and unreported metrics are `null`, not zero. Computed on request, so no schema or database change. See `docs/API.md`.
-
-### Changed
-- **Native app: macOS 27 look.** Chart colours are fixed per metric from the `macos27` tokens (CPU blue, everything else neutral grey) instead of following the accent, so changing the accent in Settings no longer recolours the charts; the top-consumer meters are neutral. Panels use the 14/10/7 radii of the web `macos27` style. `native/App/Views/Theme.swift` holds the tokens.
-
-### Added
 - **Native app: Settings.** Appearance (Auto, Light, Dark), the eight dashboard accents, alert threshold and notifications, snapshot Import and Export (JSON in the telemetry schema, the same files as the web dashboard), and the data source (This Mac or demo data). An imported snapshot is shown as a single static sample and stops polling. Preferences are stored in UserDefaults; the token is never stored. The native window follows the system look, so there is no window-style switch.
 - **Native app: resource panes.** CPU, Memory, Disk, Network and Battery, each with the current reading, a few derived stats (average, peak, capacity), a 1m/5m/1h history chart, and for CPU and Memory the busiest applications (select one to open its process inspector). Battery shows "No battery reading" on hosts without one. The sidebar is grouped Monitor, Workloads and System like the web dashboard.
 
 ### Changed
+- **Native app: macOS 27 look.** Chart colours are fixed per metric from the `macos27` tokens (CPU blue, everything else neutral grey) instead of following the accent, so changing the accent in Settings no longer recolours the charts; the top-consumer meters are neutral. Panels use the 14/10/7 radii of the web `macos27` style. `native/App/Views/Theme.swift` holds the tokens.
 - Native sidebar: the Alerts count is drawn next to its title instead of with `.badge`, which hid the title from accessibility. `scripts/test-native-ui.sh` finds sidebar rows by label and checks all ten.
 - `scripts/shots-native.sh` also captures CPU, Memory, Network, Alerts and Settings (18 images).
 

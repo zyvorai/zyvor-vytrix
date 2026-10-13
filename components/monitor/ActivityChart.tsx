@@ -1,7 +1,7 @@
 'use client';
 // SPDX-License-Identifier: BUSL-1.1
-import {useId} from 'react';
-import {Area,AreaChart,CartesianGrid,ResponsiveContainer,Tooltip,XAxis,YAxis} from 'recharts';
+import {useId,useState} from 'react';
+import {Area,AreaChart,CartesianGrid,ReferenceArea,ResponsiveContainer,Tooltip,XAxis,YAxis} from 'recharts';
 
 export type Series={key:string,label:string,color:string};
 type Point={t:number}&Record<string,number>;
@@ -16,16 +16,31 @@ function GlassTooltip({active,payload,label,format,series}:{active?:boolean,payl
   </div>;
 }
 
-export function ActivityChart({data,series,height=240,domain=[0,100],format=v=>`${v.toFixed(1)}%`}:{data:Point[],series:Series[],height?:number,domain?:[number,number|'auto'],format?:(v:number)=>string}){
+/** A shaded time range (anomaly) and a drag selection, both in epoch milliseconds. */
+export type Band={from:number,to:number};
+
+export function ActivityChart({data,series,height=240,domain=[0,100],format=v=>`${v.toFixed(1)}%`,bands=[],onSelectRange}:{data:Point[],series:Series[],height?:number,domain?:[number,number|'auto'],format?:(v:number)=>string,bands?:Band[],onSelectRange?:(range:Band)=>void}){
   const id=useId().replace(/:/g,'');
+  const [drag,setDrag]=useState<{a:number,b:number}|null>(null);
+  const at=(e:{activeLabel?:unknown})=>{const n=Number(e.activeLabel);return Number.isFinite(n)?n:null;};
+  const finish=()=>{
+    if(drag&&onSelectRange){const from=Math.min(drag.a,drag.b),to=Math.max(drag.a,drag.b);if(to-from>=2000)onSelectRange({from,to});}
+    setDrag(null);
+  };
   const span=data.length>1?data[data.length-1].t-data[0].t:0;
   return <div className="activity-chart" style={{height}}>
     <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{width:640,height}}>
-      <AreaChart data={data} margin={{top:8,right:8,bottom:0,left:-12}}>
+      <AreaChart data={data} margin={{top:8,right:8,bottom:0,left:-12}}
+        onMouseDown={onSelectRange?e=>{const t=at(e);if(t!==null)setDrag({a:t,b:t});}:undefined}
+        onMouseMove={onSelectRange?e=>{const t=at(e);if(drag&&t!==null)setDrag({...drag,b:t});}:undefined}
+        onMouseUp={onSelectRange?finish:undefined}
+        onMouseLeave={onSelectRange?()=>setDrag(null):undefined}>
         <defs>{series.map(s=><linearGradient key={s.key} id={`${id}-${s.key}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={s.color} stopOpacity={.35}/><stop offset="95%" stopColor={s.color} stopOpacity={0}/></linearGradient>)}</defs>
         <CartesianGrid vertical={false} strokeDasharray="2 6" stroke="var(--separator)"/>
         <XAxis dataKey="t" type="number" domain={['dataMin','dataMax']} scale="time" tickFormatter={t=>new Date(t).toLocaleTimeString([],span>600000?{hour:'2-digit',minute:'2-digit'}:{minute:'2-digit',second:'2-digit'})} tick={{fill:'var(--text-tertiary)',fontSize:11}} axisLine={false} tickLine={false} minTickGap={48}/>
         <YAxis domain={domain} tick={{fill:'var(--text-tertiary)',fontSize:11}} axisLine={false} tickLine={false} width={48} tickFormatter={v=>format(Number(v)).replace(/\.0(?=\D|$)/,'')}/>
+        {bands.map((b,i)=><ReferenceArea key={i} x1={b.from} x2={b.to} fill="var(--danger)" fillOpacity={.16} stroke="none" ifOverflow="hidden" className="anomaly-band"/>)}
+        {drag&&drag.a!==drag.b&&<ReferenceArea x1={Math.min(drag.a,drag.b)} x2={Math.max(drag.a,drag.b)} fill="var(--accent-color)" fillOpacity={.18} stroke="var(--accent-color)" strokeOpacity={.5} ifOverflow="hidden"/>}
         <Tooltip cursor={{stroke:'var(--text-tertiary)',strokeDasharray:'3 3'}} content={<GlassTooltip format={format} series={series}/>}/>
         {series.map(s=><Area key={s.key} type="monotone" dataKey={s.key} stroke={s.color} strokeWidth={2.2} fill={`url(#${id}-${s.key})`} isAnimationActive={false} dot={false} activeDot={{r:4,strokeWidth:2,stroke:'var(--surface-solid)'}}/>)}
       </AreaChart>
