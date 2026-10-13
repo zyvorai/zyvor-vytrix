@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v0.4.1 — 2026-10-13
+
+Packaging fix: v0.4.0's release job built the dashboard and collector archives but not the Mac DMG and pkg.
+
+### Fixed
+- `scripts/package-mac.sh` expanded an empty signing array under `set -u`, which fails on the macOS runner's bash 3.2, so the unsigned path never wrote the DMG or pkg. The v0.4.0 release has no Mac downloads; use v0.4.1. There are no app changes from v0.4.0.
+
 ## v0.4.0 — 2026-10-13
 
 The native Mac app gains a menu bar item and alerts with notifications; Fleet Pro and the BSL license land.
