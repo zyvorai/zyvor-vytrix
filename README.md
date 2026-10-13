@@ -190,6 +190,7 @@ What was run where, and what was not, is listed honestly in [docs/RELEASE.md](do
 | I want to… | Read |
 | --- | --- |
 | Call the collector, or learn what each metric means | [docs/API.md](docs/API.md) |
+| Let an MCP client ask the collector (read-only tools) | [docs/MCP.md](docs/MCP.md) |
 | Monitor several Macs (read-only) | [docs/CLUSTER.md](docs/CLUSTER.md) |
 | Fleet history, roles, alerts, Prometheus export | [docs/FLEET-PRO.md](docs/FLEET-PRO.md) |
 | Test on macOS and Linux | [docs/TESTING.md](docs/TESTING.md) |

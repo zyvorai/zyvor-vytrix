@@ -3,6 +3,9 @@
 ## Unreleased
 
 ### Added
+- **MCP server** (`agent/vytrix_mcp.py`, [docs/MCP.md](docs/MCP.md)). Read-only tools over a running collector for MCP clients: snapshot, history, anomalies, evidence, timeline and changes, plus a `vytrix_triage` prompt. Standard library only, stdio, token from the environment; a test asserts every tool is a GET. Included in the collector archive.
+
+### Added
 - **Native app: Timeline pane** (System). The same `/v1/timeline` and `/v1/changes` as the web view: events, the fingerprint, why the window differs from the one before, and apps, ports and containers that appeared or went away, over 5, 15 or 30 minutes. Needs a collector; demo data and imported snapshots say so. The collector contract test now decodes real timeline and changes output.
 - **Web dashboard: Timeline view** (System). Shows `/v1/timeline` (alert transitions at your threshold, anomaly windows, container changes, the 12-hex fingerprint, and why the window differs from the one before) and `/v1/changes` (apps started or stopped, ports opened or closed, containers). Needs a live collector; demo data and imports say so.
 - **Collector: change recorder** (`GET /v1/changes?since&to`). What appeared and went away between the first and last stored sample of a window, and what came and went inside it. Read-only, from stored history. See `docs/API.md`.
