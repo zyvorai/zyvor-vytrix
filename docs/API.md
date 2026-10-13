@@ -6,9 +6,21 @@ All `/v1` reads require `Authorization: Bearer <VYTRIX_TOKEN>`. Browser requests
 |---|---|
 | `GET /v1/snapshot` | Most recent version 1 snapshot |
 | `GET /v1/history?since=EPOCH_SECONDS&limit=300` | `{version: 1, samples: [...]}` in chronological order; limit 1–1000 |
+| `GET /v1/anomalies?since=EPOCH_SECONDS&limit=600` | Anomaly bands over stored history; see below. limit 1–1000 |
 | `GET /healthz` | `{"status": "ok"}`; no token, no telemetry |
 | `OPTIONS` | CORS preflight for an allowed origin |
 | any other path | With `--ui-upstream`: proxied to the dashboard (GET, HEAD, POST). Otherwise 404. |
+
+### Anomalies
+
+`GET /v1/anomalies` replays stored history through a small statistical band and returns, for CPU %, memory %, disk % and network (download + upload bytes/s):
+
+- `samples`: one row per sample, `{timestamp, cpu, memory, disk, network}`, each `null` or `{score, anomalous}`. `null` means not scored: the first 150 samples (about five minutes at the default interval) only warm the band up, and a metric the host did not report is `null`, never zero.
+- `windows`: runs of consecutive anomalous samples, `{metric, start, end, peak, samples}`. A single sample is a weak signal; filter on `samples`.
+- `rate`: anomalous samples divided by scored samples per metric, `null` when nothing was scored.
+- `warmupSamples`, `threshold` (4 deviations), `metrics`.
+
+The band is an exponentially weighted mean and variance with a floor on the deviation (5 points CPU, 2 memory, 1 disk, 64 KB/s network), so a flat metric does not flag tiny changes. It is a signal that something changed, not a diagnosis; it says nothing about cause. Computed on request from the SQLite history, with a 150-sample lead-in before `since`; no extra state is stored.
 
 401 means invalid/missing token, 403 means denied Origin, 400 means invalid history query, 404 means unknown path, 502 means the dashboard upstream is down. Mutations are not supported. The dashboard proxy never forwards the `Authorization` header. Snapshots contain host name, OS, process names, PIDs, RSS, CPU, best-effort project folder basename, listening ports and container metadata. No argv, environment, file contents or packet payloads are collected. Project names, executable paths and container names may still be sensitive; protect your collector and exported snapshots.
 

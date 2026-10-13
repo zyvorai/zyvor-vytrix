@@ -5,6 +5,7 @@ import argparse
 import datetime as dt
 import hmac
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -377,6 +378,75 @@ class Collector:
             extra = dict(containers=containers, runtimes=runtimes)
         return dict(version=VERSION,timestamp=dt.datetime.now(dt.timezone.utc).isoformat().replace('+00:00','Z'),host=dict(name=platform.node(),os=os_label(),cores=os.cpu_count() or 1,memoryTotal=total),cpu=round(max(0,min(100,cpu)),2),memoryUsed=used,diskUsed=disk.used,diskTotal=disk.total,download=round(download,2),upload=round(upload,2),battery=battery,processes=processes,**extra)
 
+# Anomaly bands. One exponentially weighted mean and variance per metric; a sample is anomalous when it
+# sits ANOMALY_K deviations from the mean, with a floor on the deviation so a flat metric does not flag
+# tiny wobbles. Nothing is scored before ANOMALY_WARMUP samples (about 5 minutes at the default
+# interval): those samples report null, not zero. Network is download + upload in bytes per second.
+ANOMALY_FLOORS={'cpu':5.0,'memory':2.0,'disk':1.0,'network':65536.0}
+ANOMALY_WARMUP=150
+ANOMALY_K=4.0
+ANOMALY_ALPHA=0.02
+
+def anomaly_values(sample):
+    memory_total=sample['host']['memoryTotal'];disk_total=sample['diskTotal']
+    return {
+        'cpu':sample['cpu'],
+        'memory':sample['memoryUsed']/memory_total*100 if memory_total>0 else None,
+        'disk':sample['diskUsed']/disk_total*100 if disk_total>0 else None,
+        'network':sample['download']+sample['upload'],
+    }
+
+class AnomalyDetector:
+    def __init__(self,warmup=ANOMALY_WARMUP,k=ANOMALY_K,alpha=ANOMALY_ALPHA):
+        self.warmup=warmup;self.k=k;self.alpha=alpha;self.state={}
+    def observe(self,values):
+        """Score one sample per metric: None while warming up or absent, else {score, anomalous}."""
+        result={}
+        for name,floor in ANOMALY_FLOORS.items():
+            x=values.get(name)
+            if x is None or not math.isfinite(x):
+                result[name]=None;continue
+            st=self.state.setdefault(name,{'n':0,'mean':x,'var':0.0})
+            scored=None
+            if st['n']>=self.warmup:
+                score=abs(x-st['mean'])/max(math.sqrt(st['var']),floor)
+                scored={'score':round(score,2),'anomalous':score>=self.k}
+            # Learn quickly at first, then slowly; learn from an anomaly at a fifth of the rate so a
+            # spike does not redefine normal.
+            a=max(self.alpha,1/(st['n']+1)) if st['n']<self.warmup else self.alpha
+            if scored and scored['anomalous']:a*=0.2
+            d=x-st['mean'];st['mean']+=a*d;st['var']=(1-a)*(st['var']+a*d*d);st['n']+=1
+            result[name]=scored
+        return result
+
+def anomaly_report(samples,since=0):
+    """Replay chronological samples through a fresh detector. Samples older than `since` only warm it up."""
+    detector=AnomalyDetector()
+    rows=[];open_run={};windows=[];counts={m:[0,0] for m in ANOMALY_FLOORS}
+    def close(metric):
+        run=open_run.pop(metric,None)
+        if run:windows.append({'metric':metric,'start':run['start'],'end':run['end'],'peak':run['peak'],'samples':run['n']})
+    for sample in samples:
+        scores=detector.observe(anomaly_values(sample))
+        if dt.datetime.fromisoformat(sample['timestamp'].replace('Z','+00:00')).timestamp()<since:
+            continue
+        rows.append({'timestamp':sample['timestamp'],**scores})
+        for metric,scored in scores.items():
+            if scored is None:
+                close(metric);continue
+            counts[metric][1]+=1
+            if scored['anomalous']:
+                counts[metric][0]+=1
+                run=open_run.setdefault(metric,{'start':sample['timestamp'],'peak':0,'n':0})
+                run['end']=sample['timestamp'];run['peak']=max(run['peak'],scored['score']);run['n']+=1
+            else:
+                close(metric)
+    for metric in list(open_run):close(metric)
+    windows.sort(key=lambda w:w['start'])
+    return {'version':1,'warmupSamples':ANOMALY_WARMUP,'threshold':ANOMALY_K,'metrics':list(ANOMALY_FLOORS),
+            'samples':rows,'windows':windows,
+            'rate':{m:(round(c[0]/c[1],4) if c[1] else None) for m,c in counts.items()}}
+
 class Store:
     def __init__(self,path):
         self.path=path
@@ -503,6 +573,18 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,{'version':1,'samples':self.server.store.history(since,limit)})
             except ValueError:
                 return self.reply(400,{'error':'since must be a finite epoch timestamp; limit must be 1–1000'})
+        if path.path=='/v1/anomalies':
+            try:
+                query=parse_qs(path.query)
+                since=float(query.get('since',['0'])[0]);limit=int(query.get('limit',['600'])[0])
+                if not 0<=since<1e12 or not 1<=limit<=1000:
+                    raise ValueError()
+            except ValueError:
+                return self.reply(400,{'error':'since must be a finite epoch timestamp; limit must be 1–1000'})
+            # Fetch a lead-in so the band is already warm for the first requested sample.
+            lead=ANOMALY_WARMUP
+            samples=self.server.store.history(max(0,since-lead*10),min(1000,limit+lead))
+            return self.reply(200,anomaly_report(samples,since))
         return self.reply(404,{'error':'Not found'})
 
 def main():

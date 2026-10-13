@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- **Collector: anomaly bands** (`GET /v1/anomalies`). Replays stored history through an exponentially weighted band per metric (CPU, memory, disk, network) and returns per-sample scores, anomaly windows and rates. Warm-up samples and unreported metrics are `null`, not zero. Computed on request, so no schema or database change. See `docs/API.md`.
+
 ### Changed
 - **Native app: macOS 27 look.** Chart colours are fixed per metric from the `macos27` tokens (CPU blue, everything else neutral grey) instead of following the accent, so changing the accent in Settings no longer recolours the charts; the top-consumer meters are neutral. Panels use the 14/10/7 radii of the web `macos27` style. `native/App/Views/Theme.swift` holds the tokens.
 
