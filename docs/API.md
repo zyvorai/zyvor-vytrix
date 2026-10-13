@@ -66,6 +66,7 @@ The band is an exponentially weighted mean and variance with a floor on the devi
 | `--ui-upstream URL` | none | Loopback `http://` origin of the dashboard, e.g. `http://127.0.0.1:8787`. |
 | `--interval` | `2` | Seconds between samples, 1–3600. |
 | `--database` | `~/.local/share/vytrix/history.sqlite` | |
+| `--exit-with-parent` | off | Exit when the process that started the collector exits. The native app uses it so a killed app does not leave a collector behind. |
 | `--no-containers` | off | Don't run `docker`/`podman`. |
 | `--container-interval` | `5` | Seconds between container polls, 2–3600. |
 | `--once` | | Print one snapshot and exit (no token needed). |

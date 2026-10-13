@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+- **Native app: the bundled collector no longer outlives the app.** Quitting by `kill`, Ctrl-C or logout (SIGTERM, SIGINT, SIGHUP) now terminates cleanly, and the collector has a new `--exit-with-parent` flag, which the app passes, so even `kill -9` of the app stops it within a second.
+
 ## v0.6.0 — 2026-10-13
 
 A read-only MCP server and a Time Machine scrubber on the native app and the web dashboard.

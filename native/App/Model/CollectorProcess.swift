@@ -80,7 +80,8 @@ final class CollectorProcess {
         let p = Foundation.Process()
         p.executableURL = python
         p.arguments = [script.path, "--bind", "127.0.0.1", "--port", String(port),
-                       "--database", support.appendingPathComponent("history.sqlite").path, "--interval", "2"]
+                       "--database", support.appendingPathComponent("history.sqlite").path, "--interval", "2",
+                       "--exit-with-parent"]
         var env = ProcessInfo.processInfo.environment
         env["VYTRIX_TOKEN"] = token
         p.environment = env
