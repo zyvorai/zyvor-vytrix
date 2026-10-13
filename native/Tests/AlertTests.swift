@@ -24,6 +24,7 @@ struct AlertTests {
     }
 
     static func main() {
+        let fixtures = CommandLine.arguments.dropFirst().first
         check(AlertRules.compute(snapshot(), threshold: 80).isEmpty, "quiet host raises nothing")
 
         let warn = AlertRules.compute(snapshot(cpu: 85), threshold: 80)
@@ -64,6 +65,33 @@ struct AlertTests {
         check(n.fresh([a]).isEmpty, "two quiet polls are not enough to re-arm")
         _ = n.fresh([]); _ = n.fresh([]); _ = n.fresh([])
         check(n.fresh([a]).count == 1, "re-arms after the alert stays clear")
+
+        // Contract with the collector: these files come from agent/vytrix.py (anomaly_report, evidence_report).
+        if let dir = fixtures {
+            let dec = JSONDecoder()
+            let anomalies = try? dec.decode(AnomalyReport.self, from: Data(contentsOf: URL(fileURLWithPath: dir + "/anomalies.json")))
+            check(anomalies != nil, "collector /v1/anomalies JSON decodes")
+            if let a = anomalies {
+                check(a.isScored("cpu") && a.warmupSamples == 150, "anomaly report is scored after warm-up")
+                check(a.samples.first?.cpu == nil, "warm-up samples decode as nil, not zero")
+                check(a.ranges(for: "cpu").count == 1, "one cpu anomaly range for the spike")
+                check(a.ranges(for: "memory").isEmpty, "no memory anomaly ranges")
+                check((a.rate["cpu"] ?? nil) != nil, "scored metric has a rate")
+            }
+            let evidence = try? dec.decode(EvidenceReport.self, from: Data(contentsOf: URL(fileURLWithPath: dir + "/evidence.json")))
+            check(evidence != nil, "collector /v1/evidence JSON decodes")
+            if let e = evidence {
+                check(e.apps.first?.name == "Build" && (e.apps.first?.delta ?? 0) > 0, "busy app leads with a positive delta")
+                check(e.containers.first?.name == "db", "containers decode")
+                check(e.baselineHost != nil && e.host["cpu"]?.mean != nil, "host stats decode")
+                check(!e.notes.isEmpty, "notes decode")
+            }
+        }
+        let t0 = Date(timeIntervalSince1970: 1_000)
+        check(EvidenceRequest.make(t0...t0.addingTimeInterval(30), metric: "cpu") != nil, "a 30 s range can ask for evidence")
+        check(EvidenceRequest.make(t0...t0.addingTimeInterval(0.5), metric: "cpu") == nil, "a click is not a range")
+        check(EvidenceRequest.make(nil, metric: "cpu") == nil, "no selection, no request")
+        check(EvidenceRequest.make(t0...t0.addingTimeInterval(90_000), metric: "cpu") == nil, "more than 24 h is refused")
 
         if failures > 0 { print("\(failures) failure(s)"); exit(1) }
         print("native logic tests passed")

@@ -198,6 +198,30 @@ final class TelemetryStore: ObservableObject {
         return r
     }
 
+    // MARK: anomalies and evidence (collector endpoints; absent for demo data and imported files)
+
+    private var hasCollector: Bool {
+        switch source { case .local, .remote: return true; case .demo, .file: return false }
+    }
+
+    private func fetch<T: Decodable>(_ path: String, as type: T.Type) async -> T? {
+        guard hasCollector, let r = request(path) else { return nil }
+        guard let (data, resp) = try? await session.data(for: r), (resp as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+        return try? JSONDecoder().decode(T.self, from: data)
+    }
+
+    /// Nil when there is no collector, or it predates /v1/anomalies.
+    func anomalies(since: Date, limit: Int = 900) async -> AnomalyReport? {
+        await fetch("/v1/anomalies?since=\(Int(since.timeIntervalSince1970))&limit=\(limit)", as: AnomalyReport.self)
+    }
+
+    func evidence(_ q: EvidenceRequest) async -> EvidenceReport? {
+        await fetch("/v1/evidence?from=\(q.from.timeIntervalSince1970)&to=\(q.to.timeIntervalSince1970)&metric=\(q.metric)",
+                    as: EvidenceReport.self)
+    }
+
+    var canExplain: Bool { hasCollector }
+
     private func seedHistory() async {
         let since = Int(Date().timeIntervalSince1970) - 1800
         guard let r = request("/v1/history?since=\(since)&limit=300") else { return }
