@@ -1312,3 +1312,9 @@ small { display: block; font-size: 11px; color: var(--text-tertiary); font-weigh
 .why-changed h3, .change-group h4 { font: 650 13px/1.3 var(--font-display); margin: 0 0 6px; }
 .change-group { margin-top: 12px; }
 @media (max-width: 520px) { .timeline-row { grid-template-columns: 1fr; gap: 2px; } }
+
+/* Time machine bar */
+.time-machine { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-top: 1px solid var(--separator); background: var(--surface-solid); font-size: 12.5px; }
+.time-machine input[type="range"] { flex: 1; min-width: 80px; accent-color: var(--accent-color); }
+.time-machine .num { color: var(--text-secondary); white-space: nowrap; }
+@media (max-width: 520px) { .time-machine { flex-wrap: wrap; } }
