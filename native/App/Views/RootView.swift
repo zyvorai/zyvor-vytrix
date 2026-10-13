@@ -5,6 +5,7 @@ struct RootView: View {
     @EnvironmentObject var store: TelemetryStore
     @State private var section: Pane? = VytrixApp.initialSection
     @State private var connecting = false
+    @State private var replayUnavailable = false
 
     var body: some View {
         NavigationSplitView {
@@ -54,10 +55,21 @@ struct RootView: View {
         .searchable(text: $store.search, placement: .toolbar, prompt: "Search")
         .toolbar {
             ToolbarItemGroup {
+                Button {
+                    if store.isReplaying { store.endReplay() } else { Task { replayUnavailable = !(await store.beginReplay()) } }
+                } label: { Image(systemName: "clock.arrow.circlepath") }
+                    .help(store.isReplaying ? "Back to live" : "Time Machine: replay the last stored samples")
+                    .disabled(!store.canExplain)
                 Button { store.paused.toggle() } label: { Image(systemName: store.paused ? "play.fill" : "pause.fill") }
                     .help(store.paused ? "Resume sampling" : "Pause sampling")
                 Button("Connect…") { connecting = true }
             }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) { if store.isReplaying { TimeMachineBar() } }
+        .alert("Nothing to replay yet", isPresented: $replayUnavailable) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("The collector has fewer than two stored samples, or this source keeps no history.")
         }
         .sheet(isPresented: $connecting) { ConnectSheet() }
     }

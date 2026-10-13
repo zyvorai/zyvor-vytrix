@@ -103,6 +103,11 @@ struct AlertTests {
             let none = try? dec.decode(ChangesReport.self, from: Data(contentsOf: URL(fileURLWithPath: dir + "/changes-empty.json")))
             check(none != nil && none?.changes == nil, "a window with too few samples decodes with no changes")
         }
+        if let dir = fixtures {
+            let h = try? JSONDecoder().decode(HistoryResponse.self, from: Data(contentsOf: URL(fileURLWithPath: dir + "/history.json")))
+            check(h != nil && h?.samples.count == 2, "collector /v1/history JSON decodes to full snapshots for the time machine")
+            check(h?.samples.first?.processes.isEmpty == false, "a stored sample keeps its processes")
+        }
         let t0 = Date(timeIntervalSince1970: 1_000)
         check(EvidenceRequest.make(t0...t0.addingTimeInterval(30), metric: "cpu") != nil, "a 30 s range can ask for evidence")
         check(EvidenceRequest.make(t0...t0.addingTimeInterval(0.5), metric: "cpu") == nil, "a click is not a range")
