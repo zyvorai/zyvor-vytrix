@@ -45,6 +45,14 @@ struct AlertTests {
         check(AlertRules.compute(snapshot(containers: [container(memory: 90, limit: 100, state: "exited")]), threshold: 80).isEmpty,
               "stopped containers are ignored")
 
+        // Export writes the telemetry schema; Import must read back exactly what Export wrote.
+        let original = snapshot(cpu: 42, containers: [container(memory: 50, limit: 100)])
+        let enc = JSONEncoder(); enc.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let roundTrip = (try? JSONDecoder().decode(Snapshot.self, from: enc.encode(original)))
+        check(roundTrip == original, "snapshot export decodes back to the same snapshot")
+        let text = String(data: (try? enc.encode(original)) ?? Data(), encoding: .utf8) ?? ""
+        check(text.contains("\"memoryTotal\"") && !text.contains("battery"), "export uses schema keys and omits absent readings")
+
         var n = AlertNotifier(quietPolls: 3)
         let a = VytrixAlert(id: "cpu", severity: .warning, title: "CPU", text: "")
         check(n.fresh([a]).count == 1, "first appearance notifies")
