@@ -1,5 +1,12 @@
 # Release status
 
+## v0.6.0 (2026-10-13)
+
+- **MCP server** (`agent/vytrix_mcp.py`, [MCP.md](MCP.md)): read-only tools over a collector for MCP clients; every tool is a `GET`, asserted by tests.
+- **Time Machine** in the native app and the web dashboard: scrub the whole dashboard through the collector's last stored samples (up to 1000), then Back to Live.
+- **Verified locally on macOS 27.2 (Apple silicon):** `scripts/build-native.sh`; `scripts/test-native-logic.sh` (43 checks); `scripts/test-native-ui.sh`; the Python suite (57 tests, including the MCP stdio round trip); `pnpm test:e2e` (30). The Time Machine bar was opened and read on a live collector.
+- **Not verified:** the MCP server against a real MCP client; dragging the Time Machine slider on native; macOS 26; WidgetKit widgets and App Intents are not built (see below). The DMG and pkg are unsigned and not notarized because the repository has no Apple secrets.
+
 ## v0.5.0 (2026-10-13)
 
 - **Anomaly bands, evidence, timeline and change recorder:** new collector endpoints `/v1/anomalies`, `/v1/evidence`, `/v1/timeline` and `/v1/changes`, computed from the stored history (no new storage), with a native Timeline pane and anomaly ribbon, and the same on the web dashboard. See [CHANGELOG.md](../CHANGELOG.md) and [API.md](API.md).

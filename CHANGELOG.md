@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.6.0 — 2026-10-13
+
+A read-only MCP server and a Time Machine scrubber on the native app and the web dashboard.
+
 ### Added
 - **Native app: Time Machine.** The clock button in the toolbar loads the collector's last stored samples (up to 1000, about 33 minutes at the default interval) and a bar at the bottom scrubs the whole window through them: tiles, apps, containers, ports and alerts show the sample at that time, and Back to Live returns. Live sampling keeps recording underneath and notifications do not fire while replaying. Needs a collector; demo data and imports have no history, and the button is disabled.
 
