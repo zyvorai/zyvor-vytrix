@@ -1,5 +1,9 @@
 # Release status
 
+## v0.4.1 (2026-10-13)
+
+Packaging fix only. The v0.4.0 tag's `mac` job failed (`sign_pkg[@]: unbound variable` in `scripts/package-mac.sh`), so v0.4.0 has the dashboard and collector archives but no DMG or pkg. v0.4.1 has the same app and the fix. The repository has no Apple secrets, so its DMG and pkg are unsigned and not notarized: Gatekeeper blocks the first launch until **Open Anyway**.
+
 ## v0.4.0 (2026-10-13)
 
 - **Native Mac app:** menu bar item, the app keeps running when its window closes, an Alerts section with local notifications, and the first Swift tests (`scripts/test-native-logic.sh`). Built with `scripts/package-mac.sh`; see [Release artifacts](#release-artifacts) for the DMG and pkg.
