@@ -42,6 +42,7 @@ struct RootView: View {
                     case .containers: ContainersView()
                     case .projects: ProjectsView()
                     case .alerts: AlertsView()
+                    case .settings: SettingsView()
                     case .cpu, .memory, .disk, .network, .battery: ResourceView(pane: section ?? .cpu)
                     }
                 }
@@ -88,6 +89,7 @@ struct HostFooter: View {
         if store.paused { return "Paused" }
         switch (store.source, store.status) {
         case (.demo, _): return "Demo data"
+        case (.file(let name), _): return "Imported · \(name)"
         case (_, .failed): return "Not connected"
         case (.local, _): return "This Mac · read-only"
         case (.remote(let u), _): return URL(string: u)?.host ?? "Remote collector"

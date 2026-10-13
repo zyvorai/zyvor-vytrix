@@ -3,11 +3,12 @@
 ## Unreleased
 
 ### Added
+- **Native app: Settings.** Appearance (Auto, Light, Dark), the eight dashboard accents, alert threshold and notifications, snapshot Import and Export (JSON in the telemetry schema, the same files as the web dashboard), and the data source (This Mac or demo data). An imported snapshot is shown as a single static sample and stops polling. Preferences are stored in UserDefaults; the token is never stored. The native window follows the system look, so there is no window-style switch.
 - **Native app: resource panes.** CPU, Memory, Disk, Network and Battery, each with the current reading, a few derived stats (average, peak, capacity), a 1m/5m/1h history chart, and for CPU and Memory the busiest applications (select one to open its process inspector). Battery shows "No battery reading" on hosts without one. The sidebar is grouped Monitor, Workloads and System like the web dashboard.
 
 ### Changed
 - Native sidebar: the Alerts count is drawn next to its title instead of with `.badge`, which hid the title from accessibility. `scripts/test-native-ui.sh` finds sidebar rows by label and checks all ten.
-- `scripts/shots-native.sh` also captures CPU, Memory, Network and Alerts (16 images).
+- `scripts/shots-native.sh` also captures CPU, Memory, Network, Alerts and Settings (18 images).
 
 ## v0.4.1 — 2026-10-13
 

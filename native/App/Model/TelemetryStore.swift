@@ -11,13 +11,13 @@ enum PaneSection: String, CaseIterable, Identifiable {
 enum Pane: String, CaseIterable, Identifiable {
     case overview = "Overview", cpu = "CPU", memory = "Memory", disk = "Disk", network = "Network", battery = "Battery"
     case applications = "Applications", containers = "Containers", projects = "Projects"
-    case alerts = "Alerts"
+    case alerts = "Alerts", settings = "Settings"
     var id: Self { self }   // the sidebar List tags rows by id; it must match the Pane selection
     var section: PaneSection {
         switch self {
         case .overview, .cpu, .memory, .disk, .network, .battery: return .monitor
         case .applications, .containers, .projects: return .workloads
-        case .alerts: return .system
+        case .alerts, .settings: return .system
         }
     }
     var symbol: String {
@@ -32,13 +32,14 @@ enum Pane: String, CaseIterable, Identifiable {
         case .containers: return "shippingbox"
         case .projects: return "folder"
         case .alerts: return "bell.badge"
+        case .settings: return "gearshape"
         }
     }
 }
 
 @MainActor
 final class TelemetryStore: ObservableObject {
-    enum Source: Equatable { case local, remote(String), demo }
+    enum Source: Equatable { case local, remote(String), demo, file(String) }
     enum Status: Equatable { case starting, live, failed(String) }
 
     @Published private(set) var snapshot: Snapshot?
@@ -53,6 +54,12 @@ final class TelemetryStore: ObservableObject {
     }() { didSet { UserDefaults.standard.set(threshold, forKey: "vytrix.threshold") } }
     @Published var notificationsEnabled: Bool = UserDefaults.standard.object(forKey: "vytrix.notify") as? Bool ?? true {
         didSet { UserDefaults.standard.set(notificationsEnabled, forKey: "vytrix.notify"); if notificationsEnabled { AlertNotifications.requestAuthorization() } }
+    }
+    @Published var accent: AccentChoice = AccentChoice(rawValue: UserDefaults.standard.string(forKey: "vytrix.accent") ?? "") ?? .blue {
+        didSet { UserDefaults.standard.set(accent.rawValue, forKey: "vytrix.accent") }
+    }
+    @Published var appearance: AppearanceChoice = AppearanceChoice(rawValue: UserDefaults.standard.string(forKey: "vytrix.appearance") ?? "") ?? .auto {
+        didSet { UserDefaults.standard.set(appearance.rawValue, forKey: "vytrix.appearance") }
     }
     @Published private(set) var dismissed: Set<String> = []
     private var notifier = AlertNotifier()
@@ -99,6 +106,23 @@ final class TelemetryStore: ObservableObject {
         let loopback = ["localhost", "127.0.0.1", "::1"].contains(host)
         if scheme == "https" || (scheme == "http" && loopback) { return .ok(url) }
         return .bad("Plain HTTP is only allowed for localhost. Use https:// for a remote collector.")
+    }
+
+    /// Shows one snapshot from a JSON file (the dashboard's export format) and stops polling.
+    func importSnapshot(from url: URL) throws {
+        let s = try JSONDecoder().decode(Snapshot.self, from: Data(contentsOf: url))
+        begin(.file(url.lastPathComponent))
+        snapshot = s
+        history = [Sample(s, at: Self.date(from: s.timestamp))]
+        status = .live
+    }
+
+    /// The latest sample as JSON in the telemetry schema, for Export.
+    func exportSnapshot() throws -> Data? {
+        guard let s = snapshot else { return nil }
+        let e = JSONEncoder()
+        e.outputFormatting = [.prettyPrinted, .sortedKeys]
+        return try e.encode(s)
     }
 
     func connect(url: URL, token: String) {
@@ -155,6 +179,8 @@ final class TelemetryStore: ObservableObject {
                 status = .failed(error.localizedDescription)
                 return
             }
+        case .file:
+            return
         case .remote:
             break
         }

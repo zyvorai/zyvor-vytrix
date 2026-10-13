@@ -57,7 +57,8 @@ struct VytrixApp: App {
             RootView()
                 .environmentObject(store)
                 .frame(minWidth: 900, minHeight: 600)
-                .preferredColorScheme(Self.forcedScheme)
+                .preferredColorScheme(Self.forcedScheme ?? store.appearance.scheme)
+                .tint(store.accent.color)
                 .task { startOnce() }
         }
         .defaultSize(width: 1120, height: 720)

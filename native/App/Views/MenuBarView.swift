@@ -60,6 +60,9 @@ struct MenuBarView: View {
             if store.source == .demo {
                 Text("Simulated telemetry").font(.caption).foregroundStyle(.secondary)
             }
+            if case .file(let name) = store.source {
+                Text("Imported snapshot · \(name)").font(.caption).foregroundStyle(.secondary)
+            }
         }
     }
 
