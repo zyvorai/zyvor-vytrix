@@ -19,7 +19,7 @@ struct Panel<Content: View>: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: 12))
+        .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: Theme.panelRadius))
     }
 }
 
@@ -53,22 +53,23 @@ struct MetricTile: View {
             }
             .padding(18)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: 12))
-            .contentShape(RoundedRectangle(cornerRadius: 12))
+            .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: Theme.panelRadius))
+            .contentShape(RoundedRectangle(cornerRadius: Theme.panelRadius))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(label): \(value) \(unit)")
     }
 }
 
-/// A thin horizontal bar, 0...1. One accent colour; the track is a neutral fill.
+/// A thin horizontal bar, 0...1, in the neutral apps grey; the track is a neutral fill.
 struct Meter: View {
     let fraction: Double
+    var tint: Color = MetricColor.apps.color
     var body: some View {
         GeometryReader { g in
             ZStack(alignment: .leading) {
                 Capsule().fill(.quaternary)
-                Capsule().fill(Color.accentColor).frame(width: max(2, g.size.width * min(1, max(0, fraction))))
+                Capsule().fill(tint).frame(width: max(2, g.size.width * min(1, max(0, fraction))))
             }
         }
         .frame(height: 5)
@@ -84,6 +85,6 @@ struct Monogram: View {
             .font(.system(size: size * 0.46, weight: .semibold))
             .foregroundStyle(.secondary)
             .frame(width: size, height: size)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: size * 0.26))
+            .background(.quaternary, in: RoundedRectangle(cornerRadius: min(size * 0.26, Theme.smallRadius)))
     }
 }
