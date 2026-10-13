@@ -34,6 +34,6 @@ brew install xcodegen
 
 ## What is and is not verified
 
-Verified: the Xcode build embeds a sandboxed, signed widget extension and App Intents metadata; the extension registers with `pluginkit`; the app writes the data file into the widget container; the intents' answers, the file round trip and staleness are covered by `scripts/test-native-logic.sh`; and the widget views were rendered at both sizes.
+Verified: the Xcode build embeds a sandboxed, signed widget extension and App Intents metadata; the extension registers with `pluginkit`; the app writes the data file into the widget container; the intents' answers, the file round trip and staleness are covered by `scripts/test-native-logic.sh`; and the widget views were rendered at both sizes. The published v0.7.0 DMG was also run: the app (0.7.0) and its extension verify with `codesign --verify --deep --strict`, the app wrote `widget.json` with live readings into the widget container, and macOS registered `dev.zyvor.vytrix.widgets` (0.7.0).
 
 Not verified: the widget inside the macOS widget gallery and on the desktop, Spotlight and Siri phrases, and anything on macOS 26. The widget's own process has not been observed running.

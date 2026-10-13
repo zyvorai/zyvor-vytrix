@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Documentation
+- Release status and `docs/WIDGETS.md` record what was run against the published v0.7.0 files, and what was not.
+
 ## v0.7.0 — 2026-10-13
 
 A widget and Shortcuts on the native app, and the collector no longer outlives it.
