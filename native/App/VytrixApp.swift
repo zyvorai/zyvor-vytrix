@@ -2,10 +2,11 @@
 import SwiftUI
 import AppKit
 
-/// One window: closing it quits, which also stops the bundled collector. Without this the app stays
-/// running windowless, and with New Window removed a Dock click cannot bring the window back.
+/// Closing the window keeps Vytrix running in the menu bar (and the bundled collector with it). The
+/// window is a single `Window` scene, so a Dock click or "Open Vytrix" brings it back; Quit stops
+/// the collector.
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }
 
 @main
@@ -27,6 +28,17 @@ struct VytrixApp: App {
         return Pane.allCases.first { $0.rawValue.lowercased() == a[i + 1].lowercased() } ?? .overview
     }
 
+    /// The window's task re-runs each time it reopens; the collector must only start once.
+    @MainActor private func startOnce() {
+        guard !Self.started else { return }
+        Self.started = true
+        store.start()
+        NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { store.stop() }
+        }
+    }
+    @MainActor private static var started = false
+
     static func showAbout() {
         let credits = NSMutableAttributedString(
             string: "A read-only system activity monitor by Zyvor AI Labs.\n",
@@ -41,17 +53,12 @@ struct VytrixApp: App {
     }
 
     var body: some Scene {
-        WindowGroup("Vytrix") {
+        Window("Vytrix", id: "main") {
             RootView()
                 .environmentObject(store)
                 .frame(minWidth: 900, minHeight: 600)
                 .preferredColorScheme(Self.forcedScheme)
-                .task {
-                    store.start()
-                    NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { _ in
-                        MainActor.assumeIsolated { store.stop() }
-                    }
-                }
+                .task { startOnce() }
         }
         .defaultSize(width: 1120, height: 720)
         .commands {
@@ -66,5 +73,12 @@ struct VytrixApp: App {
                 Button(store.paused ? "Resume" : "Pause") { store.paused.toggle() }.keyboardShortcut("p")
             }
         }
+
+        MenuBarExtra {
+            MenuBarView().environmentObject(store)
+        } label: {
+            MenuBarLabel().environmentObject(store)
+        }
+        .menuBarExtraStyle(.window)
     }
 }

@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+## v0.4.0 — 2026-10-13
+
+The native Mac app gains a menu bar item and alerts with notifications; Fleet Pro and the BSL license land.
+
 ### Added
+- **Native app: menu bar item.** Live CPU in the menu bar, and a popover with host totals, the alert count and the five busiest apps, plus Open Vytrix and Quit. Closing the window no longer quits: Vytrix keeps running (and keeps its bundled collector) until you Quit; a Dock click or Open Vytrix brings the window back.
+- **Native app: Alerts.** A fifth sidebar section with a count badge, a threshold slider (default 80%, saved) and per-alert Dismiss. Rules are a port of `lib/alerts.ts`: CPU, memory, disk and container memory limit, critical from threshold + 10. Optional local notifications fire once per alert, again on escalation, and re-arm after three quiet samples; they never fire for demo data and have no actions.
+- **Native tests.** `scripts/test-native-logic.sh` (alert rules and notification hysteresis, compiled against the real model files) is the first Swift test. `scripts/test-native-ui.sh` now also checks that closing the window keeps the app running, that reopening restores it, and that Quit stops the collector.
+- **Mac packaging.** `scripts/package-mac.sh` builds `Vytrix-VERSION.dmg` and `.pkg` with checksums, and signs and notarizes when Developer ID identities and a notarytool profile are provided; the release workflow's `mac` job runs it.
 - **Fleet Pro layer** (opt-in, read-only): advanced silicon/AI telemetry, safe inventory, macOS per-process rates, agent health and verified updates, centralized history, tags/groups, roles, alerts, webhooks, SSO-proxy assertions, entitlements, Prometheus export, capacity forecasting, and backup tooling. New entry points: `agent/vytrix_fleet.py`, `agent/cluster_worker_fleet.py`, `cluster/fleet_coordinator.py`; the original collector, worker and coordinator are unchanged. See `docs/FLEET-PRO.md`. No command channel to agents was added.
-- **Mac download:** the v0.3.0 release carries `Vytrix-0.3.0.dmg`, the native app signed with a Developer ID, not yet notarized (Apple silicon, macOS 26+), with its `.sha256`. README, the Pages site and `docs/RELEASE.md` link to it.
+- **Mac download:** the v0.3.0 release carries `Vytrix-0.3.0.dmg`, the native app signed with a Developer ID, not yet notarized (Apple silicon, macOS 26+), with its `.sha256`.
 
 ### Changed
 - **License:** future versions are under the Business Source License 1.1 (non-production use free; production use needs a commercial license from Zyvor AI Labs Private Limited; each version converts to Apache-2.0 four years after its first public release). v0.3.0 and earlier remain Apache-2.0. Contribution terms in CONTRIBUTING.md updated accordingly.

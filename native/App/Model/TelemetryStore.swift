@@ -3,7 +3,7 @@ import Foundation
 import SwiftUI
 
 enum Pane: String, CaseIterable, Identifiable {
-    case overview = "Overview", applications = "Applications", containers = "Containers", projects = "Projects"
+    case overview = "Overview", applications = "Applications", containers = "Containers", projects = "Projects", alerts = "Alerts"
     var id: Self { self }   // the sidebar List tags rows by id; it must match the Pane selection
     var symbol: String {
         switch self {
@@ -11,6 +11,7 @@ enum Pane: String, CaseIterable, Identifiable {
         case .applications: return "square.stack.3d.up"
         case .containers: return "shippingbox"
         case .projects: return "folder"
+        case .alerts: return "bell.badge"
         }
     }
 }
@@ -26,6 +27,25 @@ final class TelemetryStore: ObservableObject {
     @Published private(set) var source: Source = .local
     @Published var paused = false
     @Published var search = ""
+    @Published var threshold: Double = {
+        let v = UserDefaults.standard.double(forKey: "vytrix.threshold")
+        return v >= 1 && v <= 100 ? v : AlertRules.defaultThreshold
+    }() { didSet { UserDefaults.standard.set(threshold, forKey: "vytrix.threshold") } }
+    @Published var notificationsEnabled: Bool = UserDefaults.standard.object(forKey: "vytrix.notify") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: "vytrix.notify"); if notificationsEnabled { AlertNotifications.requestAuthorization() } }
+    }
+    @Published private(set) var dismissed: Set<String> = []
+    private var notifier = AlertNotifier()
+
+    /// Alerts for the latest sample that the person has not dismissed. A dismissed alert comes back
+    /// if it clears and fires again.
+    var alerts: [VytrixAlert] {
+        guard let s = snapshot else { return [] }
+        return AlertRules.compute(s, threshold: threshold).filter { !dismissed.contains($0.id) }
+            .sorted { $0.severity > $1.severity }
+    }
+    func dismiss(_ id: String) { dismissed.insert(id) }
+    func dismissAll() { dismissed.formUnion(alerts.map(\.id)) }
 
     let collector = CollectorProcess()
     private var endpoint: URL?
@@ -70,6 +90,8 @@ final class TelemetryStore: ObservableObject {
         loop?.cancel()
         snapshot = nil
         history = []
+        dismissed = []
+        notifier.reset()
         failures = 0
         status = .starting
         source = new
@@ -80,6 +102,7 @@ final class TelemetryStore: ObservableObject {
     }
 
     func start() {
+        if notificationsEnabled { AlertNotifications.requestAuthorization() }
         let args = CommandLine.arguments
         if args.contains("--demo") { begin(.demo) } else { begin(.local) }
     }
@@ -164,6 +187,10 @@ final class TelemetryStore: ObservableObject {
 
     private func append(_ s: Snapshot, date: Date) {
         snapshot = s
+        let firing = AlertRules.compute(s, threshold: threshold)
+        dismissed.formIntersection(firing.map(\.id))
+        let fresh = notifier.fresh(firing)
+        if source != .demo, notificationsEnabled, !fresh.isEmpty { AlertNotifications.post(fresh, host: s.host.name) }
         history.append(Sample(s, at: date))
         if history.count > maxSamples { history.removeFirst(history.count - maxSamples) }
     }

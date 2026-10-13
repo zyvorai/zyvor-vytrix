@@ -1,6 +1,12 @@
 # Release status
 
-## Unreleased (after v0.3.0)
+## v0.4.0 (2026-10-13)
+
+- **Native Mac app:** menu bar item, the app keeps running when its window closes, an Alerts section with local notifications, and the first Swift tests (`scripts/test-native-logic.sh`). Built with `scripts/package-mac.sh`; see [Release artifacts](#release-artifacts) for the DMG and pkg.
+- **Verified locally on macOS 27.2 (Apple silicon):** `scripts/build-native.sh`, `scripts/test-native-logic.sh` (15 checks) and `scripts/test-native-ui.sh` (sidebar clicks, close-keeps-running, reopen, quit stops the collector).
+- **Not verified:** the native app on macOS 26; a notification actually appearing on a fresh install (macOS asks for permission on first run); the menu bar popover has no automated test. The DMG and pkg are Developer ID signed and notarized only if the repository has the Apple secrets; check the release notes for what the tag actually produced.
+
+## Included from the earlier unreleased work
 
 - **License:** future versions are under the Business Source License 1.1; v0.3.0 and earlier stay Apache-2.0. Each version converts to Apache-2.0 four years after its first public release; set a concrete Change Date when you cut a release.
 - **Fleet Pro** ([FLEET-PRO.md](FLEET-PRO.md)): richer telemetry, central history, roles (`auditor`, `editor`), alerts, webhooks, SSO-proxy endpoint, entitlements, Prometheus export, forecasting.

@@ -96,6 +96,8 @@ class Tests(unittest.TestCase):
             thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
             try:
                 client=ssl.create_default_context(cafile=cert);client.check_hostname=False
+                # Python 3.13+ verifies strictly by default; the bare self-signed cert this test makes (LibreSSL on macOS) has no CA basic constraint.
+                client.verify_flags&=~getattr(ssl,'VERIFY_X509_STRICT',0)
                 request=urllib.request.Request(f'https://127.0.0.1:{server.server_port}/v1/snapshot',headers={'Authorization':'Bearer '+'a'*32})
                 with urllib.request.urlopen(request,timeout=3,context=client) as r:self.assertEqual(json.load(r)['version'],1)
             finally:
