@@ -27,6 +27,10 @@ export function useTelemetry(){
   // The token lives only in tab memory: never localStorage, never the hosting server.
   const [token,setToken]=useState('');
   const tick=useRef(60);
+  // Time machine: stored samples and the one shown. Live polling keeps recording underneath.
+  const [replay,setReplay]=useState<Snapshot[]>([]);
+  const [replayIndex,setReplayIndex]=useState<number|null>(null);
+  const replaying=useRef(false);
 
   useEffect(()=>{
     if(paused||source==='import')return;
@@ -38,7 +42,7 @@ export function useTelemetry(){
         const next=source==='live'
           ?snapshotSchema.parse(await (await fetch(endpoint,{headers:{Authorization:`Bearer ${token}`},signal:AbortSignal.timeout(8000)})).json())
           :demoSnapshot(tick.current++);
-        if(running){setSnapshot(next);setHistory(h=>[...h,next].slice(-MAX_HISTORY));setError('');}
+        if(running){if(!replaying.current)setSnapshot(next);setHistory(h=>[...h,next].slice(-MAX_HISTORY));setError('');}
       }catch{
         if(running)setError('Collector unavailable. Last successful sample is shown. Check its address, token, HTTPS and allowed origin.');
       }finally{busy=false;}
@@ -86,5 +90,26 @@ export function useTelemetry(){
     }catch{return null;}
   },[source,endpoint,token]);
 
-  return {snapshot,history,source,paused,setPaused,error,setError,connect,importFile,useDemo,collectorGet};
+  const beginReplay=useCallback(async()=>{
+    const since=Math.floor(Date.now()/1000)-3600;
+    const raw=await collectorGet(`/v1/history?since=${since}&limit=1000`) as {samples?:unknown}|null;
+    const parsed=Array.isArray(raw?.samples)?raw.samples.map(x=>snapshotSchema.safeParse(x)).flatMap(r=>r.success?[r.data]:[]):[];
+    if(parsed.length<2)return false;
+    replaying.current=true;
+    setReplay(parsed);setReplayIndex(parsed.length-1);setSnapshot(parsed[parsed.length-1]);
+    return true;
+  },[collectorGet]);
+  const scrub=useCallback((i:number)=>{
+    if(replay[i]){setReplayIndex(i);setSnapshot(replay[i]);}
+  },[replay]);
+  const endReplay=useCallback(()=>{
+    replaying.current=false;setReplayIndex(null);
+    const last=history[history.length-1]??replay[replay.length-1];
+    if(last)setSnapshot(last);
+    setReplay([]);
+  },[history,replay]);
+  // Leaving the live source leaves the replay.
+  useEffect(()=>{if(source!=='live'&&replaying.current){replaying.current=false;setReplayIndex(null);setReplay([]);}},[source]);
+
+  return {snapshot,history,source,paused,setPaused,error,setError,connect,importFile,useDemo,collectorGet,replay,replayIndex,beginReplay,scrub,endReplay};
 }

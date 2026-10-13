@@ -77,11 +77,21 @@ export default function Page(){
 
   const sidebar=<MonitorSidebar view={view} onSelect={navigate} badges={badges} snapshot={snapshot} source={source} paused={paused}/>;
   const toolbar=<Toolbar monitorControls={view!=='cluster'} theme={theme} title={meta.label} subtitle={view==='overview'?`${snapshot.host.name} · ${snapshot.host.os}`:meta.subtitle} search={search} onSearch={setSearch} showSearch={searchableViews.includes(view)} paused={paused} onPause={()=>setPaused(!paused)} onExport={()=>save(snapshot)} onConnect={()=>{setError('');setConnectOpen(true);}} onToggleSidebar={()=>isMobile?setMobileNav(true):setSidebarOpen(o=>!o)} dark={dark} onToggleDark={()=>update('appearance',dark?'light':'dark')}/>;
-  const footer=<footer className="statusbar">
+  const replayCount=telemetry.replay.length;
+  const replayAt=telemetry.replayIndex;
+  const footer=<>
+    {replayAt!==null&&<div className="time-machine" role="group" aria-label="Time machine">
+      <label htmlFor="tm-range">Time machine</label>
+      <input id="tm-range" type="range" min={0} max={Math.max(1,replayCount-1)} step={1} value={replayAt} onChange={e=>telemetry.scrub(Number(e.target.value))}/>
+      <span className="num" suppressHydrationWarning>{new Date(snapshot.timestamp).toLocaleTimeString()} · sample {replayAt+1} of {replayCount}</span>
+      <button type="button" className="button small primary" onClick={telemetry.endReplay}>Back to live</button>
+    </div>}
+  <footer className="statusbar">
     <span><ShieldCheck size={13}/>Read-only telemetry</span>
     <span>{view==='cluster'?'Cluster coordinator':source==='demo'?'Simulated data':source==='live'?'Live collector':'Imported snapshot'}{paused&&view!=='cluster'?' · Paused':''}</span>
     <span className="num" suppressHydrationWarning>{source==='demo'||view==='cluster'?'':new Date(snapshot.timestamp).toLocaleTimeString()}</span>
-  </footer>;
+    {source==='live'&&view!=='cluster'&&replayAt===null&&<button type="button" className="button small" onClick={()=>{void telemetry.beginReplay().then(ok=>{if(!ok)setError('Nothing to replay yet: the collector holds fewer than two stored samples.');});}}>Time machine</button>}
+  </footer></>;
 
   return <>
     <AppShell sidebar={sidebar} toolbar={toolbar} footer={footer} sidebarOpen={sidebarOpen} mobileNavOpen={mobileNav} onMobileNavChange={setMobileNav}>
