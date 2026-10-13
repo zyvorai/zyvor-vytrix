@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-import {BatteryMedium,Bell,Box,Cpu,FolderCode,Gauge,HardDrive,Layers,MemoryStick,Network,Server,Settings} from 'lucide-react';
+import {BatteryMedium,Bell,History,Box,Cpu,FolderCode,Gauge,HardDrive,Layers,MemoryStick,Network,Server,Settings} from 'lucide-react';
 
 export const views=[
   {id:'overview',label:'Overview',icon:Gauge,section:'Monitor',subtitle:'Your system at a glance'},
@@ -13,6 +13,7 @@ export const views=[
   {id:'containers',label:'Containers',icon:Box,section:'Workloads',subtitle:'Docker and Podman workloads'},
   {id:'projects',label:'Projects',icon:FolderCode,section:'Workloads',subtitle:'Developer servers by project folder'},
   {id:'alerts',label:'Alerts',icon:Bell,section:'System',subtitle:'Threshold checks on the latest sample'},
+  {id:'timeline',label:'Timeline',icon:History,section:'System',subtitle:'Alerts, anomalies and changes over a window'},
   {id:'settings',label:'Settings',icon:Settings,section:'System',subtitle:'Appearance, alerts and data'},
 ] as const;
 

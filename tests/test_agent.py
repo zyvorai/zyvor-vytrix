@@ -276,6 +276,43 @@ class Tests(unittest.TestCase):
                     self.assertEqual(e.exception.code,400,bad)
             finally:
                 server.shutdown();server.server_close();thread.join()
+    def test_changes_between_first_and_last_sample(self):
+        samples=Tests.synthetic(5)
+        base=lambda: [{'pid':1,'name':'a','app':'Keep','cpu':1,'memory':1,'ports':[]}]
+        samples[0]['processes']=base()+[{'pid':2,'name':'old','app':'Old','cpu':1,'memory':1,'ports':[3000]}]
+        samples[2]['processes']=base()+[{'pid':3,'name':'blip','app':'Blip','cpu':1,'memory':1,'ports':[7000]}]
+        samples[4]['processes']=base()+[{'pid':4,'name':'new','app':'New','cpu':1,'memory':1,'ports':[8080]}]
+        samples[0]['containers']=[{'runtime':'docker','id':'1','name':'db','state':'running'}]
+        samples[4]['containers']=[{'runtime':'docker','id':'1','name':'db','state':'exited'}]
+        r=v.changes_report(samples,0,10)['changes']
+        self.assertEqual(r['appsStarted'],['New'])
+        self.assertEqual(r['appsStopped'],['Old'])
+        self.assertEqual(r['portsOpened'],[{'port':8080,'app':'New'}])
+        self.assertEqual(r['portsClosed'],[{'port':3000,'app':'Old'}])
+        self.assertEqual(r['containersChanged'],[{'container':'docker:db','from':'running','to':'exited'}])
+        self.assertEqual(r['transient']['apps'],['Blip'])
+        self.assertEqual(r['transient']['ports'],[{'port':7000,'app':'Blip'}])
+    def test_changes_needs_two_samples_and_endpoint_validates(self):
+        self.assertIsNone(v.changes_report([],0,1)['changes'])
+        with tempfile.TemporaryDirectory() as d:
+            store=v.Store(str(Path(d)/'history.sqlite'))
+            samples=Tests.synthetic(10)
+            for s in samples:store.add(s)
+            server=v.TelemetryServer(('127.0.0.1',0),'a'*32,[],store,v.Collector().snapshot())
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            base='http://127.0.0.1:'+str(server.server_port)
+            def get(path):
+                return urllib.request.urlopen(urllib.request.Request(base+path,headers={'Authorization':'Bearer '+'a'*32}),timeout=3)
+            stamp=lambda i:dt.datetime.fromisoformat(samples[i]['timestamp'].replace('Z','+00:00')).timestamp()
+            try:
+                with get(f'/v1/changes?since={stamp(0)}&to={stamp(9)}') as r:body=json.load(r)
+                self.assertEqual(body['window']['samples'],10)
+                self.assertIsNotNone(body['changes'])
+                for bad in ('','?since=nan','?since=5&to=2','?since=1&to=200000'):
+                    with self.assertRaises(urllib.error.HTTPError) as e:get('/v1/changes'+bad)
+                    self.assertEqual(e.exception.code,400,bad)
+            finally:
+                server.shutdown();server.server_close();thread.join()
     def test_retention(self):
         with tempfile.TemporaryDirectory() as d:
             store=v.Store(str(Path(d)/'history.sqlite'))

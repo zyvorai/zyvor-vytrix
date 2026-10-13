@@ -9,6 +9,7 @@ All `/v1` reads require `Authorization: Bearer <VYTRIX_TOKEN>`. Browser requests
 | `GET /v1/anomalies?since=EPOCH_SECONDS&limit=600` | Anomaly bands over stored history; see below. limit 1–1000 |
 | `GET /v1/evidence?from=EPOCH&to=EPOCH&metric=cpu` | What was busy in a window, against the window before it; see below. `metric` is `cpu`, `memory` or `network` |
 | `GET /v1/timeline?from=EPOCH&to=EPOCH&threshold=85` | Alerts, anomaly windows and container changes in a window, with a fingerprint and what changed since the previous window; see below |
+| `GET /v1/changes?since=EPOCH&to=EPOCH` | Apps, ports and containers that appeared or went away between the first and last sample of a window; see below. `to` defaults to now |
 | `GET /healthz` | `{"status": "ok"}`; no token, no telemetry |
 | `OPTIONS` | CORS preflight for an allowed origin |
 | any other path | With `--ui-upstream`: proxied to the dashboard (GET, HEAD, POST). Otherwise 404. |
@@ -48,6 +49,10 @@ The band is an exponentially weighted mean and variance with a floor on the devi
 - `fingerprint`: 12 hex characters over the sorted set of `kind|subject|detail|severity`, without times, so the same pattern of events gives the same fingerprint in any window.
 - `whyChanged`: against the same-length window before it, the event keys that are `newSincePrevious` and `goneSincePrevious`, and that window's `previousFingerprint` (`null` when it holds no samples).
 - `window.samples` is capped at 1000, with a note when it was cut. `notes` says what the data is not: alerts are replayed from history, not a record of what a dashboard showed.
+
+### Changes
+
+`GET /v1/changes?since=&to=` (at most 24 hours) compares the first and the last stored sample in the window and returns `changes`: `appsStarted`, `appsStopped`, `portsOpened` and `portsClosed` (`{port, app}`), `containersAppeared`, `containersGone`, `containersChanged` (`{container, from, to}`) and `transient`, the apps, ports and containers seen only between the two. Each list holds at most 50. `changes` is `null` with fewer than two samples. A process shorter than the sample interval may not appear at all, and `notes` says so.
 
 401 means invalid/missing token, 403 means denied Origin, 400 means invalid history query, 404 means unknown path, 502 means the dashboard upstream is down. Mutations are not supported. The dashboard proxy never forwards the `Authorization` header. Snapshots contain host name, OS, process names, PIDs, RSS, CPU, best-effort project folder basename, listening ports and container metadata. No argv, environment, file contents or packet payloads are collected. Project names, executable paths and container names may still be sensitive; protect your collector and exported snapshots.
 

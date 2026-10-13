@@ -47,3 +47,30 @@ export function anomalyBands(report:AnomalyReport|null,metric:AnomalyMetric):Ban
 export function isScored(report:AnomalyReport|null,metric:AnomalyMetric){
   return !!report?.samples.some(s=>s[metric]!=null);
 }
+
+const eventSchema=z.object({time:z.string().datetime(),kind:z.enum(['alert','container','anomaly']),subject:label,detail:label,severity:label,text:z.string().max(512),end:z.string().datetime().optional(),peak:num.optional()});
+/** GET /v1/timeline. */
+export const timelineSchema=z.object({
+  window:z.object({from:num,to:num,samples:z.number().int().nonnegative(),baselineSamples:z.number().int().nonnegative()}),
+  threshold:num,
+  fingerprint:z.string().regex(/^[0-9a-f]{12}$/),
+  events:z.array(eventSchema).max(200),
+  eventCount:z.number().int().nonnegative(),
+  whyChanged:z.object({newSincePrevious:z.array(z.string().max(600)).max(500),goneSincePrevious:z.array(z.string().max(600)).max(500),previousFingerprint:z.string().regex(/^[0-9a-f]{12}$/)}).nullable(),
+  notes:z.array(z.string().max(512)).max(50),
+});
+export type TimelineReport=z.infer<typeof timelineSchema>;
+
+const portRow=z.object({port:z.number().int(),app:label});
+/** GET /v1/changes. `changes` is null with fewer than two samples. */
+export const changesSchema=z.object({
+  window:z.object({from:num,to:num,samples:z.number().int().nonnegative(),first:z.string().optional(),last:z.string().optional()}),
+  changes:z.object({
+    appsStarted:z.array(label),appsStopped:z.array(label),portsOpened:z.array(portRow),portsClosed:z.array(portRow),
+    containersAppeared:z.array(label),containersGone:z.array(label),
+    containersChanged:z.array(z.object({container:label,from:label.nullable(),to:label.nullable()})),
+    transient:z.object({apps:z.array(label),ports:z.array(portRow),containers:z.array(label)}),
+  }).nullable(),
+  notes:z.array(z.string().max(512)).max(50),
+});
+export type ChangesReport=z.infer<typeof changesSchema>;
