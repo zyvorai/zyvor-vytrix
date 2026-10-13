@@ -447,6 +447,86 @@ def anomaly_report(samples,since=0):
             'samples':rows,'windows':windows,
             'rate':{m:(round(c[0]/c[1],4) if c[1] else None) for m,c in counts.items()}}
 
+def _mean(values):
+    values=[v for v in values if v is not None]
+    return sum(values)/len(values) if values else None
+
+def _round(value,digits=2):
+    return None if value is None else round(value,digits)
+
+def app_stats(samples):
+    """Per app, summed over its processes in each sample, then averaged over the samples.
+    An app absent from a sample counts as 0 CPU and 0 RSS there; `present` says how often it was seen.
+    Network is only reported for apps whose collector actually exposed a per-process rate."""
+    count=len(samples);stats={}
+    for sample in samples:
+        per={}
+        for proc in sample.get('processes',[]):
+            name=proc.get('app') or proc.get('name') or 'unknown'
+            row=per.setdefault(name,{'cpu':0.0,'memory':0.0,'network':0.0,'network_seen':False})
+            row['cpu']+=proc.get('cpu') or 0;row['memory']+=proc.get('memory') or 0
+            for key in ('networkInRate','networkOutRate'):
+                if proc.get(key) is not None:
+                    row['network']+=proc[key];row['network_seen']=True
+        for name,row in per.items():
+            st=stats.setdefault(name,{'cpu':0.0,'memory':0.0,'network':0.0,'network_seen':False,'cpuPeak':0.0,'memoryPeak':0.0,'present':0})
+            st['cpu']+=row['cpu'];st['memory']+=row['memory'];st['network']+=row['network']
+            st['network_seen']=st['network_seen'] or row['network_seen']
+            st['cpuPeak']=max(st['cpuPeak'],row['cpu']);st['memoryPeak']=max(st['memoryPeak'],row['memory'])
+            st['present']+=1
+    out={}
+    for name,st in stats.items():
+        out[name]={'meanCpu':st['cpu']/count,'peakCpu':st['cpuPeak'],'meanMemory':st['memory']/count,
+                   'peakMemory':st['memoryPeak'],'meanNetwork':st['network']/count if st['network_seen'] else None,
+                   'present':st['present'],'samples':count}
+    return out
+
+def container_stats(samples):
+    count=len(samples);stats={}
+    for sample in samples:
+        for c in sample.get('containers') or []:
+            key=(c.get('runtime'),c.get('id'))
+            st=stats.setdefault(key,{'name':c.get('name'),'runtime':c.get('runtime'),'image':c.get('image'),'cpu':0.0,'cpuPeak':0.0,'memoryPeak':0.0,'memoryLimit':c.get('memoryLimit'),'present':0})
+            st['cpu']+=c.get('cpu') or 0;st['cpuPeak']=max(st['cpuPeak'],c.get('cpu') or 0)
+            st['memoryPeak']=max(st['memoryPeak'],c.get('memory') or 0);st['present']+=1
+    return [{'name':st['name'],'runtime':st['runtime'],'image':st['image'],'meanCpu':_round(st['cpu']/count),
+             'peakCpu':_round(st['cpuPeak']),'peakMemory':st['memoryPeak'],'memoryLimit':st['memoryLimit'],'present':st['present']}
+            for st in sorted(stats.values(),key=lambda x:x['cpu'],reverse=True)[:10]]
+
+def host_stats(samples):
+    columns={name:[anomaly_values(s)[name] for s in samples] for name in ANOMALY_FLOORS}
+    return {name:{'mean':_round(_mean(vals)),'peak':_round(max([v for v in vals if v is not None],default=None))} for name,vals in columns.items()}
+
+EVIDENCE_METRICS={'cpu':('meanCpu','peakCpu'),'memory':('meanMemory','peakMemory'),'network':('meanNetwork',None)}
+
+def evidence_report(window,baseline,lead,start,end,metric='cpu'):
+    """What was busy between start and end, and how that compares with the same-length window before it."""
+    mean_key,peak_key=EVIDENCE_METRICS[metric]
+    now=app_stats(window);before=app_stats(baseline) if baseline else {}
+    rows=[]
+    for name,st in now.items():
+        value=st[mean_key]
+        if value is None:continue
+        base=before.get(name,{}).get(mean_key) if baseline else None
+        if baseline and name not in before:base=0.0
+        rows.append({'name':name,'mean':_round(value),'peak':_round(st[peak_key]) if peak_key else None,
+                     'present':st['present'],'samples':st['samples'],
+                     'baselineMean':_round(base),'delta':_round(value-base) if base is not None else None})
+    rows.sort(key=lambda r:(r['mean'],r['name']),reverse=True)
+    report=anomaly_report(lead+window,start) if window else None
+    notes=['App memory is summed RSS and can count shared pages more than once.',
+           'An app absent from a sample counts as zero in its mean; `present` is how many samples it appeared in.']
+    if metric=='network' and not rows:
+        notes.append('No per-process network rates in this window; the base collector does not collect per-app network.')
+    return {'version':1,'metric':metric,
+            'window':{'from':start,'to':end,'samples':len(window),'baselineSamples':len(baseline)},
+            'host':host_stats(window),'baselineHost':host_stats(baseline) if baseline else None,
+            'apps':rows[:10],'containers':container_stats(window),
+            'anomalies':{'windows':[w for w in report['windows']] if report else [],
+                         'peaks':{m:max([row[m]['score'] for row in report['samples'] if row[m]],default=None) for m in ANOMALY_FLOORS} if report else {},
+                         'scoredSamples':sum(1 for row in report['samples'] if any(row[m] for m in ANOMALY_FLOORS)) if report else 0},
+            'notes':notes}
+
 class Store:
     def __init__(self,path):
         self.path=path
@@ -463,6 +543,16 @@ class Store:
     def history(self,since=0,limit=300):
         with self.lock,self.connection() as db:
             rows=db.execute('SELECT payload FROM samples WHERE timestamp >= ? ORDER BY timestamp DESC LIMIT ?',(since,min(1000,max(1,limit)))).fetchall()
+        return [json.loads(row[0]) for row in reversed(rows)]
+    def window(self,start,end,limit=1000):
+        """Samples with start <= timestamp <= end, oldest first (at most `limit`)."""
+        with self.lock,self.connection() as db:
+            rows=db.execute('SELECT payload FROM samples WHERE timestamp >= ? AND timestamp <= ? ORDER BY timestamp ASC LIMIT ?',(start,end,limit)).fetchall()
+        return [json.loads(row[0]) for row in rows]
+    def before(self,end,limit):
+        """The latest `limit` samples with timestamp < end, oldest first."""
+        with self.lock,self.connection() as db:
+            rows=db.execute('SELECT payload FROM samples WHERE timestamp < ? ORDER BY timestamp DESC LIMIT ?',(end,limit)).fetchall()
         return [json.loads(row[0]) for row in reversed(rows)]
 
 class TelemetryServer(ThreadingHTTPServer):
@@ -585,6 +675,19 @@ class Handler(BaseHTTPRequestHandler):
             lead=ANOMALY_WARMUP
             samples=self.server.store.history(max(0,since-lead*10),min(1000,limit+lead))
             return self.reply(200,anomaly_report(samples,since))
+        if path.path=='/v1/evidence':
+            try:
+                query=parse_qs(path.query)
+                start=float(query['from'][0]);end=float(query['to'][0]);metric=query.get('metric',['cpu'])[0]
+                if not (0<=start<end<1e12) or end-start>86400 or metric not in EVIDENCE_METRICS:
+                    raise ValueError()
+            except (KeyError,ValueError):
+                return self.reply(400,{'error':'from and to must be epoch seconds with from < to and at most 24 h apart; metric is cpu, memory or network'})
+            store=self.server.store
+            window=store.window(start,end,1000)
+            baseline=store.window(max(0,start-(end-start)),start-1e-6,1000)
+            lead=store.before(start,ANOMALY_WARMUP)
+            return self.reply(200,evidence_report(window,baseline,lead,start,end,metric))
         return self.reply(404,{'error':'Not found'})
 
 def main():
