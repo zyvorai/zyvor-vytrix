@@ -26,6 +26,13 @@ for i in range(400):
 ts = lambda i: base + i * 2
 tmp = sys.argv[1]
 json.dump(v.anomaly_report(samples), open(tmp + '/anomalies.json', 'w'))
+late = [dict(s) for s in samples[290:320]]
+for s in late[15:]:
+    s['processes'] = s['processes'] + [{'pid': 9, 'name': 'late', 'app': 'Late', 'cpu': 1.0, 'memory': 1, 'ports': [4000]}]
+json.dump(v.timeline_report(samples[290:320], samples[260:290], samples[:290][-v.ANOMALY_WARMUP:], ts(290), ts(319), 85.0),
+          open(tmp + '/timeline.json', 'w'))
+json.dump(v.changes_report(late, ts(290), ts(319)), open(tmp + '/changes.json', 'w'))
+json.dump(v.changes_report([], ts(290), ts(319)), open(tmp + '/changes-empty.json', 'w'))
 json.dump(v.evidence_report(samples[290:320], samples[260:290], samples[:290][-v.ANOMALY_WARMUP:], ts(290), ts(319)),
           open(tmp + '/evidence.json', 'w'))
 PY

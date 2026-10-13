@@ -87,6 +87,22 @@ struct AlertTests {
                 check(!e.notes.isEmpty, "notes decode")
             }
         }
+        if let dir = fixtures {
+            let dec = JSONDecoder()
+            let timeline = try? dec.decode(TimelineReport.self, from: Data(contentsOf: URL(fileURLWithPath: dir + "/timeline.json")))
+            check(timeline != nil, "collector /v1/timeline JSON decodes")
+            if let t = timeline {
+                check(t.fingerprint.count == 12, "fingerprint is 12 hex characters")
+                check(t.events.contains { $0.kind == "alert" && $0.subject == "cpu" && $0.detail == "fired" }, "the cpu spike fired an alert")
+                check(t.whyChanged != nil, "whyChanged decodes")
+                check(TimelineReport.describe(key: "alert|cpu|fired|critical") == "alert cpu fired (critical)", "keys are described in words")
+            }
+            let changes = try? dec.decode(ChangesReport.self, from: Data(contentsOf: URL(fileURLWithPath: dir + "/changes.json")))
+            check(changes != nil, "collector /v1/changes JSON decodes")
+            check(changes?.changes?.appsStarted == ["Late"] && changes?.changes?.portsOpened.first?.port == 4000, "started app and opened port decode")
+            let none = try? dec.decode(ChangesReport.self, from: Data(contentsOf: URL(fileURLWithPath: dir + "/changes-empty.json")))
+            check(none != nil && none?.changes == nil, "a window with too few samples decodes with no changes")
+        }
         let t0 = Date(timeIntervalSince1970: 1_000)
         check(EvidenceRequest.make(t0...t0.addingTimeInterval(30), metric: "cpu") != nil, "a 30 s range can ask for evidence")
         check(EvidenceRequest.make(t0...t0.addingTimeInterval(0.5), metric: "cpu") == nil, "a click is not a range")

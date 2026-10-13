@@ -42,6 +42,7 @@ struct RootView: View {
                     case .containers: ContainersView()
                     case .projects: ProjectsView()
                     case .alerts: AlertsView()
+                    case .timeline: TimelineView()
                     case .settings: SettingsView()
                     case .cpu, .memory, .disk, .network, .battery: ResourceView(pane: section ?? .cpu)
                     }
