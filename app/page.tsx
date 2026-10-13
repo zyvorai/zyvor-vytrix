@@ -12,6 +12,7 @@ import {MonitorSidebar} from '@/components/monitor/Sidebar';
 import {Toolbar} from '@/components/monitor/Toolbar';
 import {ClusterView} from '@/components/monitor/ClusterView';
 import {OverviewView,type Range} from '@/components/monitor/OverviewView';
+import {TimelineView} from '@/components/monitor/TimelineView';
 import {ResourceView,type ResourceKind} from '@/components/monitor/ResourceView';
 import {AppsTable,sortApps,type AppSort} from '@/components/monitor/AppsTable';
 import {ContainersView} from '@/components/monitor/ContainersView';
@@ -98,6 +99,7 @@ export default function Page(){
         {view==='containers'&&<ContainersView snapshot={snapshot} search={search} host={source==='demo'?viewer:host}/>}
         {view==='projects'&&<ProjectsView projects={apps.filter(a=>a.project)} onSelect={setSelected}/>}
         {view==='alerts'&&<AlertsView alerts={alerts} enabled={prefs.alertsEnabled} threshold={prefs.threshold} onDismiss={id=>setDismissed(d=>[...d,id])} onConfigure={()=>navigate('settings')}/>}
+        {view==='timeline'&&<TimelineView collectorGet={source==='live'?telemetry.collectorGet:undefined} threshold={prefs.threshold} onConnect={()=>setConnectOpen(true)}/>}
         {view==='settings'&&<SettingsView prefs={prefs} update={(k,v)=>{if(k==='threshold')setDismissed([]);update(k,v);}} resolvedTheme={theme} source={source} onImport={openImport} onExport={()=>save(snapshot)} onUseDemo={telemetry.useDemo}/>}
       </div>
     </AppShell>

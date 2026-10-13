@@ -616,6 +616,48 @@ def timeline_report(window,baseline,lead,start,end,threshold,truncated=False):
             'threshold':threshold,'fingerprint':timeline_fingerprint(events),'events':events[:TIMELINE_EVENTS],
             'eventCount':len(events),'whyChanged':why,'notes':notes}
 
+CHANGES_CAP=50
+
+def _inventory(sample):
+    """Apps, listening ports (port -> app) and containers of one sample, as comparable sets."""
+    apps=set();ports={}
+    for proc in sample.get('processes') or []:
+        name=proc.get('app') or proc.get('name') or 'unknown'
+        apps.add(name)
+        for port in proc.get('ports') or []:ports.setdefault(port,name)
+    containers={f"{c.get('runtime')}:{c.get('name') or c.get('id')}":c.get('state') for c in sample.get('containers') or []}
+    return apps,ports,containers
+
+def changes_report(samples,start,end,truncated=False):
+    """What appeared and disappeared between the first and the last sample of a window. Things that
+    came and went inside the window are listed separately as `transient`."""
+    if len(samples)<2:
+        return {'version':1,'window':{'from':start,'to':end,'samples':len(samples)},'changes':None,
+                'notes':['Fewer than two samples in this window; there is nothing to compare.']}
+    first_apps,first_ports,first_containers=_inventory(samples[0])
+    last_apps,last_ports,last_containers=_inventory(samples[-1])
+    seen_apps=set();seen_ports={};seen_containers={}
+    for sample in samples[1:-1]:
+        a,p,c=_inventory(sample);seen_apps|=a;seen_ports.update(p);seen_containers.update(c)
+    def sort_cap(rows):return sorted(rows,key=lambda r:json.dumps(r,sort_keys=True))[:CHANGES_CAP]
+    changes={
+        'appsStarted':sorted(last_apps-first_apps)[:CHANGES_CAP],
+        'appsStopped':sorted(first_apps-last_apps)[:CHANGES_CAP],
+        'portsOpened':sort_cap([{'port':p,'app':last_ports[p]} for p in last_ports if p not in first_ports]),
+        'portsClosed':sort_cap([{'port':p,'app':first_ports[p]} for p in first_ports if p not in last_ports]),
+        'containersAppeared':sorted(set(last_containers)-set(first_containers))[:CHANGES_CAP],
+        'containersGone':sorted(set(first_containers)-set(last_containers))[:CHANGES_CAP],
+        'containersChanged':sort_cap([{'container':k,'from':first_containers[k],'to':last_containers[k]} for k in first_containers if k in last_containers and first_containers[k]!=last_containers[k]]),
+        'transient':{'apps':sorted(seen_apps-first_apps-last_apps)[:CHANGES_CAP],
+                     'ports':sort_cap([{'port':p,'app':a} for p,a in seen_ports.items() if p not in first_ports and p not in last_ports]),
+                     'containers':sorted(set(seen_containers)-set(first_containers)-set(last_containers))[:CHANGES_CAP]},
+    }
+    notes=['Compares the first and last stored sample in the window; anything between them that is in neither is `transient`.',
+           'Samples are taken every few seconds, so a process shorter than that may not appear at all.']
+    if truncated:notes.append(f'The window holds more than {TIMELINE_LIMIT} samples; the comparison uses the first {TIMELINE_LIMIT} and the latest one.')
+    return {'version':1,'window':{'from':start,'to':end,'samples':len(samples),'first':samples[0]['timestamp'],'last':samples[-1]['timestamp']},
+            'changes':changes,'notes':notes}
+
 class Store:
     def __init__(self,path):
         self.path=path
@@ -790,6 +832,21 @@ class Handler(BaseHTTPRequestHandler):
             baseline=store.window(max(0,start-(end-start)),start-1e-6,TIMELINE_LIMIT)
             lead=store.before(start,ANOMALY_WARMUP)
             return self.reply(200,timeline_report(window,baseline,lead,start,end,threshold,len(window)>=TIMELINE_LIMIT))
+        if path.path=='/v1/changes':
+            try:
+                query=parse_qs(path.query)
+                start=float(query['since'][0]);end=float(query.get('to',[str(time.time())])[0])
+                if not (0<=start<end<1e12) or end-start>86400:
+                    raise ValueError()
+            except (KeyError,ValueError):
+                return self.reply(400,{'error':'since must be epoch seconds; to (default now) must be later and at most 24 h after since'})
+            store=self.server.store
+            window=store.window(start,end,TIMELINE_LIMIT)
+            truncated=len(window)>=TIMELINE_LIMIT
+            if truncated:
+                last=store.before(end+1e-6,1)
+                window=window+last if last and last[0]['timestamp']!=window[-1]['timestamp'] else window
+            return self.reply(200,changes_report(window,start,end,truncated))
         return self.reply(404,{'error':'Not found'})
 
 def main():
