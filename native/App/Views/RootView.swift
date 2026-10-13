@@ -8,9 +8,24 @@ struct RootView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(Pane.allCases, selection: $section) { s in
-                Label(s.rawValue, systemImage: s.symbol)
-                    .badge(s == .alerts ? store.alerts.count : 0)
+            List(selection: $section) {
+                ForEach(PaneSection.allCases) { group in
+                    Section(group.rawValue) {
+                        ForEach(Pane.allCases.filter { $0.section == group }) { s in
+                            HStack {
+                                Label(s.rawValue, systemImage: s.symbol)
+                                Spacer(minLength: 0)
+                                // A manual count, not .badge: with .badge the row exposes only the number
+                                // to accessibility, not its title.
+                                if s == .alerts, !store.alerts.isEmpty {
+                                    Text("\(store.alerts.count)").font(.caption.weight(.semibold)).monospacedDigit()
+                                        .foregroundStyle(.secondary)
+                                        .accessibilityLabel("\(store.alerts.count) active")
+                                }
+                            }
+                        }
+                    }
+                }
             }
             .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 260)
             .safeAreaInset(edge: .bottom) { HostFooter().padding(12) }
@@ -27,6 +42,7 @@ struct RootView: View {
                     case .containers: ContainersView()
                     case .projects: ProjectsView()
                     case .alerts: AlertsView()
+                    case .cpu, .memory, .disk, .network, .battery: ResourceView(pane: section ?? .cpu)
                     }
                 }
             }

@@ -37,17 +37,34 @@ for _ in $(seq 1 60); do [[ "$(title)" == *·* ]] && break; sleep 0.25; done
 if [[ "$(title)" == *·* ]]; then ok "live telemetry loaded"; else fail "no snapshot after 15 s: $(title)"; fi
 if pgrep -f "$app/Contents/Resources/vytrix.py" >/dev/null; then ok "bundled collector running"; else fail "bundled collector not running"; fi
 
-rows='rows of outline 1 of scroll area 1 of group 1 of splitter group 1 of group 1 of window 1'
-names=(Overview Applications Containers Projects Alerts)
-for i in 2 3 4 5 1; do
-  name="${names[$((i - 1))]}"
-  geometry="$(ax "get {position, size} of row $i of outline 1 of scroll area 1 of group 1 of splitter group 1 of group 1 of window 1" | tr -d ' ')"
+sidebar='outline 1 of scroll area 1 of group 1 of splitter group 1 of group 1 of window 1'
+# Rows are found by their label, so section headers and new sections do not shift the indexes.
+row_index() {
+  osascript -e 'tell application "System Events" to tell process "Vytrix"' \
+    -e "set o to $sidebar" \
+    -e 'set i to 0' \
+    -e 'repeat with r in rows of o' \
+    -e 'set i to i + 1' \
+    -e 'try' \
+    -e 'repeat with t in static texts of UI element 1 of r' \
+    -e "if (value of t) is \"$1\" then return i" \
+    -e 'end repeat' \
+    -e 'end try' \
+    -e 'end repeat' \
+    -e 'return 0' \
+    -e 'end tell'
+}
+names=(Applications Containers Projects Alerts CPU Memory Disk Network Battery Overview)
+for name in "${names[@]}"; do
+  i="$(row_index "$name")"
+  if [[ "$i" == 0 ]]; then fail "sidebar has no $name row"; continue; fi
+  geometry="$(ax "get {position, size} of row $i of $sidebar" | tr -d ' ')"
   IFS=, read -r x y w h <<<"$geometry"
   "$tmp/uiclick" $((x + w / 2)) $((y + h / 2))
   for _ in $(seq 1 20); do [[ "$(title)" == "$name"* ]] && break; sleep 0.25; done
   if [[ "$(title)" == "$name"* ]]; then ok "sidebar click opens $name"; else fail "sidebar click on $name left the window on: $(title)"; fi
 done
-[[ "$(ax "count $rows")" == 5 ]] || fail "expected 5 sidebar rows"
+[[ "$(ax "count rows of $sidebar")" == 13 ]] || fail "expected 3 section headers and 10 sidebar rows"
 
 ax 'click (first button of window 1 whose subrole is "AXCloseButton")' >/dev/null
 sleep 1

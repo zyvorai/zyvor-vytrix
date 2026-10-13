@@ -2,12 +2,32 @@
 import Foundation
 import SwiftUI
 
+/// Sidebar grouping, the same three sections as the web dashboard.
+enum PaneSection: String, CaseIterable, Identifiable {
+    case monitor = "Monitor", workloads = "Workloads", system = "System"
+    var id: Self { self }
+}
+
 enum Pane: String, CaseIterable, Identifiable {
-    case overview = "Overview", applications = "Applications", containers = "Containers", projects = "Projects", alerts = "Alerts"
+    case overview = "Overview", cpu = "CPU", memory = "Memory", disk = "Disk", network = "Network", battery = "Battery"
+    case applications = "Applications", containers = "Containers", projects = "Projects"
+    case alerts = "Alerts"
     var id: Self { self }   // the sidebar List tags rows by id; it must match the Pane selection
+    var section: PaneSection {
+        switch self {
+        case .overview, .cpu, .memory, .disk, .network, .battery: return .monitor
+        case .applications, .containers, .projects: return .workloads
+        case .alerts: return .system
+        }
+    }
     var symbol: String {
         switch self {
         case .overview: return "gauge.with.dots.needle.bottom.50percent"
+        case .cpu: return "cpu"
+        case .memory: return "memorychip"
+        case .disk: return "internaldrive"
+        case .network: return "arrow.up.arrow.down"
+        case .battery: return "battery.75percent"
         case .applications: return "square.stack.3d.up"
         case .containers: return "shippingbox"
         case .projects: return "folder"

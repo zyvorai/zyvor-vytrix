@@ -82,7 +82,7 @@ open native/build/Vytrix.app   # or add --args --demo for simulated telemetry
 ./scripts/shots-native.sh      # docs/ux/native-*.png, from the simulated telemetry
 ```
 
-Needs macOS 26 or newer, the Xcode command line tools, and Python 3.10+ for the collector (the system `/usr/bin/python3` is 3.9; the app looks for Homebrew's first). Overview, Applications, Containers, Projects and Alerts are in, along with a menu bar item (CPU, host totals, alert count, busiest apps). Closing the window keeps Vytrix running in the menu bar; Quit stops it and its collector. Alerts use the dashboard's rules (threshold default 80%, critical at +10) and post local notifications, once per alert, never for demo data. Per-resource pages and Settings are not in the native app yet. Built and run on macOS 27.2.
+Needs macOS 26 or newer, the Xcode command line tools, and Python 3.10+ for the collector (the system `/usr/bin/python3` is 3.9; the app looks for Homebrew's first). Overview, Applications, Containers, Projects and Alerts are in, grouped Monitor, Workloads and System like the dashboard, along with a menu bar item (CPU, host totals, alert count, busiest apps). Closing the window keeps Vytrix running in the menu bar; Quit stops it and its collector. Alerts use the dashboard's rules (threshold default 80%, critical at +10) and post local notifications, once per alert, never for demo data. The CPU, Memory, Disk, Network and Battery pages are in too; Settings is not in the native app yet. Built and run on macOS 27.2.
 
 | Overview, light | Applications, light |
 | --- | --- |

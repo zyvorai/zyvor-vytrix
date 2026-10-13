@@ -6,7 +6,7 @@
 | Cluster schema and URL rules | `node tests/cluster.mjs` | Node |
 | Native Mac app | `./scripts/build-native.sh` (compiles; see the two native rows below for tests) | macOS, Xcode command line tools |
 | Native Mac app, logic | `./scripts/test-native-logic.sh`: alert rules (port of `lib/alerts.ts`) and notification hysteresis, compiled with swiftc against the real model files | macOS, Xcode command line tools |
-| Native Mac app, UI smoke | `./scripts/test-native-ui.sh`: real clicks on every sidebar row, then closing the window must keep the app (menu bar) and collector running, reopening must bring the window back, and quitting must stop both. Run before every Mac release; not in CI (needs Accessibility) | macOS, Python ≥ 3.10, Accessibility for the terminal |
+| Native Mac app, UI smoke | `./scripts/test-native-ui.sh`: real clicks on every sidebar row (found by label), then closing the window must keep the app (menu bar) and collector running, reopening must bring the window back, and quitting must stop both. Run before every Mac release; not in CI (needs Accessibility) | macOS, Python ≥ 3.10, Accessibility for the terminal |
 | Schema, grouping, alerts | `node tests/telemetry.mjs` | Node |
 | Capacity forecasting | `node tests/forecast.mjs` | Node |
 | Fleet Pro (Python) and forecasting | `pnpm test:fleet` | Python ≥ 3.10, Node |
