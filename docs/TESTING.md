@@ -5,7 +5,8 @@
 | Types | `pnpm typecheck` | Node ≥ 22.13 |
 | Cluster schema and URL rules | `node tests/cluster.mjs` | Node |
 | Native Mac app | `./scripts/build-native.sh` (compiles; see the two native rows below for tests) | macOS, Xcode command line tools |
-| Native Mac app, logic | `./scripts/test-native-logic.sh`: alert rules (port of `lib/alerts.ts`), notification hysteresis the snapshot export/import round trip and decoding of real `/v1/anomalies` and `/v1/evidence` output from the collector, compiled with swiftc against the real model files | macOS, Xcode command line tools |
+| Native widget build | `./scripts/build-native-widgets.sh` builds the app with the widget extension and App Intents through xcodegen and checks both are embedded and the bundle verifies | macOS, Xcode, xcodegen |
+| Native Mac app, logic | `./scripts/test-native-logic.sh`: alert rules (port of `lib/alerts.ts`), notification hysteresis the snapshot export/import round trip and decoding of real `/v1/anomalies`, `/v1/evidence`, `/v1/timeline`, `/v1/changes` and `/v1/history` output from the collector, the widget data file and the App Intents' answers, compiled with swiftc against the real model files | macOS, Xcode command line tools |
 | Native Mac app, UI smoke | `./scripts/test-native-ui.sh`: real clicks on every sidebar row (found by label), then closing the window must keep the app (menu bar) and collector running, reopening must bring the window back, and quitting must stop both. Run before every Mac release; not in CI (needs Accessibility) | macOS, Python ≥ 3.10, Accessibility for the terminal |
 | Schema, grouping, alerts | `node tests/telemetry.mjs` | Node |
 | Capacity forecasting | `node tests/forecast.mjs` | Node |

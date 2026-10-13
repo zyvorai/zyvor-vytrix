@@ -32,3 +32,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: swiftc -parse native/App/Model/Snapshot.swift
+      - name: Native logic and widget data tests
+        run: scripts/test-native-logic.sh
+      - name: Build with widgets and App Intents
+        run: |
+          brew install xcodegen
+          scripts/build-native-widgets.sh

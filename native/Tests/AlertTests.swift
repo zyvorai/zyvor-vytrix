@@ -114,6 +114,8 @@ struct AlertTests {
         check(EvidenceRequest.make(nil, metric: "cpu") == nil, "no selection, no request")
         check(EvidenceRequest.make(t0...t0.addingTimeInterval(90_000), metric: "cpu") == nil, "more than 24 h is refused")
 
+        WidgetChecks.run { check($0, $1) }
+
         if failures > 0 { print("\(failures) failure(s)"); exit(1) }
         print("native logic tests passed")
     }

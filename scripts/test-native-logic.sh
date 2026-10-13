@@ -38,6 +38,8 @@ json.dump(v.changes_report([], ts(290), ts(319)), open(tmp + '/changes-empty.jso
 json.dump(v.evidence_report(samples[290:320], samples[260:290], samples[:290][-v.ANOMALY_WARMUP:], ts(290), ts(319)),
           open(tmp + '/evidence.json', 'w'))
 PY
-xcrun swiftc -swift-version 5 -parse-as-library -o "$tmp/logic" \
-  native/App/Model/Snapshot.swift native/App/Model/Alerts.swift native/App/Model/Evidence.swift native/Tests/AlertTests.swift
+xcrun swiftc -swift-version 5 -parse-as-library -framework AppIntents -o "$tmp/logic" \
+  native/App/Model/Snapshot.swift native/App/Model/Alerts.swift native/App/Model/Evidence.swift \
+  native/Shared/WidgetData.swift native/App/Intents/VytrixIntents.swift \
+  native/Tests/WidgetChecks.swift native/Tests/AlertTests.swift
 "$tmp/logic" "$tmp"

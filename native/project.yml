@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: BUSL-1.1
+# Generates the Xcode project used for the widget and App Intents build (scripts/build-native-widgets.sh).
+# The plain build (scripts/build-native.sh) needs no Xcode project and builds the app without widgets.
+name: Vytrix
+options:
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    GENERATE_INFOPLIST_FILE: NO
+targets:
+  Vytrix:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+      - path: Shared
+      - path: Vytrix.icns
+        buildPhase: resources
+      - path: ../agent/vytrix.py
+        buildPhase: resources
+    settings:
+      base:
+        INFOPLIST_FILE: $(PROJECT_DIR)/../Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: dev.zyvor.vytrix
+        PRODUCT_NAME: Vytrix
+        ENABLE_HARDENED_RUNTIME: NO
+    dependencies:
+      - target: VytrixWidgets
+        embed: true
+        codeSign: true
+  VytrixWidgets:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: Widgets
+        excludes: ["Info.plist", "Widgets.entitlements"]
+      - path: Shared
+    settings:
+      base:
+        INFOPLIST_FILE: $(PROJECT_DIR)/../Widgets/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: dev.zyvor.vytrix.widgets
+        PRODUCT_NAME: VytrixWidgets
+        CODE_SIGN_ENTITLEMENTS: $(PROJECT_DIR)/../Widgets/Widgets.entitlements
+        SKIP_INSTALL: YES

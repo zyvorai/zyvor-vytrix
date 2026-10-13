@@ -31,9 +31,23 @@ DMG="$OUT/Vytrix-$VERSION.dmg"
 PKG="$OUT/Vytrix-$VERSION.pkg"
 rm -f "$DMG" "$DMG.sha256" "$PKG" "$PKG.sha256"
 
-./scripts/build-native.sh
+if [[ "${VYTRIX_WIDGETS:-0}" == 1 ]]; then
+  # Widgets and App Intents need the Xcode build. If it fails, ship the app without them rather than
+  # no app, and say so loudly.
+  ./scripts/build-native-widgets.sh || {
+    echo "::warning::Widget build failed; packaging the app WITHOUT widgets and App Intents."
+    ./scripts/build-native.sh
+  }
+else
+  ./scripts/build-native.sh
+fi
 APP=native/build/Vytrix.app
 if [[ -n "$APP_ID" ]]; then
+  # Inside-out: the widget extension keeps its sandbox entitlement, then the app is signed over it.
+  for appex in "$APP"/Contents/PlugIns/*.appex; do
+    [[ -e "$appex" ]] || continue
+    codesign --force --options runtime --timestamp --entitlements native/Widgets/Widgets.entitlements --sign "$APP_ID" "$appex"
+  done
   codesign --force --options runtime --timestamp --sign "$APP_ID" "$APP"
 fi
 codesign --verify --deep --strict "$APP"
