@@ -11,13 +11,13 @@ enum PaneSection: String, CaseIterable, Identifiable {
 enum Pane: String, CaseIterable, Identifiable {
     case overview = "Overview", cpu = "CPU", memory = "Memory", disk = "Disk", network = "Network", battery = "Battery"
     case applications = "Applications", containers = "Containers", projects = "Projects"
-    case alerts = "Alerts", settings = "Settings"
+    case alerts = "Alerts", timeline = "Timeline", settings = "Settings"
     var id: Self { self }   // the sidebar List tags rows by id; it must match the Pane selection
     var section: PaneSection {
         switch self {
         case .overview, .cpu, .memory, .disk, .network, .battery: return .monitor
         case .applications, .containers, .projects: return .workloads
-        case .alerts, .settings: return .system
+        case .alerts, .timeline, .settings: return .system
         }
     }
     var symbol: String {
@@ -32,6 +32,7 @@ enum Pane: String, CaseIterable, Identifiable {
         case .containers: return "shippingbox"
         case .projects: return "folder"
         case .alerts: return "bell.badge"
+        case .timeline: return "clock.arrow.circlepath"
         case .settings: return "gearshape"
         }
     }
@@ -218,6 +219,15 @@ final class TelemetryStore: ObservableObject {
     func evidence(_ q: EvidenceRequest) async -> EvidenceReport? {
         await fetch("/v1/evidence?from=\(q.from.timeIntervalSince1970)&to=\(q.to.timeIntervalSince1970)&metric=\(q.metric)",
                     as: EvidenceReport.self)
+    }
+
+    func timeline(from: Date, to: Date) async -> TimelineReport? {
+        await fetch("/v1/timeline?from=\(from.timeIntervalSince1970)&to=\(to.timeIntervalSince1970)&threshold=\(Int(threshold))",
+                    as: TimelineReport.self)
+    }
+
+    func changes(from: Date, to: Date) async -> ChangesReport? {
+        await fetch("/v1/changes?since=\(from.timeIntervalSince1970)&to=\(to.timeIntervalSince1970)", as: ChangesReport.self)
     }
 
     var canExplain: Bool { hasCollector }

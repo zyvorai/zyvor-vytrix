@@ -54,7 +54,7 @@ row_index() {
     -e 'return 0' \
     -e 'end tell'
 }
-names=(Applications Containers Projects Alerts Settings CPU Memory Disk Network Battery Overview)
+names=(Applications Containers Projects Alerts Timeline Settings CPU Memory Disk Network Battery Overview)
 for name in "${names[@]}"; do
   i="$(row_index "$name")"
   if [[ "$i" == 0 ]]; then fail "sidebar has no $name row"; continue; fi
@@ -64,7 +64,7 @@ for name in "${names[@]}"; do
   for _ in $(seq 1 20); do [[ "$(title)" == "$name"* ]] && break; sleep 0.25; done
   if [[ "$(title)" == "$name"* ]]; then ok "sidebar click opens $name"; else fail "sidebar click on $name left the window on: $(title)"; fi
 done
-[[ "$(ax "count rows of $sidebar")" == 14 ]] || fail "expected 3 section headers and 11 sidebar rows"
+[[ "$(ax "count rows of $sidebar")" == 15 ]] || fail "expected 3 section headers and 12 sidebar rows"
 
 ax 'click (first button of window 1 whose subrole is "AXCloseButton")' >/dev/null
 sleep 1

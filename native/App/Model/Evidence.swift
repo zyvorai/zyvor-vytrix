@@ -83,3 +83,52 @@ struct EvidenceRequest: Identifiable, Equatable {
         return EvidenceRequest(from: r.lowerBound, to: r.upperBound, metric: metric)
     }
 }
+
+/// Response of GET /v1/timeline: alert transitions, container changes and anomaly windows in order,
+/// with a fingerprint of the pattern and how it differs from the range before.
+struct TimelineReport: Decodable, Equatable {
+    struct Event: Decodable, Equatable, Identifiable {
+        var time: String; var kind: String; var subject: String; var detail: String
+        var severity: String; var text: String
+        var id: String { "\(time)|\(kind)|\(subject)|\(detail)" }
+    }
+    struct Why: Decodable, Equatable {
+        var newSincePrevious: [String]; var goneSincePrevious: [String]; var previousFingerprint: String
+    }
+    struct Span: Decodable, Equatable { var samples: Int; var baselineSamples: Int }
+    var window: Span
+    var threshold: Double
+    var fingerprint: String
+    var events: [Event]
+    var eventCount: Int
+    var whyChanged: Why?
+    var notes: [String]
+
+    /// `alert|cpu|fired|critical` as words.
+    static func describe(key: String) -> String {
+        let p = key.split(separator: "|", omittingEmptySubsequences: false).map(String.init)
+        guard p.count >= 3 else { return key }
+        return "\(p[0]) \(p[1]) \(p[2])" + (p.count > 3 && !p[3].isEmpty ? " (\(p[3]))" : "")
+    }
+}
+
+/// Response of GET /v1/changes. `changes` is nil with fewer than two samples in the window.
+struct ChangesReport: Decodable, Equatable {
+    struct PortRow: Decodable, Equatable, Hashable { var port: Int; var app: String }
+    struct ContainerChange: Decodable, Equatable, Hashable { var container: String; var from: String?; var to: String? }
+    struct Transient: Decodable, Equatable { var apps: [String]; var ports: [PortRow]; var containers: [String] }
+    struct Changes: Decodable, Equatable {
+        var appsStarted: [String]; var appsStopped: [String]
+        var portsOpened: [PortRow]; var portsClosed: [PortRow]
+        var containersAppeared: [String]; var containersGone: [String]
+        var containersChanged: [ContainerChange]
+        var transient: Transient
+        var isEmpty: Bool {
+            appsStarted.isEmpty && appsStopped.isEmpty && portsOpened.isEmpty && portsClosed.isEmpty
+                && containersAppeared.isEmpty && containersGone.isEmpty && containersChanged.isEmpty
+                && transient.apps.isEmpty && transient.ports.isEmpty && transient.containers.isEmpty
+        }
+    }
+    var changes: Changes?
+    var notes: [String]
+}

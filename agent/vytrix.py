@@ -652,7 +652,7 @@ def changes_report(samples,start,end,truncated=False):
                      'ports':sort_cap([{'port':p,'app':a} for p,a in seen_ports.items() if p not in first_ports and p not in last_ports]),
                      'containers':sorted(set(seen_containers)-set(first_containers)-set(last_containers))[:CHANGES_CAP]},
     }
-    notes=['Compares the first and last stored sample in the window; anything between them that is in neither is `transient`.',
+    notes=['Compares the first and last stored sample in the window; anything between them that is in neither is listed as transient.',
            'Samples are taken every few seconds, so a process shorter than that may not appear at all.']
     if truncated:notes.append(f'The window holds more than {TIMELINE_LIMIT} samples; the comparison uses the first {TIMELINE_LIMIT} and the latest one.')
     return {'version':1,'window':{'from':start,'to':end,'samples':len(samples),'first':samples[0]['timestamp'],'last':samples[-1]['timestamp']},
