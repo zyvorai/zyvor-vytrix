@@ -861,8 +861,12 @@ def main():
     parser.add_argument('--container-interval',type=float,default=5,help='Seconds between Docker/Podman polls')
     parser.add_argument('--tls-cert',help='PEM certificate; serve HTTPS (required for remote browser access)')
     parser.add_argument('--tls-key',help='PEM private key for --tls-cert')
+    parser.add_argument('--exit-with-parent',action='store_true',help='Exit when the process that started the collector exits (used by the native app)')
     parser.add_argument('--ui-upstream',help='Proxy non-API paths to this dashboard URL, e.g. http://127.0.0.1:8787')
     args=parser.parse_args()
+    parent=os.getppid()
+    if args.exit_with_parent and parent==1:
+        return   # already orphaned: nothing to serve
     if args.interval<1 or args.interval>3600:
         parser.error('--interval must be 1–3600 seconds')
     if args.container_interval<2 or args.container_interval>3600:
@@ -908,6 +912,13 @@ def main():
             except (OSError,RuntimeError,sqlite3.Error) as error:
                 print('Collection failed:',type(error).__name__,flush=True)
     threading.Thread(target=sample_loop,daemon=True).start()
+    if args.exit_with_parent:
+        def watch_parent():
+            # A killed parent leaves this process adopted by launchd/init (ppid changes), so stop serving.
+            while not stop.wait(1):
+                if os.getppid()!=parent:
+                    server.shutdown();return
+        threading.Thread(target=watch_parent,daemon=True).start()
     if probe:
         probe.start(args.container_interval)
     print(f"Vytrix read-only collector listening on {'https' if server.tls else 'http'}://{args.bind}:{args.port}",flush=True)

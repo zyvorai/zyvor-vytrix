@@ -2,6 +2,9 @@
 import datetime as dt
 import importlib.util
 import json
+import os
+import sys
+import time
 import tempfile
 import threading
 import unittest
@@ -313,6 +316,33 @@ class Tests(unittest.TestCase):
                     self.assertEqual(e.exception.code,400,bad)
             finally:
                 server.shutdown();server.server_close();thread.join()
+    def test_exit_with_parent(self):
+        """A collector started with --exit-with-parent stops when its parent goes away, even by SIGKILL."""
+        import signal, socket, subprocess
+        with tempfile.TemporaryDirectory() as d:
+            with socket.socket() as sock:
+                sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
+            script=str(Path(v.__file__).resolve())
+            # The shell starts the collector in the background, prints its pid, then is killed.
+            shell=subprocess.Popen(['sh','-c',f'"{sys.executable}" "{script}" --bind 127.0.0.1 --port {port} '
+                                    f'--database "{d}/h.sqlite" --no-containers --exit-with-parent >/dev/null 2>&1 & echo $!; sleep 60'],
+                                   stdout=subprocess.PIPE,text=True,env=dict(os.environ,VYTRIX_TOKEN='a'*32))
+            pid=int(shell.stdout.readline())
+            try:
+                for _ in range(100):   # wait until it serves
+                    try:
+                        socket.create_connection(('127.0.0.1',port),timeout=0.2).close();break
+                    except OSError:time.sleep(0.2)
+                else:self.fail('collector did not start')
+                shell.kill();shell.wait()
+                for _ in range(100):
+                    try:os.kill(pid,0)
+                    except ProcessLookupError:break
+                    time.sleep(0.2)
+                else:self.fail('collector kept running after its parent was killed')
+            finally:
+                try:os.kill(pid,signal.SIGKILL)
+                except ProcessLookupError:pass
     def test_retention(self):
         with tempfile.TemporaryDirectory() as d:
             store=v.Store(str(Path(d)/'history.sqlite'))

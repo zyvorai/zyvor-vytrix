@@ -13,7 +13,7 @@
 - **Native Mac app:** per-resource panes, Settings with snapshot import and export, the macOS 27 look pass, Evidence sheet and Timeline.
 - **Verified locally on macOS 27.2 (Apple silicon):** `scripts/build-native.sh`; `scripts/test-native-logic.sh` (41 checks, including decoding real collector output); `scripts/test-native-ui.sh` (15 sidebar rows, close-keeps-running, reopen, quit stops the collector); the Python suite (51 tests); `pnpm test:e2e`.
 - **Not verified:** the native app on macOS 26; dragging a range on the native chart by hand; a shaded anomaly range on a real busy host (only seen in tests); notifications on a fresh install. The DMG and pkg are unsigned and not notarized because the repository has no Apple secrets.
-- **Known:** terminating the app with SIGTERM leaves the bundled collector running; use Quit.
+- **Known:** terminating the app with SIGTERM leaves the bundled collector running; use Quit. (Fixed after this release: see CHANGELOG.)
 
 ## v0.4.1 (2026-10-13)
 

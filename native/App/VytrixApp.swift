@@ -7,6 +7,20 @@ import AppKit
 /// the collector.
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+
+    private var signalSources: [DispatchSourceSignal] = []
+
+    /// `kill`, a logout script or Ctrl-C should quit cleanly so the bundled collector stops with the
+    /// app. (The collector also exits by itself when its parent dies, which covers SIGKILL.)
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        for sig in [SIGTERM, SIGINT, SIGHUP] {
+            signal(sig, SIG_IGN)
+            let source = DispatchSource.makeSignalSource(signal: sig, queue: .main)
+            source.setEventHandler { NSApp.terminate(nil) }
+            source.resume()
+            signalSources.append(source)
+        }
+    }
 }
 
 @main
