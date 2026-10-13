@@ -1291,3 +1291,11 @@ small { display: block; font-size: 11px; color: var(--text-tertiary); font-weigh
   .cluster-connect form { grid-template-columns: 1fr; }
   .cluster-summary .card { display: flex; align-items: center; justify-content: space-between; }
 }
+
+/* Anomaly bands and the evidence sheet */
+.evidence-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.evidence-bar .fine-print { margin-top: 0; flex: 1 1 260px; }
+.sheet-h { font: 650 13px/1.3 var(--font-display); margin: 16px 0 6px; }
+.evidence-list { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.6; }
+.evidence-list.notes { color: var(--text-tertiary); margin-top: 12px; }
+.evidence-sheet { overflow-y: auto; }

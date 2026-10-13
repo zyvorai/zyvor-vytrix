@@ -90,7 +90,7 @@ export default function Page(){
       <div className="view" hidden={view!=='cluster'}><ClusterView/></div>
       <div className="view" key={view} hidden={view==='cluster'}>
         {view==='overview'&&<OverviewView snapshot={snapshot} history={history} apps={apps} range={range} onRange={setRange} onNavigate={navigate} onSelect={setSelected}/>}
-        {resourceViews.includes(view)&&<ResourceView kind={view as ResourceKind} snapshot={snapshot} history={history} apps={apps} range={range} onRange={setRange} onSelect={setSelected}/>}
+        {resourceViews.includes(view)&&<ResourceView kind={view as ResourceKind} snapshot={snapshot} history={history} apps={apps} range={range} onRange={setRange} onSelect={setSelected} collectorGet={source==='live'?telemetry.collectorGet:undefined}/>}
         {view==='applications'&&<Card>
           <div className="section-bar"><div><h2>Applications <span className="count">{apps.length}</span></h2><p className="muted">{snapshot.processes.length} processes grouped by executable and app bundle</p></div></div>
           <AppsTable apps={sortApps(apps,appSort)} memoryTotal={snapshot.host.memoryTotal} cores={snapshot.host.cores} sort={appSort} onSort={setAppSort} onSelect={setSelected}/>

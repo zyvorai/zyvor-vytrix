@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {demoSnapshot,snapshotSchema,type Snapshot} from '@/lib/telemetry';
+import {collectorUrl} from '@/lib/evidence';
 
 export type Source='demo'|'live'|'import';
 const MAX_HISTORY=1800;
@@ -76,5 +77,14 @@ export function useTelemetry(){
     setSource('demo');setPaused(false);setHistory(seedHistory());setToken('');setEndpoint('');setError('');
   },[]);
 
-  return {snapshot,history,source,paused,setPaused,error,setError,connect,importFile,useDemo};
+  /** GET a history endpoint of the connected collector; null for demo data, imports and failures. */
+  const collectorGet=useCallback(async(path:string):Promise<unknown>=>{
+    if(source!=='live')return null;
+    try{
+      const res=await fetch(collectorUrl(endpoint,path),{headers:{Authorization:`Bearer ${token}`},signal:AbortSignal.timeout(8000)});
+      return res.ok?await res.json():null;
+    }catch{return null;}
+  },[source,endpoint,token]);
+
+  return {snapshot,history,source,paused,setPaused,error,setError,connect,importFile,useDemo,collectorGet};
 }
