@@ -7,6 +7,7 @@ All `/v1` reads require `Authorization: Bearer <VYTRIX_TOKEN>`. Browser requests
 | `GET /v1/snapshot` | Most recent version 1 snapshot |
 | `GET /v1/history?since=EPOCH_SECONDS&limit=300` | `{version: 1, samples: [...]}` in chronological order; limit 1–1000 |
 | `GET /v1/anomalies?since=EPOCH_SECONDS&limit=600` | Anomaly bands over stored history; see below. limit 1–1000 |
+| `GET /v1/evidence?from=EPOCH&to=EPOCH&metric=cpu` | What was busy in a window, against the window before it; see below. `metric` is `cpu`, `memory` or `network` |
 | `GET /healthz` | `{"status": "ok"}`; no token, no telemetry |
 | `OPTIONS` | CORS preflight for an allowed origin |
 | any other path | With `--ui-upstream`: proxied to the dashboard (GET, HEAD, POST). Otherwise 404. |
@@ -21,6 +22,19 @@ All `/v1` reads require `Authorization: Bearer <VYTRIX_TOKEN>`. Browser requests
 - `warmupSamples`, `threshold` (4 deviations), `metrics`.
 
 The band is an exponentially weighted mean and variance with a floor on the deviation (5 points CPU, 2 memory, 1 disk, 64 KB/s network), so a flat metric does not flag tiny changes. It is a signal that something changed, not a diagnosis; it says nothing about cause. Computed on request from the SQLite history, with a 150-sample lead-in before `since`; no extra state is stored.
+
+### Evidence
+
+`GET /v1/evidence?from=&to=&metric=` answers "what was busy then?" for a time range (at most 24 hours). It reads the stored history only and returns:
+
+- `window`: `from`, `to`, the number of `samples`, and `baselineSamples`, the samples in the same-length window immediately before `from`.
+- `host`, `baselineHost`: mean and peak of CPU %, memory %, disk % and network bytes/s in the window and in the baseline (`baselineHost` is `null` when the baseline holds no samples).
+- `apps`: the top 10 apps by `metric`: `mean`, `peak`, `present` (samples the app was seen in), `baselineMean` and `delta`. Apps are the collector's groups of processes; memory is summed RSS. An app absent from a sample counts as zero in its mean.
+- `containers`: the top 10 by mean CPU: mean and peak CPU, peak memory and limit.
+- `anomalies`: the `/v1/anomalies` windows that fall in the range, the highest score per metric and how many samples were scored (the band is warmed up with the 150 samples before `from`).
+- `notes`: what the numbers are and are not.
+
+`metric=network` lists only apps that actually have per-process network rates (Fleet Pro on macOS); with the base collector it returns an empty `apps` list and says why, rather than estimating. Evidence correlates; it does not establish cause.
 
 401 means invalid/missing token, 403 means denied Origin, 400 means invalid history query, 404 means unknown path, 502 means the dashboard upstream is down. Mutations are not supported. The dashboard proxy never forwards the `Authorization` header. Snapshots contain host name, OS, process names, PIDs, RSS, CPU, best-effort project folder basename, listening ports and container metadata. No argv, environment, file contents or packet payloads are collected. Project names, executable paths and container names may still be sensitive; protect your collector and exported snapshots.
 

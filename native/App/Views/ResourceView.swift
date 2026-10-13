@@ -9,6 +9,9 @@ struct ResourceView: View {
     @EnvironmentObject var store: TelemetryStore
     @State private var range: TimeInterval = 300
     @State private var selection: AppGroup.ID?
+    @State private var report: AnomalyReport?
+    @State private var selected: ClosedRange<Date>?
+    @State private var evidence: EvidenceRequest?
 
     private let MB = 1_048_576.0
 
@@ -36,12 +39,59 @@ struct ResourceView: View {
             }
             .padding(32)
         }
-        .inspector(isPresented: Binding(get: { selected != nil }, set: { if !$0 { selection = nil } })) {
-            if let a = selected { ProcessList(group: a) }
+        .inspector(isPresented: Binding(get: { selectedApp != nil }, set: { if !$0 { selection = nil } })) {
+            if let a = selectedApp { ProcessList(group: a) }
+        }
+        .sheet(item: $evidence) { EvidenceSheet(request: $0).environmentObject(store) }
+        .task(id: refreshKey) { await refreshAnomalies() }
+    }
+
+    private var selectedApp: AppGroup? { store.apps.first { $0.id == selection } }
+
+    // MARK: anomalies
+
+    /// The collector metric behind this pane, or nil (battery has no band).
+    private var metric: String? {
+        switch pane { case .cpu: return "cpu"; case .memory: return "memory"; case .disk: return "disk"; case .network: return "network"; default: return nil }
+    }
+
+    /// Evidence ranks apps by CPU, memory or network; disk has a ribbon but no per-app ranking.
+    private var explainable: Bool { pane == .cpu || pane == .memory || pane == .network }
+
+    private var refreshKey: String { "\(pane.rawValue)-\(Int(range))-\(String(describing: store.source))" }
+
+    private func refreshAnomalies() async {
+        report = nil; selected = nil
+        guard metric != nil, store.canExplain else { return }
+        while !Task.isCancelled {
+            report = await store.anomalies(since: Date().addingTimeInterval(-range))
+            try? await Task.sleep(nanoseconds: 10_000_000_000)
         }
     }
 
-    private var selected: AppGroup? { store.apps.first { $0.id == selection } }
+    private var bands: [ClosedRange<Date>] {
+        guard let metric, let report else { return [] }
+        return report.ranges(for: metric)
+    }
+
+    @ChartContentBuilder private var overlays: some ChartContent {
+        ForEach(Array(bands.enumerated()), id: \.offset) { _, b in
+            RectangleMark(xStart: .value("From", b.lowerBound), xEnd: .value("To", b.upperBound))
+                .foregroundStyle(.orange.opacity(0.22))
+        }
+        if let selected {
+            RectangleMark(xStart: .value("From", selected.lowerBound), xEnd: .value("To", selected.upperBound))
+                .foregroundStyle(Color.accentColor.opacity(0.14))
+        }
+    }
+
+    private var anomalyCaption: String? {
+        guard let metric, store.canExplain else { return nil }
+        guard let report else { return "Checking for anomalies…" }
+        if !report.isScored(metric) { return "Anomaly band warming up: it needs about five minutes of history." }
+        let n = bands.count
+        return n == 0 ? "No anomalies in this range." : "\(n) anomal\(n == 1 ? "y" : "ies") in this range, shaded."
+    }
 
     private var windowed: [Sample] {
         let cutoff = Date().addingTimeInterval(-range)
@@ -128,6 +178,18 @@ struct ResourceView: View {
             }
             .pickerStyle(.segmented).labelsHidden().frame(width: 150)
             chart.frame(height: 260)
+            if let caption = anomalyCaption {
+                Text(caption).font(.caption).foregroundStyle(.secondary)
+            }
+            if explainable, let metric, store.canExplain {
+                HStack {
+                    Text(selected == nil ? "Drag across the chart to select a range." : "Selected \(selected!.lowerBound.formatted(date: .omitted, time: .standard)) – \(selected!.upperBound.formatted(date: .omitted, time: .standard))")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Show Evidence") { evidence = EvidenceRequest.make(selected, metric: metric) }
+                        .disabled(EvidenceRequest.make(selected, metric: metric) == nil)
+                }
+            }
         }
     }
 
@@ -142,7 +204,9 @@ struct ResourceView: View {
                     LineMark(x: .value("Time", p.date), y: .value("MB/s", p.upload / MB), series: .value("Series", "Upload"))
                         .foregroundStyle(by: .value("Series", "Upload"))
                 }
+                overlays
             }
+            .chartXSelection(range: $selected)
             .chartForegroundStyleScale(["Download": MetricColor.network.color, "Upload": MetricColor.upload.color])
             .chartYAxis { AxisMarks { v in AxisGridLine(); AxisValueLabel(String(format: "%.1f MB/s", v.as(Double.self) ?? 0)) } }
         default:
@@ -154,12 +218,16 @@ struct ResourceView: View {
                 default: return $0.battery
                 }
             }
-            Chart(w) { p in
-                if let v = value(p) {
-                    LineMark(x: .value("Time", p.date), y: .value(pane.rawValue, v))
-                        .foregroundStyle(lineColor)
+            Chart {
+                ForEach(w) { p in
+                    if let v = value(p) {
+                        LineMark(x: .value("Time", p.date), y: .value(pane.rawValue, v))
+                            .foregroundStyle(lineColor)
+                    }
                 }
+                overlays
             }
+            .chartXSelection(range: $selected)
             .chartYScale(domain: 0...100)
             .chartYAxis { AxisMarks(values: [0, 25, 50, 75, 100]) { v in AxisGridLine(); AxisValueLabel("\(v.as(Int.self) ?? 0)%") } }
         }

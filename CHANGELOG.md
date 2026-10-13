@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Added
+- **Native app: anomaly ribbon and evidence.** On the CPU, Memory, Disk and Network panes, anomalous ranges from `/v1/anomalies` are shaded on the history chart, with a caption that says when the band is still warming up. Drag across the chart and choose Show Evidence to see what was busy in that range against the range before it: host stats, top apps with their change, containers and the anomalies inside it. Needs a collector (this Mac or remote); demo data and imported snapshots have no history endpoints, so they show neither. `scripts/test-native-logic.sh` now decodes real collector output, so a schema drift fails the test.
+- **Collector: evidence** (`GET /v1/evidence?from&to&metric`). For a time window, returns the top apps by CPU, memory or network with their change from the preceding same-length window, the busiest containers, host stats and the anomaly windows inside it. Absent per-app network is reported as absent, not zero. See `docs/API.md`.
 - **Collector: anomaly bands** (`GET /v1/anomalies`). Replays stored history through an exponentially weighted band per metric (CPU, memory, disk, network) and returns per-sample scores, anomaly windows and rates. Warm-up samples and unreported metrics are `null`, not zero. Computed on request, so no schema or database change. See `docs/API.md`.
 
 ### Changed
