@@ -38,7 +38,7 @@ EOF
 
 col="zyvor-vytrix-collector-$VERSION"
 mkdir -p "$STAGE/$col/agent" "$STAGE/$col/cluster" "$STAGE/$col/scripts" "$STAGE/$col/docs"
-cp agent/vytrix.py agent/cluster_worker.py "$STAGE/$col/agent/"
+cp agent/vytrix.py agent/vytrix_mcp.py agent/cluster_worker.py "$STAGE/$col/agent/"
 cp cluster/coordinator.py "$STAGE/$col/cluster/"
 cp scripts/install-macos.sh scripts/install-linux.sh "$STAGE/$col/scripts/"
 cp docs/API.md docs/CLUSTER.md "$STAGE/$col/docs/"
