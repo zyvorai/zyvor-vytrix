@@ -9,7 +9,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"; pkill -x Vytrix 2>/dev/null || true' EXIT
 xcrun swiftc -O scripts/windowid.swift -o "$tmp/windowid"
 for mode in light dark; do
-  for section in overview applications containers projects; do
+  for section in overview applications containers projects cpu memory network alerts; do
     id=""
     for attempt in 1 2 3; do
       open -n native/build/Vytrix.app --args -ApplePersistenceIgnoreState YES --demo --appearance "$mode" --section "$section"
@@ -32,4 +32,4 @@ for mode in light dark; do
     while pgrep -x Vytrix >/dev/null; do sleep 0.2; done
   done
 done
-echo "wrote 8 native screenshots to $out"
+echo "wrote 16 native screenshots to $out"

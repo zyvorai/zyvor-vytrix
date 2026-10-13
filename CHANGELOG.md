@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Added
+- **Native app: resource panes.** CPU, Memory, Disk, Network and Battery, each with the current reading, a few derived stats (average, peak, capacity), a 1m/5m/1h history chart, and for CPU and Memory the busiest applications (select one to open its process inspector). Battery shows "No battery reading" on hosts without one. The sidebar is grouped Monitor, Workloads and System like the web dashboard.
+
+### Changed
+- Native sidebar: the Alerts count is drawn next to its title instead of with `.badge`, which hid the title from accessibility. `scripts/test-native-ui.sh` finds sidebar rows by label and checks all ten.
+- `scripts/shots-native.sh` also captures CPU, Memory, Network and Alerts (16 images).
+
 ## v0.4.1 — 2026-10-13
 
 Packaging fix: v0.4.0's release job built the dashboard and collector archives but not the Mac DMG and pkg.
