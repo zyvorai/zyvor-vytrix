@@ -3,6 +3,7 @@
 """Read-only Linux/macOS telemetry collector. Python 3.10+, no dependencies."""
 import argparse
 import datetime as dt
+import hashlib
 import hmac
 import json
 import math
@@ -527,6 +528,94 @@ def evidence_report(window,baseline,lead,start,end,metric='cpu'):
                          'scoredSamples':sum(1 for row in report['samples'] if any(row[m] for m in ANOMALY_FLOORS)) if report else 0},
             'notes':notes}
 
+TIMELINE_LIMIT=1000
+TIMELINE_EVENTS=200
+TIMELINE_CLEAR_MARGIN=5.0
+
+def _epoch(timestamp):
+    return dt.datetime.fromisoformat(timestamp.replace('Z','+00:00')).timestamp()
+
+def timeline_events(samples,threshold):
+    """Deterministic events from chronological samples: threshold alerts (with hysteresis: fire at the
+    threshold, clear 5 points below it, critical at threshold+10), container appearance, disappearance
+    and state changes, and container memory-limit pressure. Anomaly windows are added by the caller."""
+    events=[];active={};containers={};primed=False
+    critical=min(100.0,threshold+10)
+    def alert(sample,key,title,value):
+        was=active.get(key)
+        if value is None:
+            return
+        if was is None and value>=threshold:
+            severity='critical' if value>=critical else 'warning'
+            active[key]=severity;events.append({'time':sample['timestamp'],'kind':'alert','subject':key,'detail':'fired','severity':severity,'text':f'{title}: {value:.1f}%'})
+        elif was is not None:
+            if value<threshold-TIMELINE_CLEAR_MARGIN:
+                del active[key];events.append({'time':sample['timestamp'],'kind':'alert','subject':key,'detail':'cleared','severity':was,'text':f'{title} cleared at {value:.1f}%'})
+            elif was=='warning' and value>=critical:
+                active[key]='critical';events.append({'time':sample['timestamp'],'kind':'alert','subject':key,'detail':'escalated','severity':'critical','text':f'{title}: {value:.1f}%'})
+    for sample in samples:
+        values=anomaly_values(sample)
+        alert(sample,'cpu','CPU pressure',values['cpu'])
+        alert(sample,'memory','Memory pressure',values['memory'])
+        alert(sample,'disk','Disk nearly full',values['disk'])
+        seen={}
+        for c in sample.get('containers') or []:
+            key=f"{c.get('runtime')}:{c.get('name') or c.get('id')}"
+            seen[key]=c
+            limit=c.get('memoryLimit')
+            if c.get('state')=='running' and limit:
+                alert(sample,f'container-memory:{key}',f"{c.get('name')} near memory limit",c.get('memory',0)/limit*100)
+        for key,c in seen.items():
+            before=containers.get(key)
+            if primed and before is None:
+                events.append({'time':sample['timestamp'],'kind':'container','subject':key,'detail':'appeared','severity':'info','text':f"Container {c.get('name')} appeared ({c.get('state')})"})
+            elif before is not None and before.get('state')!=c.get('state'):
+                events.append({'time':sample['timestamp'],'kind':'container','subject':key,'detail':f"{before.get('state')} to {c.get('state')}",'severity':'info','text':f"Container {c.get('name')} went from {before.get('state')} to {c.get('state')}"})
+        if primed:
+            for key,c in containers.items():
+                if key not in seen:
+                    events.append({'time':sample['timestamp'],'kind':'container','subject':key,'detail':'disappeared','severity':'info','text':f"Container {c.get('name')} disappeared"})
+        if sample.get('containers') is not None:
+            containers=seen;primed=True
+    return events
+
+def event_key(event):
+    """What an event is, without when: the unit the fingerprint and whyChanged compare."""
+    return '|'.join((event['kind'],event['subject'],event['detail'],event.get('severity','')))
+
+def timeline_fingerprint(events):
+    """12 hex characters over the sorted event keys. The same pattern of events gives the same
+    fingerprint in any window, so two incidents can be recognised as alike."""
+    body='\n'.join(sorted(set(event_key(e) for e in events)))
+    return hashlib.sha256(body.encode()).hexdigest()[:12]
+
+def timeline_report(window,baseline,lead,start,end,threshold,truncated=False):
+    """Alerts, anomaly windows and container changes in [start,end], plus how the set of events differs
+    from the same-length window before it (`whyChanged`). No model is involved."""
+    def build(samples,lo,hi,leadin):
+        events=[e for e in timeline_events(leadin+samples,threshold) if lo<=_epoch(e['time'])<=hi]
+        if samples:
+            report=anomaly_report(leadin+samples,lo)
+            for w in report['windows']:
+                events.append({'time':w['start'],'kind':'anomaly','subject':w['metric'],'detail':'window','severity':'info',
+                               'text':f"{w['metric']} unusual for {w['samples']} samples, peak score {w['peak']:.1f}",'end':w['end'],'peak':w['peak']})
+        events.sort(key=lambda e:(e['time'],e['kind'],e['subject']))
+        return events
+    events=build(window,start,end,lead)
+    prior=build(baseline,start-(end-start),start,[]) if baseline else None
+    now_keys={event_key(e) for e in events}
+    why=None
+    if prior is not None:
+        before={event_key(e) for e in prior}
+        why={'newSincePrevious':sorted(now_keys-before),'goneSincePrevious':sorted(before-now_keys),
+             'previousFingerprint':timeline_fingerprint(prior)}
+    notes=['Alert events replay the stored history against the threshold you pass; they are not a record of what the dashboard showed.',
+           'Anomaly windows need about five minutes of history to warm up.']
+    if truncated:notes.append(f'The window holds more than {TIMELINE_LIMIT} samples; only the first {TIMELINE_LIMIT} were read.')
+    return {'version':1,'window':{'from':start,'to':end,'samples':len(window),'baselineSamples':len(baseline)},
+            'threshold':threshold,'fingerprint':timeline_fingerprint(events),'events':events[:TIMELINE_EVENTS],
+            'eventCount':len(events),'whyChanged':why,'notes':notes}
+
 class Store:
     def __init__(self,path):
         self.path=path
@@ -688,6 +777,19 @@ class Handler(BaseHTTPRequestHandler):
             baseline=store.window(max(0,start-(end-start)),start-1e-6,1000)
             lead=store.before(start,ANOMALY_WARMUP)
             return self.reply(200,evidence_report(window,baseline,lead,start,end,metric))
+        if path.path=='/v1/timeline':
+            try:
+                query=parse_qs(path.query)
+                start=float(query['from'][0]);end=float(query['to'][0]);threshold=float(query.get('threshold',['85'])[0])
+                if not (0<=start<end<1e12) or end-start>86400 or not 1<=threshold<=100:
+                    raise ValueError()
+            except (KeyError,ValueError):
+                return self.reply(400,{'error':'from and to must be epoch seconds with from < to and at most 24 h apart; threshold is 1–100'})
+            store=self.server.store
+            window=store.window(start,end,TIMELINE_LIMIT)
+            baseline=store.window(max(0,start-(end-start)),start-1e-6,TIMELINE_LIMIT)
+            lead=store.before(start,ANOMALY_WARMUP)
+            return self.reply(200,timeline_report(window,baseline,lead,start,end,threshold,len(window)>=TIMELINE_LIMIT))
         return self.reply(404,{'error':'Not found'})
 
 def main():
