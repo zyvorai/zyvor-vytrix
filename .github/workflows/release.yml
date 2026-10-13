@@ -85,8 +85,11 @@ jobs:
             --keychain "$RUNNER_TEMP/signing.keychain-db"
           rm "$RUNNER_TEMP/notary.p8"
           echo "NOTARY_PROFILE=vytrix-notary" >> "$GITHUB_ENV"
+      - name: Install xcodegen
+        run: brew install xcodegen
       - name: Package
         env:
+          VYTRIX_WIDGETS: "1"
           DEVELOPER_ID_APP: ${{ env.HAVE_CERTS == 'true' && secrets.DEVELOPER_ID_APP || '' }}
           DEVELOPER_ID_INSTALLER: ${{ env.HAVE_CERTS == 'true' && secrets.DEVELOPER_ID_INSTALLER || '' }}
         run: scripts/package-mac.sh "${TAG#v}"

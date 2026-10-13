@@ -10,9 +10,9 @@ cp native/Info.plist "$app/Contents/Info.plist"
 cp native/Vytrix.icns "$app/Contents/Resources/Vytrix.icns"
 cp agent/vytrix.py "$app/Contents/Resources/vytrix.py"
 sources=()
-while IFS= read -r f; do sources+=("$f"); done < <(find native/App -name '*.swift' | sort)
+while IFS= read -r f; do sources+=("$f"); done < <(find native/App native/Shared -name '*.swift' | sort)
 xcrun swiftc -swift-version 5 -target arm64-apple-macosx26.0 -O -parse-as-library \
-  -framework SwiftUI -framework AppKit -framework Charts \
+  -framework SwiftUI -framework AppKit -framework Charts -framework WidgetKit -framework AppIntents \
   "${sources[@]}" -o "$app/Contents/MacOS/Vytrix"
 codesign --force --sign - "$app"
 echo "Built $app (ad-hoc signed developer build)."

@@ -69,6 +69,7 @@ final class TelemetryStore: ObservableObject {
     }
     @Published private(set) var dismissed: Set<String> = []
     private var notifier = AlertNotifier()
+    private let widgets = WidgetBridge()
 
     /// Alerts for the latest sample that the person has not dismissed. A dismissed alert comes back
     /// if it clears and fires again.
@@ -302,6 +303,7 @@ final class TelemetryStore: ObservableObject {
         dismissed.formIntersection(firing.map(\.id))
         let fresh = notifier.fresh(firing)
         if source != .demo, notificationsEnabled, !fresh.isEmpty, replayIndex == nil { AlertNotifications.post(fresh, host: s.host.name) }
+        if replayIndex == nil, !paused { widgets.publish(s, alerts: alerts.count, simulated: source == .demo) }
         history.append(Sample(s, at: date))
         if history.count > maxSamples { history.removeFirst(history.count - maxSamples) }
     }
