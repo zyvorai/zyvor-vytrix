@@ -1,5 +1,10 @@
 # Release status
 
+## v0.7.1 (2026-10-15)
+
+- **MCP Registry packaging:** the MCP server ships as the OCI image `ghcr.io/zyvorai/vytrix-mcp` and is listed in the MCP Registry as `io.github.zyvorai/vytrix` ([MCP.md](MCP.md)). The tool list is unchanged. The app, collector and dashboard have no functional change.
+- **Not verified:** the image build and the Registry publish have not run before the v0.7.1 tag; the MCP server has not been used through a real MCP client from the Registry. The DMG and pkg are unsigned and not notarized because the repository has no Apple secrets.
+
 ## v0.7.0 (2026-10-13)
 
 - **Native widget and App Intents** (see [WIDGETS.md](WIDGETS.md)): a System widget (small, medium) and "What is using my CPU?" / "How is my Mac doing?" intents. Read-only; the app hands readings to the widget's own sandbox container, no App Group, no token.
