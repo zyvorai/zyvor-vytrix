@@ -191,7 +191,7 @@ What was run where, and what was not, is listed honestly in [docs/RELEASE.md](do
 | I want to… | Read |
 | --- | --- |
 | Call the collector, or learn what each metric means | [docs/API.md](docs/API.md) |
-| Let an MCP client ask the collector (read-only tools) | [docs/MCP.md](docs/MCP.md) |
+| Let an MCP client ask the collector (six read-only tools; registry name `io.github.zyvorai/vytrix`, image `ghcr.io/zyvorai/vytrix-mcp:0.7.1`, both published from the v0.7.1 release) | [docs/MCP.md](docs/MCP.md) |
 | Monitor several Macs (read-only) | [docs/CLUSTER.md](docs/CLUSTER.md) |
 | Fleet history, roles, alerts, Prometheus export | [docs/FLEET-PRO.md](docs/FLEET-PRO.md) |
 | Test on macOS and Linux | [docs/TESTING.md](docs/TESTING.md) |
