@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.7.1 — 2026-10-15
+
+Publishes the MCP server as a container image and lists it in the MCP Registry. The app, collector and dashboard are unchanged.
+
 ### Added
 - MCP Registry packaging for the MCP server: `server.json` (`io.github.zyvorai/vytrix`), `Dockerfile.mcp` (OCI image `ghcr.io/zyvorai/vytrix-mcp`), release-workflow build and publish jobs, and `scripts/check-version-sync.sh`. The tool list is unchanged. See `docs/MCP.md`.
 

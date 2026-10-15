@@ -47,7 +47,7 @@ There is one prompt, `vytrix_triage`, and the server's instructions tell the mod
 docker run -i --rm \
   -e VYTRIX_URL=http://host.docker.internal:9847 \
   -e VYTRIX_TOKEN=<collector token> \
-  ghcr.io/zyvorai/vytrix-mcp:0.7.0
+  ghcr.io/zyvorai/vytrix-mcp:0.7.1
 ```
 
 The environment variables are the same two the script reads, `VYTRIX_URL` and `VYTRIX_TOKEN` (secret). Inside a container `127.0.0.1` is the container itself, so `VYTRIX_URL` must point at the collector explicitly, and plain HTTP is still accepted only for localhost, so a remote collector needs `https://`. The tool list is unchanged and read-only.
