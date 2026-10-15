@@ -9,9 +9,18 @@ on:
         required: true
 permissions:
   contents: write
+concurrency:
+  # One release run per ref; a re-run or double dispatch queues behind it, never cancels a publish.
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+# Heavy, trusted jobs (release, mcp-image, publish-mcp) run on the org self-hosted runners
+# (group zyvor-build); the expression falls back to a hosted runner for any pull_request event.
+# This workflow has no pull_request trigger; the guard keeps it that way if one is added.
+# The macOS job stays on GitHub-hosted macos-latest.
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(github.event_name == 'pull_request' && '"ubuntu-latest"' || '["self-hosted","zyvor-build","docker"]') }}
+    timeout-minutes: 60
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
     steps:
@@ -99,7 +108,8 @@ jobs:
 
   # The MCP server image the Registry points at (server.json). Built on every tag with the other assets.
   mcp-image:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(github.event_name == 'pull_request' && '"ubuntu-latest"' || '["self-hosted","zyvor-build","docker"]') }}
+    timeout-minutes: 120
     permissions:
       contents: read
       packages: write
@@ -137,7 +147,7 @@ jobs:
   publish-mcp:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: mcp-image
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(github.event_name == 'pull_request' && '"ubuntu-latest"' || '["self-hosted","zyvor-build","docker"]') }}
     permissions:
       contents: read
       id-token: write   # GitHub OIDC login to the MCP Registry, no long-lived token
