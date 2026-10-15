@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- MCP Registry packaging for the MCP server: `server.json` (`io.github.zyvorai/vytrix`), `Dockerfile.mcp` (OCI image `ghcr.io/zyvorai/vytrix-mcp`), release-workflow build and publish jobs, and `scripts/check-version-sync.sh`. The tool list is unchanged. See `docs/MCP.md`.
+
 ### Documentation
 - Release status and `docs/WIDGETS.md` record what was run against the published v0.7.0 files, and what was not.
 

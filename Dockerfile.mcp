@@ -1,0 +1,13 @@
+# vytrix-mcp: the stdio MCP server (agent/vytrix_mcp.py), packaged for the MCP Registry (server.json).
+# Python standard library only: nothing is installed with pip. It is a read-only client of a running
+# Vytrix collector's /v1 API and holds no state. Run with `docker run -i --rm -e VYTRIX_URL -e VYTRIX_TOKEN`.
+FROM python:3.12-slim
+# The MCP Registry verifies ownership of an OCI package by this label; it must equal "name" in
+# server.json (scripts/check-version-sync.sh gates that).
+LABEL io.modelcontextprotocol.server.name="io.github.zyvorai/vytrix"
+LABEL org.opencontainers.image.source="https://github.com/zyvorai/zyvor-vytrix"
+LABEL org.opencontainers.image.licenses="BUSL-1.1"
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+COPY agent/vytrix_mcp.py /app/vytrix_mcp.py
+USER 65532:65532
+ENTRYPOINT ["python3", "/app/vytrix_mcp.py"]
