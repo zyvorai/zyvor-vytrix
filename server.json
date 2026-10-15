@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.zyvorai/vytrix",
+  "title": "Vytrix",
+  "description": "Read-only host activity, history, anomalies and evidence from a Vytrix collector.",
+  "version": "0.7.0",
+  "repository": {
+    "url": "https://github.com/zyvorai/zyvor-vytrix",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/zyvorai/zyvor-vytrix",
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/zyvorai/vytrix-mcp:0.7.0",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "VYTRIX_URL",
+          "description": "Base URL of the Vytrix collector, e.g. http://host.docker.internal:9847 or https://vytrix.example. Plain HTTP is accepted only for localhost; inside a container 127.0.0.1 is the container itself, so set this explicitly.",
+          "isRequired": true
+        },
+        {
+          "name": "VYTRIX_TOKEN",
+          "description": "Bearer token of the collector. Read from the environment only; never printed.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
