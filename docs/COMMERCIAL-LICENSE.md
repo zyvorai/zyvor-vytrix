@@ -24,7 +24,7 @@ On receipt of the Supporter payment (suggested US$1.00, minimum US$0.99, or the 
 - The payment receipt (Razorpay payment ID) is the Licensee's proof. There are no keys, accounts, or activation; the software never checks.
 - Provided as is, no warranty, under the same disclaimers as the BUSL.
 - Payments are non-refundable except as required by law.
-- Questions, receipts, and larger or multi-entity commercial licences: sales@zyvor.dev.
+- Questions, receipts, USD invoices, and larger or multi-entity commercial licences: sales@zyvor.dev (invoiced separately, on terms agreed in writing).
 - Governing law and venue: *[Licensor and counsel to fill in]*.
 - Tax: *[Licensor and counsel to fill in: GST and export treatment]*.
 
