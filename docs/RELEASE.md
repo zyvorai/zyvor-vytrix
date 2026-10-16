@@ -11,7 +11,8 @@
 - **Fix:** the bundled collector no longer outlives the app (SIGTERM, SIGINT, SIGHUP, and `--exit-with-parent` for `kill -9`).
 - **Verified locally on macOS 27.2 (Apple silicon):** Xcode build of the app with the widget extension, signed sandboxed appex, `codesign --verify --deep --strict`, pluginkit registration, widget views rendered at both sizes, `scripts/test-native-logic.sh`, `scripts/test-native-ui.sh`; the collector was stopped with `kill -TERM` and `kill -KILL` of the app.
 - **Verified on the published release files** (downloaded from the v0.7.0 release page): the pkg and dmg match their `.sha256`, both tarballs match `SHA256SUMS`; the collector from the tarball answers `/v1/snapshot`, `/v1/history`, `/v1/anomalies`, `/v1/evidence`, `/v1/timeline` and `/v1/changes` with 200, rejects a missing token (401) and a POST (405); the MCP server from the tarball reports 0.7.0 and lists its six tools (`initialize` and `tools/list` only; no tool call); the app from the DMG launched with live telemetry and a running bundled collector, wrote `widget.json`, registered its widget extension, and `kill -TERM` stopped the app and its collector. The pkg was inspected (payload and signature), not run through the installer, and the dashboard tarball was not served.
-- **Not verified:** the widget in the macOS widget gallery or on the desktop; Spotlight, Siri and Shortcuts UI; Developer ID signing of the appex; macOS 26. The DMG and pkg are unsigned and not notarized because the repository has no Apple secrets.
+- **Not verified:** the widget in the macOS widget gallery or on the desktop; Spotlight, Siri and Shortcuts UI; macOS 26; the notarized files on a second Mac.
+- **Notarized (2026-10-16):** the DMG and pkg first attached to this release were unsigned. They were replaced the same day with files built by `scripts/package-mac.sh 0.7.0` on a Mac with the identities in the keychain: the app and widget extension are Developer ID signed (hardened runtime, the appex keeps its sandbox entitlement), the DMG and pkg were accepted by Apple's notary service and stapled, and `spctl` reports Notarized Developer ID for the DMG, the pkg and the app inside the DMG. Checked on the files downloaded back from the release page: they match their `.sha256`, `stapler validate` passes, and the app installed from the DMG launched with no Gatekeeper prompt. The checks in the previous bullet were made on the earlier unsigned files; the tarballs did not change. Notarization was done by hand, not by CI.
 - **Known:** Time Machine and timeline windows are capped at 1000 samples (about 33 minutes at the default interval).
 
 ## v0.6.0 (2026-10-13)
@@ -89,6 +90,8 @@ NOTARY_PROFILE=vytrix-notary ./scripts/package-mac.sh VERSION
 ```
 
 Before a Mac release, run `./scripts/test-native-ui.sh` (see [TESTING.md](TESTING.md)).
+
+v0.7.0: DMG and pkg Developer ID signed and notarized, see the v0.7.0 notes above.
 
 v0.3.0: [Vytrix-0.3.0.dmg](https://github.com/zyvorai/zyvor-vytrix/releases/download/v0.3.0/Vytrix-0.3.0.dmg) (Apple silicon, macOS 26+), signed by hand, not notarized.
 
