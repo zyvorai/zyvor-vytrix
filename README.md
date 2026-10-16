@@ -72,7 +72,7 @@ Optional and read-only: a small worker on each Mac pushes its snapshot to a coor
 
 A SwiftUI app (`native/`) that shows the same telemetry in a native macOS 27 window. It starts the bundled collector on loopback with a random token held in memory, or connects to one you run elsewhere (Connect…, HTTPS unless it is localhost). It is read-only, like everything else here.
 
-**[Download Vytrix 0.7.0 for Mac](https://github.com/zyvorai/zyvor-vytrix/releases/tag/v0.7.0)** (Apple silicon, macOS 26 or newer): `Vytrix-0.7.0.pkg` installs into Applications, or open `Vytrix-0.7.0.dmg` and drag Vytrix there. If the build is not notarized (the release notes say), the first launch is blocked: open **System Settings → Privacy & Security** and choose **Open Anyway** next to the Vytrix message. Each file has a `.sha256`; check it with `shasum -a 256 -c Vytrix-0.7.0.pkg.sha256`. v0.3.0 remains available as a hand-signed DMG. The app bundles the collector, which needs Python 3.10+ (see below).
+**[Download Vytrix 0.7.0 for Mac](https://github.com/zyvorai/zyvor-vytrix/releases/tag/v0.7.0)** (Apple silicon, macOS 26 or newer): `Vytrix-0.7.0.pkg` installs into Applications, or open `Vytrix-0.7.0.dmg` and drag Vytrix there. The v0.7.0 files are Developer ID signed and notarized. If you use a build that is not (a local or CI build without Apple secrets), the first launch is blocked: open **System Settings → Privacy & Security** and choose **Open Anyway** next to the Vytrix message. Each file has a `.sha256`; check it with `shasum -a 256 -c Vytrix-0.7.0.pkg.sha256`. v0.3.0 remains available as a hand-signed DMG. The app bundles the collector, which needs Python 3.10+ (see below).
 
 Or build it from source:
 
