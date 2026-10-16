@@ -1,6 +1,6 @@
-# Vytrix Supporter Commercial License (DRAFT, not in force)
+# Vytrix Supporter Commercial License
 
-> **Draft for review by Zyvor AI Labs Private Limited and its counsel. It is not linked from the site or README, and it grants nothing until approved and published.**
+Applies to payments made on the [Vytrix Supporter License page](https://rzp.io/rzp/tTFVA7PD). Governing law and tax terms are still to be completed by the Licensor (see the placeholders below and the open questions at the end).
 
 Vytrix is source-available under the Business Source License 1.1 (`LICENSE`). Anyone may use it free for non-production purposes. This page describes a one-time paid grant that lifts the production restriction.
 

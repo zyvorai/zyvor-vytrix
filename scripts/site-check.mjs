@@ -57,6 +57,7 @@ let { ctx, page, bad } = await open("light", { width: 1440, height: 900 }, "land
 await page.goto(base);
 check((await page.title()).includes("Vytrix"), "landing: title");
 check((await page.locator("h1").innerText()).includes("really doing"), "landing: h1");
+check((await page.locator("#support a.btn").getAttribute("href")).startsWith("https://"), "landing: support link is https");
 check(await page.getAttribute("html", "data-theme") === "light", "landing: follows OS light");
 check((await page.locator("#shot").getAttribute("src")).includes("glass-light-overview"), "gallery: starts on the glass overview matching the page theme");
 await shot(page, "site-landing-light");

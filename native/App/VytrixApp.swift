@@ -53,6 +53,9 @@ struct VytrixApp: App {
     }
     @MainActor private static var started = false
 
+    /// Optional, opens the payment page in the browser; the app makes no request itself and nothing is locked.
+    static let supportURL = URL(string: "https://rzp.io/rzp/tTFVA7PD")!
+
     static func showAbout() {
         let credits = NSMutableAttributedString(
             string: "A read-only system activity monitor by Zyvor AI Labs.\n",
@@ -81,6 +84,9 @@ struct VytrixApp: App {
                 Button("About Vytrix") { Self.showAbout() }
             }
             CommandGroup(replacing: .newItem) {}
+            CommandGroup(after: .help) {
+                Button("Support Vytrix…") { NSWorkspace.shared.open(Self.supportURL) }
+            }
             CommandMenu("Source") {
                 Button("Monitor This Mac") { store.useThisMac() }.keyboardShortcut("1")
                 Button("Show Demo Data") { store.useDemo() }.keyboardShortcut("2")
