@@ -31,19 +31,16 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, mini]
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-        with:
-          version: 11.25.0
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: pnpm
+      # Self-hosted runner: no hosted toolchain actions, so pin pnpm here.
+      - run: |
+          npm install --prefix "$RUNNER_TEMP/pnpm" pnpm@11.25.0
+          echo "$RUNNER_TEMP/pnpm/node_modules/.bin" >> "$GITHUB_PATH"
       - run: pnpm install --frozen-lockfile
       # Landing page + the real dashboard built static (simulated telemetry) under /demo/.
       # Same command locally: ./scripts/build-site.sh
