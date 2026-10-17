@@ -58,6 +58,8 @@ struct AlertNotifier {
     private var notified: [String: VytrixAlert.Severity] = [:]
     private var absent: [String: Int] = [:]
 
+    init(quietPolls: Int = 3) { self.quietPolls = quietPolls }
+
     mutating func fresh(_ current: [VytrixAlert]) -> [VytrixAlert] {
         let ids = Set(current.map(\.id))
         for id in notified.keys where !ids.contains(id) {
