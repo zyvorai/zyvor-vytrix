@@ -33,7 +33,7 @@
   <a class="brand" href="./" aria-label="Vytrix home">
     <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1d1d1f"/><path d="M5 18h5l3-9 5 16 3-7h6" fill="none" stroke="#f56a21" stroke-width="2.5" stroke-linejoin="round"/></svg><b>VYTRIX</b></a>
   <nav aria-label="Sections" id="sections">
-    <a href="#gallery">See it</a><a href="#features">Features</a><a href="#how">How it fits</a><a href="#download">Download</a><a href="#quickstart">Quickstart</a><a href="#deploy">Deploy</a>
+    <a href="#gallery">See it</a><a href="#tour">Tour</a><a href="#features">Features</a><a href="#mac">Mac app</a><a href="#how">How it fits</a><a href="#download">Download</a><a href="#quickstart">Quickstart</a><a href="#deploy">Deploy</a>
   </nav>
   <div class="bar-actions">
     <button id="theme" class="icon" type="button" aria-label="Switch to dark mode" aria-pressed="false">
@@ -86,6 +86,44 @@
     <div><b>Honest numbers</b><span>App memory is RSS. Not collected means absent, not zero.</span></div>
   </section>
 
+  <section id="tour" class="tour" aria-labelledby="tour-h">
+    <h2 id="tour-h">One window. Every question.</h2>
+    <p class="sub">Scroll through what Vytrix shows. Every image is the real app on simulated telemetry (host <code>zyvor-dev-01</code>), not a capture of a real machine.</p>
+    <div class="tour-grid">
+      <ol class="steps" id="steps">
+      <li class="step" data-view="overview" data-label="Overview" tabindex="0" aria-current="true">
+        <span class="n">01</span><h3>Everything, at a glance</h3><p>CPU, memory, disk and network, and the busiest applications, on one screen. A counter the collector does not have is shown as absent, never as zero.</p>
+        <a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/README.md">README</a>
+        <figure class="device step-img"><img data-view="overview" src="ux/glass-dark-overview.png" width="1440" height="900" alt="Vytrix Overview view on simulated telemetry" loading="lazy" decoding="async" /></figure>
+      </li>
+      <li class="step" data-view="applications" data-label="Applications" tabindex="0">
+        <span class="n">02</span><h3>Which app is it?</h3><p>Processes grouped by executable or .app bundle, with CPU and memory per application and a process sheet one click away. App memory is RSS.</p>
+        <a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/API.md">Collector API</a>
+        <figure class="device step-img"><img data-view="applications" src="ux/glass-dark-applications.png" width="1440" height="900" alt="Vytrix Applications view on simulated telemetry" loading="lazy" decoding="async" /></figure>
+      </li>
+      <li class="step" data-view="containers" data-label="Containers" tabindex="0">
+        <span class="n">03</span><h3>Which container?</h3><p>Docker and Podman side by side: state, CPU, memory against its limit, network I/O and published ports, from read-only CLI calls.</p>
+        <a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/API.md">Containers in the API</a>
+        <figure class="device step-img"><img data-view="containers" src="ux/glass-dark-containers.png" width="1440" height="900" alt="Vytrix Containers view on simulated telemetry" loading="lazy" decoding="async" /></figure>
+      </li>
+      <li class="step" data-view="projects" data-label="Projects" tabindex="0">
+        <span class="n">04</span><h3>What is on port 5173?</h3><p>Listening ports tied to the application and its project folder, so a stray dev server is easy to find.</p>
+        <a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/README.md">README</a>
+        <figure class="device step-img"><img data-view="projects" src="ux/glass-dark-projects.png" width="1440" height="900" alt="Vytrix Projects view on simulated telemetry" loading="lazy" decoding="async" /></figure>
+      </li>
+      <li class="step" data-view="alerts" data-label="Alerts" tabindex="0">
+        <span class="n">05</span><h3>Tell me when</h3><p>Threshold alerts on CPU, memory, disk and containers, at a level you set. No notifications you did not ask for.</p>
+        <a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/README.md">README</a>
+        <figure class="device step-img"><img data-view="alerts" src="ux/glass-dark-alerts.png" width="1440" height="900" alt="Vytrix Alerts view on simulated telemetry" loading="lazy" decoding="async" /></figure>
+      </li>
+      </ol>
+      <div class="stage">
+        <figure class="device"><img id="stage-img" src="ux/glass-dark-overview.png" width="1440" height="900" alt="Vytrix Overview on simulated telemetry" decoding="async" />
+          <figcaption id="stage-cap">Overview · simulated telemetry</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
   <section id="features">
     <h2>Built for the questions you actually ask</h2>
     <div class="grid">
@@ -95,6 +133,36 @@
       <article class="card"><h3>Tell me when</h3><p>Threshold alerts on CPU, memory, disk and containers, with a level you set. No notifications you did not ask for.</p></article>
       <article class="card"><h3>What happened earlier?</h3><p>Activity history in the tab, and 30 days of samples in a 0600 SQLite file that the collector serves over an authenticated API.</p></article>
       <article class="card"><h3>Safe to leave running</h3><p>Bearer token, exact CORS origin, HTTPS. No mutations in the API: it cannot do anything to the machine.</p></article>
+    </div>
+  </section>
+
+  <section id="mac" class="mac" aria-labelledby="mac-h">
+    <h2 id="mac-h">Native on the Mac</h2>
+    <p class="sub">A SwiftUI app with the collector bundled: a menu bar item (CPU, host totals, alert count, busiest apps), local notifications once per alert, a System widget and two Shortcuts actions. Read-only like everything else. Built and run on macOS 27.2; not checked on macOS 26, and the widget has not been seen in the widget gallery (<a href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/WIDGETS.md">docs/WIDGETS.md</a>).</p>
+    <figure class="device wide"><img data-native="overview" src="ux/native-dark-overview.png" width="2240" height="1440" alt="The native Vytrix app, Overview, on simulated telemetry" loading="lazy" decoding="async" />
+      <figcaption>The native app on simulated telemetry.</figcaption></figure>
+    <div class="duo">
+      <figure class="device"><img data-native="applications" src="ux/native-dark-applications.png" width="2240" height="1440" alt="The native Vytrix app, Applications" loading="lazy" decoding="async" /></figure>
+      <figure class="device"><img data-native="containers" src="ux/native-dark-containers.png" width="2240" height="1440" alt="The native Vytrix app, Containers" loading="lazy" decoding="async" /></figure>
+    </div>
+    <ul class="ticks">
+      <li><b>Menu bar</b><span>Closing the window keeps Vytrix in the menu bar; Quit stops it and its collector.</span></li>
+      <li><b>Notifications</b><span>Your alert rules, once per alert, never for demo data.</span></li>
+      <li><b>Widget and Shortcuts</b><span>"What is using my CPU?" and "How is my Mac doing?" answer from the app's last reading.</span></li>
+      <li><b>Time Machine</b><span>Scrub up to 1000 stored samples (about 33 minutes at the default interval). Needs a collector.</span></li>
+    </ul>
+  </section>
+
+  <section id="depth" aria-labelledby="depth-h">
+    <h2 id="depth-h">What happened, and why</h2>
+    <p class="sub">History lives in a 0600 SQLite file next to the collector, and everything below is computed from it on request. Demo data and imported snapshots have no history, so they show none of this.</p>
+    <div class="grid feats">
+      <article class="card feat"><h3>Time Machine</h3><p>A scrubber replays the collector's stored samples: tiles, apps, containers, ports and alerts show the sample at that time, and Back to Live returns.</p><a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/CHANGELOG.md">v0.6.0 notes</a></article>
+      <article class="card feat"><h3>Anomaly bands and evidence</h3><p>Ranges that break an exponentially weighted band are shaded on CPU, memory, disk and network. Drag across a range to see what was busy in it against the range before.</p><a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/API.md">Collector API</a></article>
+      <article class="card feat"><h3>Incident timeline</h3><p>Alert transitions, container changes and anomaly windows in one ordered list, with a short fingerprint of the pattern and why the window differs from the one before. Deterministic, no model.</p><a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/API.md">Collector API</a></article>
+      <article class="card feat"><h3>For your assistant: MCP</h3><p>A read-only MCP server over a running collector. Every tool is one GET, and a test asserts that none writes anything.</p><a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/MCP.md">docs/MCP.md</a></article>
+      <article class="card feat"><h3>Several Macs <small>experimental</small></h3><p>Optional. A small worker on each Mac pushes its snapshot to a coordinator; the dashboard reads the coordinator. No command channel. Checked with one real Mac over loopback, not yet across two Macs or over HTTPS.</p><a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/CLUSTER.md">docs/CLUSTER.md</a></article>
+      <article class="card feat"><h3>Fleet Pro <small>new, opt-in</small></h3><p>Central history, metadata, roles, alerts and exports on top of the read-only collector. It adds no command channel, and counters a host does not expose are omitted, not estimated. Not yet checked across several Macs or over HTTPS.</p><a class="link" href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/FLEET-PRO.md">docs/FLEET-PRO.md</a></article>
     </div>
   </section>
 

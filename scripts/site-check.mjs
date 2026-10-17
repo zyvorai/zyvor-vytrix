@@ -40,8 +40,8 @@ if (!base.endsWith("/")) base += "/";
 const browser = await chromium.launch().catch(() => chromium.launch({ channel: "chrome" }));
 const shot = async (page, name) => { if (shotsDir) { fs.mkdirSync(shotsDir, { recursive: true }); await page.screenshot({ path: path.join(shotsDir, name + ".png") }); } };
 
-async function open(scheme, viewport, tag) {
-  const ctx = await browser.newContext({ colorScheme: scheme, viewport, permissions: ["clipboard-read", "clipboard-write"], reducedMotion: "reduce" });
+async function open(scheme, viewport, tag, opts = {}) {
+  const ctx = await browser.newContext({ colorScheme: scheme, viewport, permissions: ["clipboard-read", "clipboard-write"], reducedMotion: opts.motion ? "no-preference" : "reduce", javaScriptEnabled: opts.js !== false });
   const page = await ctx.newPage();
   const bad = [];
   page.on("pageerror", (e) => bad.push(`${tag} pageerror: ${e.message}`));
@@ -59,6 +59,7 @@ check((await page.title()).includes("Vytrix"), "landing: title");
 check((await page.locator("h1").innerText()).includes("really doing"), "landing: h1");
 check((await page.locator("#support a.btn").getAttribute("href")).startsWith("https://"), "landing: support link is https");
 check(await page.getAttribute("html", "data-theme") === "light", "landing: follows OS light");
+check(await page.locator(".reveal").count() === 0, "reduced motion: nothing is hidden waiting for a scroll reveal");
 check((await page.locator("#shot").getAttribute("src")).includes("glass-light-overview"), "gallery: starts on the glass overview matching the page theme");
 await shot(page, "site-landing-light");
 // gallery: every control changes the real screenshot, by click and by keyboard
@@ -115,9 +116,51 @@ await ctx.close();
 ({ ctx, page, bad } = await open("dark", { width: 390, height: 844 }, "landing-mobile"));
 await page.goto(base);
 check(await noSideScroll(page), "mobile: no horizontal scroll");
+check(await page.locator("#steps .step-img").first().isVisible() && !(await page.locator(".stage").isVisible()), "mobile: each tour step carries its own image, the pinned stage is off");
 check(await page.locator('.seg.wide').evaluate((el) => el.scrollWidth >= el.clientWidth), "mobile: the view picker scrolls instead of overflowing the page");
 await shot(page, "site-landing-mobile");
 bad.forEach((b) => check(false, b));
+await ctx.close();
+
+// ---------- feature sections: reveal, the pinned tour, the native-app showcase (motion allowed)
+({ ctx, page, bad } = await open("dark", { width: 1440, height: 900 }, "features", { motion: true }));
+await page.goto(base);
+for (const id of ["tour", "mac", "depth"]) check(await page.locator("#" + id).count() === 1, `features: #${id} is on the page`);
+check(await page.locator("#steps .step").count() === 5, "tour: five steps");
+check(await page.locator('#sections a[href="#tour"], #sections a[href="#mac"]').count() === 2, "nav: Tour and Mac app are linked");
+for (const [view, label] of [["containers", "Containers"], ["alerts", "Alerts"]]) {
+  await page.locator(`#steps .step[data-view="${view}"]`).evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.waitForFunction((v) => document.getElementById("stage-img").src.includes(`glass-dark-${v}.png`), view);
+  check((await page.locator("#stage-cap").innerText()).startsWith(label), `tour: scrolling to ${label} swaps the pinned screenshot and caption`);
+  check(await page.locator(`#steps .step[data-view="${view}"]`).getAttribute("aria-current") === "true", `tour: ${label} is the current step`);
+  const top = await page.locator(".stage").evaluate((el) => el.getBoundingClientRect().top);
+  check(top >= 0 && top < 220, `tour: the stage stays pinned in view while ${label} is read`);
+}
+await shot(page, "site-tour");
+await page.locator("#mac").scrollIntoViewIfNeeded();
+await page.waitForTimeout(500);
+await shot(page, "site-mac");
+// a hard flick (1400px jumps, more than a screen) must not leave anything hidden behind the reader
+await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 1400) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 70)); } window.scrollTo(0, document.body.scrollHeight); });
+await page.waitForFunction(() => [...document.querySelectorAll(".reveal")].every((e) => e.classList.contains("in")), null, { timeout: 4000 }).catch(() => {});
+const stuck = await page.evaluate(() => [...document.querySelectorAll(".reveal:not(.in)")].map((e) => `${e.tagName.toLowerCase()}.${e.className.replace(/\s*reveal\s*/, " ").trim()}:${(e.textContent || e.getAttribute("alt") || "").trim().slice(0, 30)}`));
+check(stuck.length === 0 && await page.locator(".reveal").count() > 10, `reveal: everything has revealed after scrolling the page${stuck.length ? " (stuck: " + stuck.join(" | ") + ")" : ""}`);
+await page.click("#theme");
+await page.waitForFunction(() => document.getElementById("stage-img").src.includes("glass-light-") && document.querySelector("img[data-native]").src.includes("native-light-"));
+check(true, "features: the pinned and native screenshots follow the page theme");
+await page.locator("#mac").scrollIntoViewIfNeeded();
+const bad2 = await page.evaluate(async () => { const out = []; for (const i of document.querySelectorAll("img[data-native], img[data-view]")) { i.loading = "eager"; await i.decode().catch(() => out.push(i.getAttribute("src"))); } return out; });
+check(bad2.length === 0, `features: every tour and native image decodes${bad2.length ? " (" + bad2.join(", ") + ")" : ""}`);
+check(await noSideScroll(page), "features: no horizontal scroll (desktop, motion on)");
+bad.forEach((b) => check(false, b));
+await ctx.close();
+
+// ---------- without JavaScript every step still shows its own image and nothing is hidden
+({ ctx, page, bad } = await open("light", { width: 1440, height: 900 }, "nojs", { js: false }));
+await page.goto(base);
+check(await page.locator("#steps .step-img").first().isVisible() && !(await page.locator(".stage").isVisible()), "no JS: every tour step shows its own image");
+check(await page.locator(".reveal").count() === 0 && await page.locator("#features .card").first().isVisible(), "no JS: nothing is hidden waiting for a script");
+check(await noSideScroll(page), "no JS: no horizontal scroll");
 await ctx.close();
 
 // ---------- the live demo: the real dashboard, built static
