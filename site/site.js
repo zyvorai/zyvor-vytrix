@@ -98,3 +98,102 @@
     });
   });
 })();
+
+// Reveal on scroll, the pinned tour, and a little depth on the screenshots. No dependencies; content stays visible without JS or with reduced motion.
+(function () {
+  var root = document.documentElement;
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasIO = "IntersectionObserver" in window;
+  function mode() { return root.getAttribute("data-theme") === "light" ? "light" : "dark"; }
+
+  // ---- reveal
+  if (hasIO && !reduce) {
+    var els = [].slice.call(document.querySelectorAll("main h2, main .sub, main .card, .band > div, .ticks li, .card-img, .frame, .code, .mac .device, .shot"))
+      .filter(function (el) { return !el.closest(".step-img, .stage"); });
+    var seen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("in"); seen.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    els.forEach(function (el) {
+      el.classList.add("reveal");
+      var sib = el.parentNode && el.parentNode.children ? [].indexOf.call(el.parentNode.children, el) : 0;
+      if (el.matches(".card, .band > div, .ticks li")) el.style.setProperty("--d", Math.min(sib, 5) * 70 + "ms");
+      seen.observe(el);
+    });
+    // A fast flick can skip an element entirely, and the observer only fires on a change: reveal whatever is already behind the reader.
+    var sweepTick = false;
+    var sweep = function () {
+      sweepTick = false;
+      var edge = (window.innerHeight || 800) * 0.94;
+      els.forEach(function (el) {
+        if (!el.classList.contains("in") && el.getBoundingClientRect().top < edge) { el.classList.add("in"); seen.unobserve(el); }
+      });
+    };
+    addEventListener("scroll", function () { if (!sweepTick) { sweepTick = true; requestAnimationFrame(sweep); } }, { passive: true });
+  }
+
+  // ---- the tour: steps scroll, one screenshot stays pinned
+  var steps = [].slice.call(document.querySelectorAll("#steps .step"));
+  var stage = document.getElementById("stage-img"), cap = document.getElementById("stage-cap");
+  var cur = "overview";
+  function glass(v) { return "ux/glass-" + mode() + "-" + v + ".png"; }
+  function show(v, label) {
+    cur = v;
+    steps.forEach(function (s) {
+      if (s.getAttribute("data-view") === v) s.setAttribute("aria-current", "true"); else s.removeAttribute("aria-current");
+    });
+    var src = glass(v);
+    if (cap) cap.textContent = label + " · simulated telemetry";
+    if (!stage || stage.getAttribute("src") === src) return;
+    var pre = new Image();
+    pre.onload = pre.onerror = function () { if (cur === v) { stage.src = src; stage.alt = "Vytrix " + label + " view on simulated telemetry"; } };
+    pre.src = src;
+  }
+  if (steps.length && stage) {
+    root.classList.add("tour-js");
+    var label = function (s) { return s.getAttribute("data-label"); };
+    if (hasIO) {
+      var preloaded = false;
+      var near = new IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting || preloaded) return;
+        preloaded = true;
+        steps.forEach(function (s) { new Image().src = glass(s.getAttribute("data-view")); });
+      }, { rootMargin: "400px 0px" });
+      near.observe(document.getElementById("tour"));
+      var mid = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) show(e.target.getAttribute("data-view"), label(e.target)); });
+      }, { rootMargin: "-45% 0px -45% 0px" });
+      steps.forEach(function (s) { mid.observe(s); });
+    }
+    steps.forEach(function (s) { s.addEventListener("focus", function () { show(s.getAttribute("data-view"), label(s)); }); });
+  }
+
+  // ---- screenshots follow the page theme (the gallery already does)
+  function syncTheme() {
+    var m = mode();
+    [].forEach.call(document.querySelectorAll("img[data-view]"), function (i) { i.src = "ux/glass-" + m + "-" + i.getAttribute("data-view") + ".png"; });
+    [].forEach.call(document.querySelectorAll("img[data-native]"), function (i) { i.src = "ux/native-" + m + "-" + i.getAttribute("data-native") + ".png"; });
+    if (stage) { var s = steps.filter(function (x) { return x.getAttribute("data-view") === cur; })[0]; if (s) show(cur, label0(s)); }
+  }
+  function label0(s) { return s.getAttribute("data-label"); }
+  syncTheme();
+  if ("MutationObserver" in window) new MutationObserver(syncTheme).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+
+  // ---- depth: the pinned and the wide screenshot settle into place as they arrive
+  if (!reduce) {
+    var depth = [].slice.call(document.querySelectorAll(".stage .device, .mac .device.wide")), ticking = false;
+    var update = function () {
+      ticking = false;
+      var vh = window.innerHeight || 800;
+      depth.forEach(function (el) {
+        var p = Math.max(0, Math.min(1, (vh - el.getBoundingClientRect().top) / (vh * 0.75)));
+        el.style.setProperty("--tilt", ((1 - p) * 7).toFixed(2) + "deg");
+        el.style.setProperty("--sc", (0.95 + 0.05 * p).toFixed(3));
+      });
+    };
+    var req = function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+    addEventListener("scroll", req, { passive: true }); addEventListener("resize", req); update();
+  }
+})();
