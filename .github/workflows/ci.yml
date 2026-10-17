@@ -12,7 +12,7 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           version: 11.25.0
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -28,7 +28,7 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium webkit
       - run: pnpm test:e2e
       - if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-${{ matrix.os }}
           path: test-results/
@@ -70,7 +70,7 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           version: 11.25.0
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -81,7 +81,7 @@ jobs:
       - run: ./scripts/build-site.sh
       - run: node scripts/site-check.mjs --shots "$RUNNER_TEMP/site-shots"
       - if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: site-screenshots
           path: ${{ runner.temp }}/site-shots
