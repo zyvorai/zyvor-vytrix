@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## v0.8.0 — 2026-10-18
+
+More for MCP clients, and Claude Code wiring for this repository. The app, collector and dashboard have no functional change.
+
+### Added
+- **MCP prompts:** `vytrix_what_changed`, `vytrix_incident_report` and `vytrix_capacity_check` beside `vytrix_triage`; all take an optional `minutes` (1-1440).
+- **MCP resources:** `vytrix://snapshot` and `vytrix://anomalies`.
+- **MCP cluster and Fleet Pro tools:** `vytrix_cluster`, `vytrix_fleet_history`, `vytrix_fleet_alerts` and `vytrix_fleet_entitlement`, offered only when `VYTRIX_CLUSTER_URL` and `VYTRIX_CLUSTER_TOKEN` are set. Each is one `GET`; the cluster token is sent only on cluster paths; audit, webhook and rule endpoints are not exposed.
+- **Claude Code:** a project `.mcp.json` (no token), a `/vytrix-triage` command and an allowlist for the server's read-only tools. See `docs/MCP.md`.
+
 ## v0.7.1 — 2026-10-15
 
 Publishes the MCP server as a container image and lists it in the MCP Registry. The app, collector and dashboard are unchanged.

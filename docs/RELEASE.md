@@ -1,5 +1,11 @@
 # Release status
 
+## v0.8.0 (2026-10-18)
+
+- **MCP:** three more prompts, two resources, and optional read-only cluster/Fleet Pro tools ([MCP.md](MCP.md)); a Claude Code `.mcp.json` and `/vytrix-triage` command. The app, collector and dashboard have no functional change.
+- **Verified:** on the Mac mini (macOS, Python 3.15, Node 26) before the merge: typecheck, lint, `pnpm test` (60 Python tests plus the Node tests), build, `pnpm test:e2e` (30 passed, 2 skipped), shellcheck and `scripts/build-native.sh`; all CI checks on the merged PR. A stdio run of every tool, prompt and resource against a real collector, with a stub coordinator for the cluster tools.
+- **Not verified:** the cluster tools against a real coordinator or Fleet Pro install; the new prompts and resources through a real MCP client; the image build and Registry publish for 0.8.0 (the v0.7.1 publish is recorded above as unverified).
+
 ## v0.7.1 (2026-10-15)
 
 - **MCP Registry packaging:** the MCP server ships as the OCI image `ghcr.io/zyvorai/vytrix-mcp` and is listed in the MCP Registry as `io.github.zyvorai/vytrix` ([MCP.md](MCP.md)). The tool list is unchanged. The app, collector and dashboard have no functional change.

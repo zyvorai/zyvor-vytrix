@@ -20,7 +20,7 @@ import urllib.parse
 import urllib.request
 
 PROTOCOL = '2025-06-18'
-SERVER = {'name': 'vytrix', 'version': '0.7.1'}
+SERVER = {'name': 'vytrix', 'version': '0.8.0'}
 MAX_TEXT = 200_000
 GUARD = ('Report only what the data shows. Do not invent counters: a missing field means the collector '
          'did not measure it. App memory is RSS. Evidence correlates; it does not establish a cause.')
