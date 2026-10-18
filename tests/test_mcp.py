@@ -46,6 +46,44 @@ class McpTests(unittest.TestCase):
         for verb in ('kill', 'stop', 'set', 'write', 'delete', 'restart', 'run', 'exec'):
             self.assertNotIn(verb, names)
 
+    def test_cluster_tools_only_with_cluster_and_use_its_token(self):
+        server, _ = self.server()
+        self.assertNotIn('vytrix_cluster', {t['name'] for t in self.rpc(server, 'tools/list')['result']['tools']})
+        self.assertEqual(self.rpc(server, 'tools/call', {'name': 'vytrix_cluster'})['error']['code'], -32602)
+        opener = FakeOpener()
+        server = mcp.Server('http://127.0.0.1:9847', 'tok', opener, cluster=('https://coord.example', 'ctok'))
+        listed = self.rpc(server, 'tools/list')['result']['tools']
+        self.assertTrue(set(mcp.CLUSTER_TOOLS) <= {t['name'] for t in listed})
+        self.assertTrue(all(t['annotations']['readOnlyHint'] for t in listed))
+        for name in mcp.CLUSTER_TOOLS:
+            self.rpc(server, 'tools/call', {'name': name, 'arguments': {'node': 'a b'} if name == 'vytrix_fleet_history' else {}})
+        self.rpc(server, 'tools/call', {'name': 'vytrix_snapshot'})
+        *cluster, collector_req = opener.requests
+        for r in cluster:
+            self.assertEqual((r.get_method(), r.get_header('Authorization')), ('GET', 'Bearer ctok'))
+            self.assertTrue(r.full_url.startswith('https://coord.example/v1/'))
+        self.assertEqual(collector_req.get_header('Authorization'), 'Bearer tok')
+        self.assertIn('node=a+b', cluster[1].full_url)
+        self.assertEqual(self.rpc(server, 'tools/call', {'name': 'vytrix_fleet_history', 'arguments': {'node': 5}})['error']['code'], -32602)
+        names = ' '.join(mcp.CLUSTER_TOOLS)
+        for verb in ('kill', 'stop', 'set', 'write', 'delete', 'restart', 'run', 'exec', 'webhook', 'audit', 'rule'):
+            self.assertNotIn(verb, names)
+
+    def test_prompts_and_resources(self):
+        server, opener = self.server()
+        listed = self.rpc(server, 'prompts/list')['result']['prompts']
+        self.assertEqual({p['name'] for p in listed}, set(mcp.PROMPTS))
+        for name in mcp.PROMPTS:
+            text = self.rpc(server, 'prompts/get', {'name': name, 'arguments': {'minutes': '30'}})['result']['messages'][0]['content']['text']
+            self.assertIn('Do not invent counters', text)
+        self.assertIn('1800', self.rpc(server, 'prompts/get', {'name': 'vytrix_what_changed', 'arguments': {'minutes': '30'}})['result']['messages'][0]['content']['text'])
+        self.assertIn('86400', self.rpc(server, 'prompts/get', {'name': 'vytrix_what_changed', 'arguments': {'minutes': '999999'}})['result']['messages'][0]['content']['text'])
+        self.assertEqual({r['uri'] for r in self.rpc(server, 'resources/list')['result']['resources']}, set(mcp.RESOURCES))
+        body = self.rpc(server, 'resources/read', {'uri': 'vytrix://snapshot'})['result']['contents'][0]
+        self.assertIn('/v1/snapshot', body['text'])
+        self.assertEqual(self.rpc(server, 'resources/read', {'uri': 'file:///etc/passwd'})['error']['code'], -32602)
+        self.assertEqual(len(opener.requests), 1)
+
     def test_arguments_are_validated_and_unknown_tools_rejected(self):
         server, opener = self.server()
         self.assertEqual(self.rpc(server, 'tools/call', {'name': 'rm_rf'})['error']['code'], -32602)
