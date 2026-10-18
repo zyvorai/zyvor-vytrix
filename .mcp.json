@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "vytrix": {
+      "command": "python3",
+      "args": ["agent/vytrix_mcp.py"],
+      "env": { "VYTRIX_URL": "http://127.0.0.1:9847" }
+    }
+  }
+}

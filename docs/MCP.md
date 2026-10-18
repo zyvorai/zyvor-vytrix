@@ -24,6 +24,23 @@ VYTRIX_URL=http://127.0.0.1:9847 VYTRIX_TOKEN=<collector token> python3 agent/vy
 } } }
 ```
 
+## Use with Claude Code
+
+The repository's `.mcp.json` registers the server for Claude Code. It carries no token: export `VYTRIX_TOKEN` in the shell that starts `claude`.
+
+```bash
+export VYTRIX_TOKEN=<collector token>
+claude mcp list
+```
+
+To register it outside this repository:
+
+```bash
+claude mcp add vytrix -e VYTRIX_URL=http://127.0.0.1:9847 -- python3 /path/to/agent/vytrix_mcp.py
+```
+
+The project also ships a `/vytrix-triage [minutes]` slash command (`.claude/commands/`) and allows the `vytrix` server's read-only tools in `.claude/settings.json`.
+
 ## Tools
 
 | Tool | Collector endpoint |
@@ -37,7 +54,26 @@ VYTRIX_URL=http://127.0.0.1:9847 VYTRIX_TOKEN=<collector token> python3 agent/vy
 
 Times are epoch seconds. Responses are the collector's JSON, truncated at 200 KB with a note. If the collector is unreachable or rejects the token, the tool returns an error result with a short message and nothing else.
 
-There is one prompt, `vytrix_triage`, and the server's instructions tell the model not to invent counters: a missing field was not measured, app memory is RSS, and evidence correlates without establishing a cause.
+### Cluster and Fleet Pro tools (optional)
+
+Set `VYTRIX_CLUSTER_URL` (https, or http to localhost) and `VYTRIX_CLUSTER_TOKEN` to a coordinator and its token and four more tools appear. They are still one `GET` each and use the cluster token only for cluster paths; with neither variable set they do not exist.
+
+| Tool | Coordinator endpoint |
+|---|---|
+| `vytrix_cluster` | `/v1/cluster` |
+| `vytrix_fleet_history` (`node`) | `/v1/fleet/history` |
+| `vytrix_fleet_alerts` | `/v1/fleet/alerts` (auditor role) |
+| `vytrix_fleet_entitlement` | `/v1/fleet/entitlement` |
+
+Audit, webhook and rule endpoints are deliberately not exposed: they need admin and can carry secrets. Use a `viewer` or `auditor` token, never `admin`.
+
+### Resources
+
+`vytrix://snapshot` and `vytrix://anomalies` can be attached as context (`resources/list`, `resources/read`). Each is one `GET` on the collector.
+
+### Prompts
+
+All take an optional `minutes` argument (1-1440, default 15): `vytrix_triage`, `vytrix_what_changed`, `vytrix_incident_report` and `vytrix_capacity_check`. The server's instructions tell the model not to invent counters: a missing field was not measured, app memory is RSS, and evidence correlates without establishing a cause.
 
 ## MCP Registry and the container image
 
