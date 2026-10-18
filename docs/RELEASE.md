@@ -4,6 +4,8 @@
 
 - **MCP:** three more prompts, two resources, and optional read-only cluster/Fleet Pro tools ([MCP.md](MCP.md)); a Claude Code `.mcp.json` and `/vytrix-triage` command. The app, collector and dashboard have no functional change.
 - **Verified:** on the Mac mini (macOS, Python 3.15, Node 26) before the merge: typecheck, lint, `pnpm test` (60 Python tests plus the Node tests), build, `pnpm test:e2e` (30 passed, 2 skipped), shellcheck and `scripts/build-native.sh`; all CI checks on the merged PR. A stdio run of every tool, prompt and resource against a real collector, with a stub coordinator for the cluster tools.
+- **Notarized (2026-10-18):** the DMG and pkg first attached by CI were unsigned (the repository has no Apple secrets). They were replaced with files built from the `v0.8.0` source by `VYTRIX_WIDGETS=1 scripts/package-mac.sh 0.8.0` on the Mac mini with the Developer ID identities: Apple's notary service accepted both, both are stapled, and `spctl` reports Notarized Developer ID for the DMG and the pkg. Checked on the files downloaded back from the release page: they match their `.sha256` and are byte-identical to the built files, and `stapler validate` passes. Not run: installing the pkg, or launching the app from the DMG on a second Mac. Notarization was done by hand, not by CI.
+- **Published by CI:** the `mcp-image` and `publish-mcp` jobs of the v0.8.0 release run succeeded. Not checked: pulling `ghcr.io/zyvorai/vytrix-mcp:0.8.0` or reading the Registry entry back.
 - **Not verified:** the cluster tools against a real coordinator or Fleet Pro install; the new prompts and resources through a real MCP client; the image build and Registry publish for 0.8.0 (the v0.7.1 publish is recorded above as unverified).
 
 ## v0.7.1 (2026-10-15)
