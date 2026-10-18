@@ -205,7 +205,7 @@ npx pnpm@11.25.0 dev            # http://localhost:5173, simulated telemetry</co
     <div class="code"><button class="copy" type="button" aria-label="Copy the live telemetry commands">Copy</button>
 <pre><code>export VYTRIX_TOKEN="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
 python3 agent/vytrix.py --allow-origin http://localhost:5173</code></pre></div>
-    <p class="sub">For an MCP client, a read-only server is listed in the MCP Registry as <code>io.github.zyvorai/vytrix</code> once the v0.7.1 release publishes it. It is a stdio container image, <code>ghcr.io/zyvorai/vytrix-mcp:0.7.1</code>, with six read-only tools; set <code>VYTRIX_URL</code> and <code>VYTRIX_TOKEN</code> (secret). See <a href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/MCP.md">docs/MCP.md</a>.</p>
+    <p class="sub">For an MCP client, a read-only server is listed in the MCP Registry as <code>io.github.zyvorai/vytrix</code> once the v0.8.0 release publishes it. It is a stdio container image, <code>ghcr.io/zyvorai/vytrix-mcp:0.8.0</code>, with six read-only tools (plus optional cluster tools, four prompts and two resources); set <code>VYTRIX_URL</code> and <code>VYTRIX_TOKEN</code> (secret). See <a href="https://github.com/zyvorai/zyvor-vytrix/blob/main/docs/MCP.md">docs/MCP.md</a>.</p>
   </section>
 
   <section id="deploy">

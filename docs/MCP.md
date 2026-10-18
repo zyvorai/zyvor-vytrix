@@ -83,10 +83,10 @@ All take an optional `minutes` argument (1-1440, default 15): `vytrix_triage`, `
 docker run -i --rm \
   -e VYTRIX_URL=http://host.docker.internal:9847 \
   -e VYTRIX_TOKEN=<collector token> \
-  ghcr.io/zyvorai/vytrix-mcp:0.7.1
+  ghcr.io/zyvorai/vytrix-mcp:0.8.0
 ```
 
-The environment variables are the same two the script reads, `VYTRIX_URL` and `VYTRIX_TOKEN` (secret). Inside a container `127.0.0.1` is the container itself, so `VYTRIX_URL` must point at the collector explicitly, and plain HTTP is still accepted only for localhost, so a remote collector needs `https://`. The tool list is unchanged and read-only.
+The environment variables are the same two the script reads, `VYTRIX_URL` and `VYTRIX_TOKEN` (secret). Inside a container `127.0.0.1` is the container itself, so `VYTRIX_URL` must point at the collector explicitly, and plain HTTP is still accepted only for localhost, so a remote collector needs `https://`. The tool list is read-only. The optional cluster variables (`VYTRIX_CLUSTER_URL`, `VYTRIX_CLUSTER_TOKEN`) are not declared in `server.json`; add them with further `-e` flags to enable the cluster tools.
 
 Releases: pushing a `v*` tag builds and pushes the image (`mcp-image` in `release.yml`), then `publish-mcp` validates `server.json` with a pinned `mcp-publisher` and publishes it using GitHub OIDC (`id-token: write`, no stored token). `scripts/check-version-sync.sh` (run in CI) fails when `server.json`, the image tag, the server's own version and the image label drift from `package.json`.
 
