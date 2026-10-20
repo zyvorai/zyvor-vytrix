@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {demoSnapshot,snapshotSchema,type Snapshot} from '@/lib/telemetry';
-import {collectorUrl} from '@/lib/evidence';
+import {collectorUrl,isAllowedCollectorUrl} from '@/lib/evidence';
 
 export type Source='demo'|'live'|'import';
 const MAX_HISTORY=1800;
@@ -13,9 +13,7 @@ function seedHistory():Snapshot[]{
   return Array.from({length:60},(_,i)=>({...demoSnapshot(i),timestamp:new Date(Date.now()-(59-i)*POLL_MS).toISOString()}));
 }
 
-export function isAllowedCollectorUrl(url:URL){
-  return url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname));
-}
+export {isAllowedCollectorUrl};
 
 export function useTelemetry(){
   const [snapshot,setSnapshot]=useState<Snapshot>(()=>demoSnapshot());
