@@ -34,7 +34,9 @@ export type EvidenceReport=z.infer<typeof evidenceSchema>;
 
 /** The history endpoints live next to the snapshot endpoint the person connected. */
 export function collectorUrl(snapshotEndpoint:string,path:string){
-  return new URL(path,snapshotEndpoint).href;
+  // Keep any reverse-proxy sub-path in front of /v1/ (https://host/vytrix/v1/snapshot).
+  const u=new URL(snapshotEndpoint);const i=u.pathname.lastIndexOf('/v1/');
+  return new URL((i>0?u.pathname.slice(0,i):'')+path,u).href;
 }
 
 export type Band={from:number,to:number};

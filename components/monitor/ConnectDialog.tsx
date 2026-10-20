@@ -5,7 +5,7 @@ import {Plug,Upload} from 'lucide-react';
 import {Dialog,DialogContent,DialogDescription,DialogTitle} from '@/components/ui/dialog';
 
 export function ConnectDialog({open,onOpenChange,onConnect,onImport,error}:{open:boolean,onOpenChange:(o:boolean)=>void,onConnect:(url:string,token:string)=>Promise<boolean>,onImport:()=>void,error:string}){
-  const [url,setUrl]=useState('');
+  const [url,setUrl]=useState<string|null>(null);
   const [token,setToken]=useState('');
   const [busy,setBusy]=useState(false);
   // Derived during render (not set in an effect): an https dashboard is usually served by its own collector.
@@ -13,7 +13,7 @@ export function ConnectDialog({open,onOpenChange,onConnect,onImport,error}:{open
   const submit=async(e:React.FormEvent)=>{
     e.preventDefault();
     setBusy(true);
-    const ok=await onConnect(url||defaultUrl,token);
+    const ok=await onConnect(url??defaultUrl,token);
     setBusy(false);
     if(ok){setToken('');onOpenChange(false);}
   };
@@ -23,7 +23,7 @@ export function ConnectDialog({open,onOpenChange,onConnect,onImport,error}:{open
       <DialogTitle className="dialog-title">Connect your system</DialogTitle>
       <DialogDescription className="dialog-text">Run the Vytrix collector on your Mac or Linux host, then enter its HTTPS snapshot endpoint. The token stays in this tab only.</DialogDescription>
       <form className="form" onSubmit={submit}>
-        <label className="field"><span>Collector endpoint</span><input required inputMode="url" placeholder="https://monitor.example.com/v1/snapshot" value={url||defaultUrl} onChange={e=>setUrl(e.target.value)}/></label>
+        <label className="field"><span>Collector endpoint</span><input required inputMode="url" placeholder="https://monitor.example.com/v1/snapshot" value={url??defaultUrl} onChange={e=>setUrl(e.target.value)}/></label>
         <label className="field"><span>Access token</span><input required type="password" autoComplete="off" value={token} onChange={e=>setToken(e.target.value)}/></label>
         {error&&open&&<p role="alert" className="inline-error">{error}</p>}
         <button className="button primary block" type="submit" disabled={busy}>{busy?'Connecting…':'Connect'}</button>
