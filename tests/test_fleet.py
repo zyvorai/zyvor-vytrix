@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BUSL-1.1
-import base64, hashlib, hmac, importlib.util, json, sqlite3, tempfile, time, unittest
+import base64, hashlib, hmac, importlib.util, json, sqlite3, subprocess, sys, tempfile, time, unittest
 from pathlib import Path
 ROOT=Path(__file__).parents[1]
 def load(name,path):
@@ -15,6 +15,19 @@ class FleetTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d)/'candidate';p.write_bytes(b'hello');sha=hashlib.sha256(b'hello').hexdigest()
    self.assertTrue(fleet.verify_update_manifest({'sha256':sha},p));self.assertFalse(fleet.verify_update_manifest({'sha256':'0'*64},p))
+ def test_prometheus_escapes_label_values(self):
+  text=core.FleetStore.prometheus(core.FleetStore.__new__(core.FleetStore),[{'id':'a"b\\c\nvytrix_evil 1','online':True}])
+  self.assertNotIn('\nvytrix_evil',text);self.assertIn('node="a\\"b\\\\c\\nvytrix_evil 1"',text)
+ def test_updater_ignores_planted_symlink_and_checks_staged_bytes(self):
+  with tempfile.TemporaryDirectory() as d:
+   d=Path(d);cand=d/'cand';cand.write_bytes(b'hello');victim=d/'victim';victim.write_text('keep')
+   (d/'agent.py.new').symlink_to(victim);man=d/'m.json';man.write_text(json.dumps({'sha256':hashlib.sha256(b'hello').hexdigest()}))
+   script=Path(__file__).resolve().parents[1]/'scripts/vytrix-agent-update.py'
+   r=subprocess.run([sys.executable,str(script),str(man),str(cand),str(d/'agent.py')],capture_output=True,text=True)
+   self.assertEqual(r.returncode,0,r.stderr);self.assertEqual(victim.read_text(),'keep');self.assertEqual((d/'agent.py').read_bytes(),b'hello')
+   self.assertEqual(list(d.glob('agent.py.*.new')),[])
+   man.write_text(json.dumps({'sha256':'0'*64}));r=subprocess.run([sys.executable,str(script),str(man),str(cand),str(d/'agent2.py')],capture_output=True,text=True)
+   self.assertNotEqual(r.returncode,0);self.assertFalse((d/'agent2.py').exists())
  def test_sso_and_entitlement(self):
   now=1000;sig=hmac.new(b'secret',b'alice\n1000',hashlib.sha256).hexdigest()
   self.assertTrue(core.verify_sso('secret','alice','1000',sig,now));self.assertFalse(core.verify_sso('secret','alice','800',sig,now))

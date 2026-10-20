@@ -203,7 +203,7 @@ class FleetStore:
     def prometheus(self, nodes: list[dict[str, Any]]) -> str:
         lines=["# HELP vytrix_node_online Whether the node is online", "# TYPE vytrix_node_online gauge"]
         for node in nodes:
-            nid=str(node["id"]).replace('"',''); snap=node.get("snapshot") or {}; label=f'node="{nid}"'
+            nid=str(node["id"]).replace("\\","\\\\").replace('"','\\"').replace("\n","\\n"); snap=node.get("snapshot") or {}; label=f'node="{nid}"'
             lines.append(f"vytrix_node_online{{{label}}} {1 if node.get('online') else 0}")
             for metric in ("cpu","download","upload"):
                 value=self.metric(snap,metric)
