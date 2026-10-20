@@ -13,6 +13,7 @@ try{
   assert.deepEqual(anomalyBands(report,'memory'),[]);
   assert.equal(anomalyBands(null,'cpu').length,0);
   assert.equal(collectorUrl('https://host:9847/v1/snapshot','/v1/anomalies?since=1'),'https://host:9847/v1/anomalies?since=1');
+  assert.equal(collectorUrl('https://host/vytrix/v1/snapshot','/v1/anomalies?since=1'),'https://host/vytrix/v1/anomalies?since=1','a reverse-proxy sub-path is kept');
   assert.throws(()=>evidenceSchema.parse({metric:'disk'}));
   console.log('evidence tests passed');
 }finally{await unlink(out).catch(()=>{});}

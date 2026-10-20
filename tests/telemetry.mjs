@@ -56,5 +56,7 @@ try{
  const alerts=computeAlerts(hot,80);
  assert.deepEqual(alerts.map(a=>a.id),['cpu',`container-${c.runtime}-${c.id}`]);
  assert.equal(alerts[0].severity,'critical');
+ const empty={...calm,memoryUsed:5,diskUsed:5,diskTotal:0,host:{...calm.host,memoryTotal:0}};
+ assert.deepEqual(computeAlerts(empty,80),[],'zero totals never produce NaN or Infinity alerts');
  console.log('Telemetry tests passed: validation, grouping, containers, backward compatibility, platforms and alerts.');
 }finally{await Promise.all(compiled.map(u=>unlink(u).catch(()=>{})));}
