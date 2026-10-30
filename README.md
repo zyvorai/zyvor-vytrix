@@ -226,7 +226,7 @@ Vytrix is licensed under the **Business Source License 1.1**.
 
 You may use Vytrix for development, evaluation, testing, demonstration, and other non-production purposes under the terms of the BSL.
 
-**Production and commercial deployments require a commercial license from Zyvor AI Labs Private Limited.** The [Supporter Commercial License](docs/COMMERCIAL-LICENSE.md) is a one-time payment that grants it for your own machines: [pay what you like, suggested ₹99 or US$1](https://rzp.io/rzp/tTFVA7PD) (the page takes INR; a USD page is not set up yet). Companies, USD invoices and multi-entity licences: write to sales@zyvor.dev and we will send an invoice. Using Vytrix without paying changes nothing in the app; nothing is locked.
+**Production and commercial deployments require a commercial license from Zyvor AI Labs Private Limited.** The [Supporter Commercial License](docs/COMMERCIAL-LICENSE.md) is a one-time payment that grants it for your own machines: [₹899 incl. GST (about US$10)](https://payments.cashfree.com/forms/zyvor-vytrix-supporter) (the page takes INR; a USD page is not set up yet). Need something customised, a company invoice or multi-entity terms? Write to sales@zyvor.dev. Companies get a USD invoice. Using Vytrix without paying changes nothing in the app; nothing is locked.
 
 Each version converts to the **Apache License 2.0** four years after its initial release under the Business Source License.
 
