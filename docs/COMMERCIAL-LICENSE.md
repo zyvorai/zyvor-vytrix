@@ -6,7 +6,7 @@ Vytrix is source-available under the Business Source License 1.1 (`LICENSE`). An
 
 ## The grant
 
-On receipt of the Supporter payment (suggested US$1.00, minimum US$0.99, or the INR equivalent shown on the payment page), Zyvor AI Labs Private Limited ("Licensor") grants the payer ("Licensee", an individual or a single legal entity) a perpetual, worldwide, non-exclusive, non-transferable licence to:
+On receipt of the Supporter payment (₹899 including GST, about US$10, as shown on the payment page), Zyvor AI Labs Private Limited ("Licensor") grants the payer ("Licensee", an individual or a single legal entity) a perpetual, worldwide, non-exclusive, non-transferable licence to:
 
 1. run the Licensed Work (Zyvor Vytrix) in production and for commercial purposes, including monitoring machines the Licensee owns or operates, internally or as part of the Licensee's own business;
 2. do so for the version current at the time of payment and every later version released under the BUSL by Licensor;
@@ -31,5 +31,5 @@ On receipt of the Supporter payment (suggested US$1.00, minimum US$0.99, or the 
 ## Open questions for counsel
 
 - Whether to implement this as an "Additional Use Grant" in `LICENSE` (cannot name a payment) or as this separate commercial licence referenced from `LICENSE` (recommended: keep `Additional Use Grant: None` and point to this page).
-- Whether US$0.99 for full commercial rights is intended for large organisations, or capped by entity size (the Licensor's larger commercial licences, invoiced separately, would otherwise be undercut).
+- Whether ₹899 (about US$10) for full commercial rights is intended for large organisations, or capped by entity size (the Licensor's larger commercial licences, invoiced separately, would otherwise be undercut).
 - Transferability on company sale, and what happens to prior payers if terms change.
