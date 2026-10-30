@@ -54,7 +54,7 @@ struct VytrixApp: App {
     @MainActor private static var started = false
 
     /// Optional, opens the payment page in the browser; the app makes no request itself and nothing is locked.
-    static let supportURL = URL(string: "https://rzp.io/rzp/tTFVA7PD")!
+    static let supportURL = URL(string: "https://payments.cashfree.com/forms/zyvor-vytrix-supporter")!
 
     static func showAbout() {
         let credits = NSMutableAttributedString(
